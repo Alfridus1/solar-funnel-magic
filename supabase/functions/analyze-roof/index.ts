@@ -32,7 +32,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4-vision-preview',
         messages: [
           {
             role: 'system',
@@ -43,7 +43,10 @@ serve(async (req) => {
             content: [
               {
                 type: 'image_url',
-                image_url: imageUrl,
+                image_url: {
+                  url: imageUrl,
+                  detail: 'high'
+                }
               },
               {
                 type: 'text',
@@ -80,7 +83,6 @@ serve(async (req) => {
       if (jsonMatch) {
         content = jsonMatch[0];
       }
-
       coordinates = JSON.parse(content);
 
       if (!Array.isArray(coordinates)) {
