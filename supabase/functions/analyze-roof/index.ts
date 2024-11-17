@@ -26,6 +26,12 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured');
     }
 
+    // Fetch the image and convert to base64
+    const imageResponse = await fetch(imageUrl);
+    const imageArrayBuffer = await imageResponse.arrayBuffer();
+    const base64Image = btoa(String.fromCharCode(...new Uint8Array(imageArrayBuffer)));
+    const base64Url = `data:image/jpeg;base64,${base64Image}`;
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -33,7 +39,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4-vision-preview',
+        model: 'gpt-4o-mini',
         messages: [
           {
             role: 'system',
@@ -49,25 +55,21 @@ Instructions:
 Response format:
 - Return ONLY a JSON object with either coordinates array or error message
 - For successful detection: {"coordinates":[[lat1,lng1],[lat2,lng2],[lat3,lng3],[lat1,lng1]]}
-- For failed detection: {"error":"Could not identify roof"}
-
-Important rules:
-- Coordinates must be numbers (latitude and longitude)
-- The polygon must be closed (first and last points must match)
-- Focus on the largest visible roof structure
-- Ignore smaller attachments or extensions
-- If multiple buildings are visible, focus on the most prominent one in the center
-- If the image is unclear or no clear roof is visible, return the error message`
+- For failed detection: {"error":"Could not identify roof"}`
           },
           {
             role: 'user',
             content: [
               {
+                type: 'text',
+                text: 'Please analyze this satellite image and identify the roof outline.',
+              },
+              {
                 type: 'image_url',
                 image_url: {
-                  url: imageUrl,
-                }
-              }
+                  url: base64Url
+                },
+              },
             ],
           },
         ],
