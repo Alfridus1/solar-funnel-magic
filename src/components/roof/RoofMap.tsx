@@ -1,23 +1,14 @@
 import { useState, useCallback } from "react";
-import { GoogleMap, DrawingManager, Polygon } from "@react-google-maps/api";
-import { Info, Pencil, Plus, Trash2 } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Button } from "@/components/ui/button";
+import { GoogleMap, DrawingManager } from "@react-google-maps/api";
 import { useToast } from "@/components/ui/use-toast";
+import { Instructions } from "./components/Instructions";
+import { MapControls } from "./components/MapControls";
+import { calculateModulePositions } from "./utils/moduleCalculations";
 
 interface RoofMapProps {
   coordinates: { lat: number; lng: number };
   onRoofOutlineComplete: (paths: google.maps.LatLng[][]) => void;
 }
-
-const MODULE_WIDTH = 1.135; // meters
-const MODULE_HEIGHT = 1.962; // meters
-const METERS_PER_DEGREE = 111319.9; // approximate meters per degree at equator
 
 export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) => {
   const [map, setMap] = useState<google.maps.Map | null>(null);
@@ -33,60 +24,6 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
   const clearModules = () => {
     modules.forEach(module => module.setMap(null));
     setModules([]);
-  };
-
-  const calculateModulePositions = (polygon: google.maps.Polygon) => {
-    clearModules();
-    const bounds = new google.maps.LatLngBounds();
-    const path = polygon.getPath();
-    path.forEach(point => bounds.extend(point));
-
-    const center = bounds.getCenter();
-    const latMetersPerDegree = METERS_PER_DEGREE;
-    const lngMetersPerDegree = METERS_PER_DEGREE * Math.cos(center.lat() * Math.PI / 180);
-
-    const moduleWidthDeg = MODULE_WIDTH / lngMetersPerDegree;
-    const moduleHeightDeg = MODULE_HEIGHT / latMetersPerDegree;
-
-    const newModules: google.maps.Rectangle[] = [];
-    const polygonBounds = polygon.getBounds();
-    if (!polygonBounds) return;
-
-    const north = polygonBounds.getNorthEast().lat();
-    const south = polygonBounds.getSouthWest().lat();
-    const east = polygonBounds.getNorthEast().lng();
-    const west = polygonBounds.getSouthWest().lng();
-
-    for (let lat = south; lat < north; lat += moduleHeightDeg) {
-      for (let lng = west; lng < east; lng += moduleWidthDeg) {
-        const moduleBounds = {
-          north: lat + moduleHeightDeg,
-          south: lat,
-          east: lng + moduleWidthDeg,
-          west: lng
-        };
-
-        const moduleCenter = new google.maps.LatLng(
-          lat + moduleHeightDeg / 2,
-          lng + moduleWidthDeg / 2
-        );
-
-        if (google.maps.geometry.poly.containsLocation(moduleCenter, polygon)) {
-          const moduleRect = new google.maps.Rectangle({
-            bounds: moduleBounds,
-            map: map,
-            fillColor: "#2563eb",
-            fillOpacity: 0.4,
-            strokeColor: "#1e40af",
-            strokeWeight: 1
-          });
-          newModules.push(moduleRect);
-        }
-      }
-    }
-
-    setModules(newModules);
-    return newModules.length;
   };
 
   const startDrawing = () => {
@@ -106,7 +43,6 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
       setPolygons(prev => prev.slice(0, -1));
       clearModules();
       
-      // Recalculate total area
       const allPaths = polygons.slice(0, -1).map(poly => 
         poly.getPath().getArray()
       );
@@ -124,9 +60,8 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
     setPolygons(prev => [...prev, polygon]);
     setIsDrawing(false);
     
-    const moduleCount = calculateModulePositions(polygon);
+    const moduleCount = calculateModulePositions(polygon, map, setModules);
     
-    // Get paths from all polygons including the new one
     const allPaths = [...polygons, polygon].map(poly => 
       poly.getPath().getArray()
     );
@@ -145,22 +80,7 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
 
   return (
     <div className="space-y-4">
-      <div className="bg-white p-4 rounded-lg shadow-sm border">
-        <div className="flex items-start gap-4">
-          <div className="bg-blue-50 p-3 rounded-full">
-            <Pencil className="h-6 w-6 text-blue-600" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold mb-1">So zeichnen Sie Ihr Dach ein:</h3>
-            <ol className="list-decimal list-inside space-y-2 text-gray-600">
-              <li>Klicken Sie auf "Dach hinzufügen" unten</li>
-              <li>Klicken Sie nacheinander auf die Ecken Ihres Daches</li>
-              <li>Schließen Sie die Form, indem Sie wieder auf den ersten Punkt klicken</li>
-              <li>Die möglichen PV-Module werden automatisch eingezeichnet</li>
-            </ol>
-          </div>
-        </div>
-      </div>
+      <Instructions />
 
       <div className="w-full h-[calc(100vh-400px)] md:h-[400px] rounded-lg overflow-hidden relative">
         <GoogleMap
@@ -203,29 +123,12 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
           />
         </GoogleMap>
 
-        <div className="absolute bottom-4 left-0 right-0 px-4 flex justify-center gap-3">
-          <Button
-            size="sm"
-            onClick={startDrawing}
-            disabled={isDrawing}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full shadow-lg whitespace-nowrap min-w-[160px]"
-          >
-            <Plus className="mr-1 h-4 w-4" />
-            Dach hinzufügen
-          </Button>
-          
-          {polygons.length > 0 && (
-            <Button
-              size="sm"
-              variant="destructive"
-              onClick={deleteLastRoof}
-              className="rounded-full shadow-lg whitespace-nowrap min-w-[160px]"
-            >
-              <Trash2 className="mr-1 h-4 w-4" />
-              Letztes Dach entfernen
-            </Button>
-          )}
-        </div>
+        <MapControls
+          isDrawing={isDrawing}
+          polygonsExist={polygons.length > 0}
+          onStartDrawing={startDrawing}
+          onDeleteLastRoof={deleteLastRoof}
+        />
       </div>
     </div>
   );
