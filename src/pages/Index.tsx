@@ -62,11 +62,11 @@ const Index = () => {
                     autocompleteRef.current = autocomplete;
                   }}
                   onPlaceChanged={onPlaceSelected}
-                  restrictions={{ country: "us" }}
+                  restrictions={{ country: "de" }}
                 >
                   <Input
                     type="text"
-                    placeholder="Enter your address"
+                    placeholder="Geben Sie Ihre Adresse ein"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                     className="w-full"
