@@ -36,17 +36,17 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
       const center = map.getCenter();
       const zoom = map.getZoom();
       const div = map.getDiv();
-      const width = div.clientWidth;
-      const height = div.clientHeight;
+      // Ensure we have valid dimensions
+      const width = Math.min(div.clientWidth * 2, 1024); // Max width 1024px
+      const height = Math.min(div.clientHeight * 2, 1024); // Max height 1024px
 
-      // Verbesserte Bildqualität durch höhere Auflösung und zusätzliche Parameter
       const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?`
         + `center=${center?.lat()},${center?.lng()}`
         + `&zoom=${zoom}`
-        + `&size=${width * 2}x${height * 2}` // Doppelte Auflösung
-        + `&scale=2` // Zusätzliche Skalierung für schärfere Bilder
+        + `&size=${width}x${height}`
+        + `&scale=2`
         + `&maptype=satellite`
-        + `&style=feature:all|element:labels|visibility:off` // Entfernt alle Labels
+        + `&style=feature:all|element:labels|visibility:off`
         + `&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`;
 
       const { data, error } = await supabase.functions.invoke('analyze-roof', {

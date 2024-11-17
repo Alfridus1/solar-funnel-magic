@@ -26,10 +26,18 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured');
     }
 
-    // Parse the original URL to extract width and height
+    // Parse and validate the URL
     const url = new URL(imageUrl);
     const sizeParam = url.searchParams.get('size');
-    const [width, height] = sizeParam ? sizeParam.split('x').map(Number) : [1200, 800];
+    if (!sizeParam) {
+      throw new Error('Size parameter is missing from the image URL');
+    }
+
+    // Validate size format
+    const [width, height] = sizeParam.split('x').map(Number);
+    if (isNaN(width) || isNaN(height)) {
+      throw new Error('Invalid size format in image URL');
+    }
 
     // Construct a clean URL with proper parameters
     const enhancedImageUrl = `https://maps.googleapis.com/maps/api/staticmap`
