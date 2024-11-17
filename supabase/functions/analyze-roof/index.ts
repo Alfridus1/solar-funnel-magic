@@ -34,26 +34,30 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4-vision-preview',
         messages: [
           {
             role: 'system',
-            content: `You are a roof analysis expert. Your task is to identify the main roof outline in satellite images and return its coordinates.
-
+            content: `You are a roof analysis expert specialized in identifying building outlines from satellite imagery. 
+            
 Instructions:
-1. Look for the main building structure in the satellite image
-2. Identify the edges of the main roof
-3. Return the coordinates as a closed polygon (first and last point must match)
-4. ONLY return a JSON object in this exact format:
-{"coordinates":[[lat1,lng1],[lat2,lng2],[lat3,lng3],[lat1,lng1]]}
+1. Focus on finding the main building structure in the center of the image
+2. Look for clear geometric shapes that indicate roof edges
+3. Identify the corners of the main roof structure
+4. Return coordinates as a closed polygon (first and last point must be identical)
+
+Response format:
+- Return ONLY a JSON object with either coordinates array or error message
+- For successful detection: {"coordinates":[[lat1,lng1],[lat2,lng2],[lat3,lng3],[lat1,lng1]]}
+- For failed detection: {"error":"Could not identify roof"}
 
 Important rules:
-- Return ONLY the JSON object, no explanations or additional text
-- Each coordinate must be a number (latitude and longitude)
+- Coordinates must be numbers (latitude and longitude)
 - The polygon must be closed (first and last points must match)
-- If you cannot identify the roof clearly, return exactly: {"error":"Could not identify roof"}
-- Focus on the main roof structure, ignore smaller attachments or extensions
-- Try to follow the actual roof edges as precisely as possible`
+- Focus on the largest visible roof structure
+- Ignore smaller attachments or extensions
+- If multiple buildings are visible, focus on the most prominent one in the center
+- If the image is unclear or no clear roof is visible, return the error message`
           },
           {
             role: 'user',
@@ -87,57 +91,27 @@ Important rules:
     let content = data.choices[0].message.content.trim();
     console.log('Content to parse:', content);
 
-    // Default coordinates for testing (centered on the provided address)
-    const defaultCoordinates = [
-      [52.52001, 13.40495],
-      [52.52002, 13.40500],
-      [52.52003, 13.40498],
-      [52.52001, 13.40495]
-    ];
-
     try {
-      // Try to parse the response as JSON
       const parsedContent = JSON.parse(content);
       
-      // Check if AI reported an error
       if (parsedContent.error) {
         console.log('AI reported error:', parsedContent.error);
         return new Response(
-          JSON.stringify({ 
-            coordinates: defaultCoordinates,
-            aiError: parsedContent.error 
-          }), 
+          JSON.stringify({ error: parsedContent.error }), 
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
-      // Validate response format
       if (!parsedContent.coordinates || !Array.isArray(parsedContent.coordinates)) {
-        console.log('Invalid response format from AI');
-        return new Response(
-          JSON.stringify({ 
-            coordinates: defaultCoordinates,
-            aiError: "Invalid response format from AI" 
-          }), 
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        throw new Error('Invalid response format from AI');
       }
 
       const coordinates = parsedContent.coordinates;
 
-      // Validate number of points
       if (coordinates.length < 3) {
-        console.log('Too few points in AI response');
-        return new Response(
-          JSON.stringify({ 
-            coordinates: defaultCoordinates,
-            aiError: "Not enough points to form a polygon" 
-          }), 
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        throw new Error('Not enough points to form a polygon');
       }
 
-      // Validate coordinate format
       const validCoordinates = coordinates.every((coord: any) => 
         Array.isArray(coord) && 
         coord.length === 2 &&
@@ -146,17 +120,9 @@ Important rules:
       );
 
       if (!validCoordinates) {
-        console.log('Invalid coordinate format in AI response');
-        return new Response(
-          JSON.stringify({ 
-            coordinates: defaultCoordinates,
-            aiError: "Invalid coordinate format in AI response" 
-          }), 
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        throw new Error('Invalid coordinate format in AI response');
       }
 
-      // Ensure polygon is closed
       const first = coordinates[0];
       const last = coordinates[coordinates.length - 1];
       if (first[0] !== last[0] || first[1] !== last[1]) {
@@ -171,14 +137,7 @@ Important rules:
     } catch (error) {
       console.error('Failed to parse AI response:', error);
       console.error('Raw content that failed to parse:', content);
-      
-      return new Response(
-        JSON.stringify({ 
-          coordinates: defaultCoordinates,
-          aiError: "Failed to parse AI response" 
-        }), 
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      throw new Error('Failed to parse AI response');
     }
   } catch (error) {
     console.error('Error in analyze-roof function:', error);
