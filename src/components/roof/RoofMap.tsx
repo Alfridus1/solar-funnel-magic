@@ -12,10 +12,26 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [currentPolygon, setCurrentPolygon] = useState<google.maps.Polygon | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [targetMarker, setTargetMarker] = useState<google.maps.Marker | null>(null);
 
   const onLoad = useCallback((map: google.maps.Map) => {
     setMap(map);
-  }, []);
+    // Create a pulsing marker at the center
+    const marker = new google.maps.Marker({
+      position: coordinates,
+      map: map,
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 10,
+        fillColor: "#FF0000",
+        fillOpacity: 0.8,
+        strokeWeight: 2,
+        strokeColor: "#FF0000",
+        animation: google.maps.Animation.BOUNCE
+      }
+    });
+    setTargetMarker(marker);
+  }, [coordinates]);
 
   const onPolygonComplete = (polygon: google.maps.Polygon) => {
     if (currentPolygon) {
@@ -36,9 +52,8 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
       const center = map.getCenter();
       const zoom = map.getZoom();
       const div = map.getDiv();
-      // Ensure we have valid dimensions
-      const width = Math.min(div.clientWidth * 2, 1024); // Max width 1024px
-      const height = Math.min(div.clientHeight * 2, 1024); // Max height 1024px
+      const width = Math.min(div.clientWidth * 2, 1024);
+      const height = Math.min(div.clientHeight * 2, 1024);
 
       const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?`
         + `center=${center?.lat()},${center?.lng()}`
@@ -46,6 +61,7 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
         + `&size=${width}x${height}`
         + `&scale=2`
         + `&maptype=satellite`
+        + `&markers=color:red|${center?.lat()},${center?.lng()}`
         + `&style=feature:all|element:labels|visibility:off`
         + `&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`;
 
@@ -121,7 +137,6 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
           ]
         }}
       >
-        <Marker position={coordinates} />
         <DrawingManager
           onPolygonComplete={onPolygonComplete}
           options={{

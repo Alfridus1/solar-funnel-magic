@@ -46,6 +46,7 @@ serve(async (req) => {
       + `&size=${width}x${height}`
       + `&scale=2`
       + `&maptype=satellite`
+      + `&markers=color:red|${location?.lat},${location?.lng}`
       + `&style=feature:all|element:labels|visibility:off`
       + `&key=${url.searchParams.get('key')}`;
 
@@ -66,6 +67,8 @@ serve(async (req) => {
             Your task is to return ONLY the coordinates of roof corners in the following JSON format:
             {"coordinates": [[lat1,lng1], [lat2,lng2], ...]}
             
+            Look for the roof marked with a red marker in the center of the image.
+            
             If you cannot identify the roof clearly, return:
             {"error": "Could not identify roof outline clearly"}
             
@@ -76,7 +79,7 @@ serve(async (req) => {
             content: [
               {
                 type: "text",
-                text: `Analyze this satellite image and return ONLY the roof corner coordinates in the specified JSON format.
+                text: `Analyze this satellite image and return ONLY the roof corner coordinates for the building marked with the red marker in the center.
                 Location: ${location?.lat}, ${location?.lng}
                 Zoom: ${location?.zoom}`
               },
