@@ -133,12 +133,12 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
           />
         </GoogleMap>
 
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+        <div className="absolute bottom-4 left-0 right-0 px-4 flex justify-center gap-3">
           <Button
             size="sm"
             onClick={startDrawing}
             disabled={isDrawing}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full shadow-lg"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full shadow-lg whitespace-nowrap min-w-[160px]"
           >
             <Plus className="mr-1 h-4 w-4" />
             Dach hinzufügen
@@ -149,7 +149,7 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
               size="sm"
               variant="destructive"
               onClick={deleteLastRoof}
-              className="rounded-full shadow-lg"
+              className="rounded-full shadow-lg whitespace-nowrap min-w-[160px]"
             >
               <Trash2 className="mr-1 h-4 w-4" />
               Letztes Dach entfernen
