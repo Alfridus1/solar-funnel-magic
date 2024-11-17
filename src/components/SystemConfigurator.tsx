@@ -39,7 +39,14 @@ export const SystemConfigurator = () => {
       return;
     }
 
-    setProducts(productsData as Product[]);
+    // Type assertion to ensure the data matches our Product interface
+    const typedProducts = (productsData as any[]).map(product => ({
+      ...product,
+      category: product.category as 'module' | 'inverter' | 'battery',
+      specs: product.specs as Product['specs']
+    }));
+
+    setProducts(typedProducts);
   };
 
   const calculateAutarky = () => {

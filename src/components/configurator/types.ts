@@ -7,9 +7,11 @@ export interface Product {
     watts?: number;
     capacity?: number;
     power?: number;
-    efficiency: number;
-    warranty: number;
+    efficiency?: number;
+    warranty?: number;
   };
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface SystemConfig {
