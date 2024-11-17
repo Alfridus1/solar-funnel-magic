@@ -6,7 +6,11 @@ interface ProgressBarProps {
   steps: { title: string; description: string }[];
 }
 
-export const ProgressBar = ({ currentStep, totalSteps, steps }: ProgressBarProps) => {
+export const ProgressBar = ({ currentStep, totalSteps, steps = [] }: ProgressBarProps) => {
+  if (!steps || steps.length === 0) {
+    return null;
+  }
+
   return (
     <div className="w-full max-w-4xl mx-auto mb-8">
       <div className="relative">

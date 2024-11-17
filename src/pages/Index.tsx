@@ -4,11 +4,17 @@ import { Input } from "@/components/ui/input";
 import { ProgressBar } from "@/components/ProgressBar";
 import { RoofCheck } from "@/components/RoofCheck";
 import { LeadForm } from "@/components/LeadForm";
-import { SystemConfigurator } from "@/components/SystemConfigurator"; // Import the new SystemConfigurator component
+import { SystemConfigurator } from "@/components/SystemConfigurator";
 import { useLoadScript, Autocomplete } from "@react-google-maps/api";
 import { useNavigate } from "react-router-dom";
 
 const libraries = ["places"];
+
+const steps = [
+  { title: "Adresse", description: "Ihre Adresse eingeben" },
+  { title: "Dachanalyse", description: "Ihr Dach prüfen" },
+  { title: "Angebot", description: "Ihr Solarangebot" },
+];
 
 const Index = () => {
   const [step, setStep] = useState(1);
@@ -52,7 +58,7 @@ const Index = () => {
           </p>
         </div>
 
-        <ProgressBar currentStep={step} totalSteps={totalSteps} />
+        <ProgressBar currentStep={step} totalSteps={totalSteps} steps={steps} />
 
         <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-6 mb-8">
           {step === 1 && (
