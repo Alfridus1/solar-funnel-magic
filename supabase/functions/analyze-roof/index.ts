@@ -39,11 +39,11 @@ serve(async (req) => {
       throw new Error('Invalid size format in image URL');
     }
 
-    // Construct a clean URL with proper parameters
+    // Enhance image quality and zoom level for better roof detection
     const enhancedImageUrl = `https://maps.googleapis.com/maps/api/staticmap`
       + `?center=${location?.lat},${location?.lng}`
-      + `&zoom=${location?.zoom || 19}`
-      + `&size=${width}x${height}`
+      + `&zoom=${location?.zoom || 20}` // Increased zoom level for better detail
+      + `&size=${Math.min(width * 2, 1024)}x${Math.min(height * 2, 1024)}` // Increased resolution
       + `&scale=2`
       + `&maptype=satellite`
       + `&markers=color:red|${location?.lat},${location?.lng}`
@@ -63,16 +63,22 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are a highly specialized AI trained to analyze satellite imagery and identify roof outlines. 
-            Your task is to identify the roof marked with a red marker and return its corner coordinates in this format:
-            {"coordinates": [[lat1,lng1], [lat2,lng2], ...]}
+            content: `You are a highly specialized AI trained to analyze satellite imagery and identify roof outlines with high precision. 
+            Your task is to identify the roof marked with a red marker and return its corner coordinates.
             
-            Important guidelines:
-            1. Focus on the building with the red marker
-            2. Return coordinates in clockwise order starting from the top-left corner
-            3. Be precise in coordinate calculations
-            4. If multiple buildings are present, only outline the one with the marker
-            5. If you cannot identify the roof clearly, return {"error": "Could not identify roof outline clearly"}
+            Important guidelines for accurate roof detection:
+            1. Focus exclusively on the building with the red marker
+            2. Analyze the image carefully to identify clear roof edges and corners
+            3. Return coordinates in clockwise order starting from the top-left corner
+            4. Pay special attention to:
+               - Shadow patterns to determine roof edges
+               - Color and texture changes that indicate roof boundaries
+               - Architectural features like chimneys or solar panels
+            5. If multiple buildings are present, only outline the one with the marker
+            6. If you cannot identify the roof clearly, return {"error": "Could not identify roof outline clearly"}
+            
+            Return the coordinates in this exact format:
+            {"coordinates": [[lat1,lng1], [lat2,lng2], ...]}
             
             Return ONLY the JSON response, no explanations.`
           },
@@ -81,7 +87,7 @@ serve(async (req) => {
             content: [
               {
                 type: "text",
-                text: `Analyze this satellite image and return the roof corner coordinates for the building marked with the red marker.
+                text: `Analyze this satellite image and provide precise roof corner coordinates for the building marked with the red marker.
                 Location: ${location?.lat}, ${location?.lng}
                 Zoom: ${location?.zoom}`
               },
@@ -89,14 +95,14 @@ serve(async (req) => {
                 type: "image_url",
                 image_url: {
                   url: enhancedImageUrl,
-                  detail: "high" // Using high detail mode for better accuracy
+                  detail: "high"
                 }
               }
             ]
           }
         ],
         max_tokens: 1000,
-        temperature: 0.1,
+        temperature: 0.1, // Lower temperature for more precise outputs
       }),
     });
 
@@ -117,7 +123,6 @@ serve(async (req) => {
     console.log('Content to parse:', content);
 
     try {
-      // Try to parse the response as JSON
       const parsedContent = JSON.parse(content);
       
       if (parsedContent.error) {
