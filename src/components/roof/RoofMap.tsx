@@ -1,4 +1,3 @@
-```typescript
 import { GoogleMap, Marker, DrawingManager } from "@react-google-maps/api";
 import { useState, useCallback } from "react";
 
@@ -17,7 +16,6 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
   const onPolygonComplete = (polygon: google.maps.Polygon) => {
     const path = polygon.getPath().getArray();
     onRoofOutlineComplete(path);
-    // Remove the drawing polygon and keep only the final one
     polygon.setMap(null);
   };
 
@@ -58,4 +56,3 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
     </div>
   );
 };
-```

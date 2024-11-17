@@ -1,7 +1,4 @@
-import { LatLng } from "@react-google-maps/api";
-
-export const calculateRoofArea = (path: LatLng[]): number => {
-  // Implementation of the Shoelace formula (also known as surveyor's formula)
+export const calculateRoofArea = (path: google.maps.LatLng[]): number => {
   let area = 0;
   
   for (let i = 0; i < path.length; i++) {
