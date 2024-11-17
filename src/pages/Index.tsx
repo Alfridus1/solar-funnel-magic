@@ -32,19 +32,18 @@ const Index = () => {
     }
   };
 
-  if (loadError) return <div>Error loading maps</div>;
-  if (!isLoaded) return <div>Loading...</div>;
+  if (loadError) return <div>Fehler beim Laden der Karten</div>;
+  if (!isLoaded) return <div>Laden...</div>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-solar-blue to-white">
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-8 animate-fade-up">
           <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-            Save Big with Solar Power
+            Sparen Sie mit Solarenergie
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Join thousands of homeowners who are saving up to 60% on their energy
-            bills with solar power
+            Schließen Sie sich tausenden Hausbesitzern an, die bis zu 60% ihrer Energiekosten mit Solarenergie sparen
           </p>
         </div>
 
@@ -54,7 +53,7 @@ const Index = () => {
           {step === 1 && (
             <div className="animate-fade-up">
               <h2 className="text-2xl font-semibold mb-4">
-                Let's Check Your Home's Solar Potential
+                Lassen Sie uns Ihr Solarpotenzial prüfen
               </h2>
               <div className="space-y-4">
                 <Autocomplete
@@ -77,7 +76,7 @@ const Index = () => {
                   disabled={!address}
                   className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white"
                 >
-                  Check My Roof
+                  Dach prüfen
                 </Button>
               </div>
             </div>
@@ -85,13 +84,13 @@ const Index = () => {
 
           {step === 2 && (
             <div className="animate-fade-up">
-              <h2 className="text-2xl font-semibold mb-4">Analyzing Your Roof</h2>
-              <RoofCheck />
+              <h2 className="text-2xl font-semibold mb-4">Analyse Ihres Daches</h2>
+              <RoofCheck address={address} />
               <Button
                 onClick={nextStep}
                 className="w-full mt-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white"
               >
-                Get My Solar Quote
+                Solarangebot erhalten
               </Button>
             </div>
           )}
@@ -99,7 +98,7 @@ const Index = () => {
           {step === 3 && (
             <div className="animate-fade-up">
               <h2 className="text-2xl font-semibold mb-4">
-                Get Your Free Solar Quote
+                Kostenloses Solarangebot erhalten
               </h2>
               <LeadForm />
             </div>
@@ -109,15 +108,15 @@ const Index = () => {
         <div className="flex justify-center space-x-8 text-center max-w-4xl mx-auto">
           <div className="flex-1 p-4">
             <div className="text-4xl font-bold text-solar-orange mb-2">60%</div>
-            <div className="text-gray-600">Average Energy Savings</div>
+            <div className="text-gray-600">Durchschnittliche Energieeinsparung</div>
           </div>
           <div className="flex-1 p-4">
             <div className="text-4xl font-bold text-solar-orange mb-2">26%</div>
-            <div className="text-gray-600">Federal Tax Credit</div>
+            <div className="text-gray-600">Staatliche Förderung</div>
           </div>
           <div className="flex-1 p-4">
             <div className="text-4xl font-bold text-solar-orange mb-2">24/7</div>
-            <div className="text-gray-600">Expert Support</div>
+            <div className="text-gray-600">Experten-Support</div>
           </div>
         </div>
       </div>
