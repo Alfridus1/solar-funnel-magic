@@ -41,7 +41,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini', // Updated to use the current recommended model
+        model: 'gpt-4o', // Updated to use the latest recommended model
         messages: [
           {
             role: 'system',
