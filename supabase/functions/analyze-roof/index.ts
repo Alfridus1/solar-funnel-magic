@@ -31,7 +31,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are an expert at analyzing satellite images of roofs. When given a satellite image, identify the roof outline and return a JSON array of coordinates in the format [[lat1,lng1], [lat2,lng2], ...]. The coordinates should form a closed polygon around the main roof structure. Return ONLY the coordinate array, no additional text.'
+            content: 'You are an expert at analyzing satellite images of roofs. For the given satellite image, identify the main roof outline and return the coordinates that form a closed polygon around it. Return ONLY a JSON array in the format [[lat1,lng1], [lat2,lng2], ...] with no additional text.'
           },
           {
             role: 'user',
@@ -42,7 +42,7 @@ serve(async (req) => {
               },
               {
                 type: 'text',
-                text: 'Analyze this roof and return its coordinates as a JSON array.',
+                text: 'Return the coordinates of this roof as a JSON array.',
               },
             ],
           },
@@ -53,38 +53,45 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
-      console.error('OpenAI API error:', await response.text());
+      const errorText = await response.text();
+      console.error('OpenAI API error:', errorText);
       throw new Error('Failed to get response from OpenAI');
     }
 
     const data = await response.json();
-    console.log('Raw OpenAI Response:', JSON.stringify(data));
+    console.log('OpenAI raw response:', JSON.stringify(data));
 
+    // Check for the expected response structure
     if (!data.choices?.[0]?.message?.content) {
-      console.error('Invalid response structure:', data);
-      throw new Error('Invalid response from OpenAI');
+      throw new Error('Unexpected response structure from OpenAI');
     }
 
     let content = data.choices[0].message.content.trim();
-    console.log('Content before parsing:', content);
+    console.log('Content to parse:', content);
 
-    // Try to extract just the JSON array if there's additional text
-    const jsonMatch = content.match(/\[\s*\[.*?\]\s*\]/s);
-    if (jsonMatch) {
-      content = jsonMatch[0];
-    }
-
+    // Try to parse the coordinates
     let coordinates;
     try {
+      // First, try to extract just the JSON array if there's additional text
+      const jsonMatch = content.match(/\[\s*\[.*?\]\s*\]/s);
+      if (jsonMatch) {
+        content = jsonMatch[0];
+      }
+
       coordinates = JSON.parse(content);
-      
-      if (!Array.isArray(coordinates) || coordinates.length < 3) {
-        throw new Error('Invalid polygon: needs at least 3 points');
+
+      // Validate the coordinates array
+      if (!Array.isArray(coordinates)) {
+        throw new Error('Response is not an array');
+      }
+
+      if (coordinates.length < 3) {
+        throw new Error('Need at least 3 points for a polygon');
       }
 
       // Validate each coordinate pair
       coordinates.forEach((coord, index) => {
-        if (!Array.isArray(coord) || coord.length !== 2 || 
+        if (!Array.isArray(coord) || coord.length !== 2 ||
             typeof coord[0] !== 'number' || typeof coord[1] !== 'number') {
           throw new Error(`Invalid coordinate at index ${index}`);
         }
@@ -94,15 +101,16 @@ serve(async (req) => {
       const first = coordinates[0];
       const last = coordinates[coordinates.length - 1];
       if (first[0] !== last[0] || first[1] !== last[1]) {
-        coordinates.push([...first]); // Close the polygon
+        coordinates.push([...first]);
       }
+
     } catch (error) {
-      console.error('Coordinate parsing error:', error);
+      console.error('Failed to parse coordinates:', error);
       console.error('Content that failed to parse:', content);
-      throw new Error(`Failed to parse coordinates: ${error.message}`);
+      throw new Error(`Invalid coordinate format: ${error.message}`);
     }
 
-    console.log('Final coordinates:', coordinates);
+    console.log('Final parsed coordinates:', coordinates);
 
     return new Response(
       JSON.stringify({ coordinates }), 
