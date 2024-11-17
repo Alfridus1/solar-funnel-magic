@@ -26,11 +26,20 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured');
     }
 
-    // Enhanced image quality with higher resolution
-    const enhancedImageUrl = imageUrl
-      .replace('size=', 'size=1200x1200')
-      .replace('zoom=', 'zoom=' + (location?.zoom || 19))
-      .concat('&scale=2');
+    // Parse the original URL to extract width and height
+    const url = new URL(imageUrl);
+    const sizeParam = url.searchParams.get('size');
+    const [width, height] = sizeParam ? sizeParam.split('x').map(Number) : [1200, 800];
+
+    // Construct a clean URL with proper parameters
+    const enhancedImageUrl = `https://maps.googleapis.com/maps/api/staticmap`
+      + `?center=${location?.lat},${location?.lng}`
+      + `&zoom=${location?.zoom || 19}`
+      + `&size=${width}x${height}`
+      + `&scale=2`
+      + `&maptype=satellite`
+      + `&style=feature:all|element:labels|visibility:off`
+      + `&key=${url.searchParams.get('key')}`;
 
     console.log('Enhanced image URL:', enhancedImageUrl);
 
@@ -41,7 +50,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o', // Updated to use the latest recommended model
+        model: 'gpt-4-vision-preview',
         messages: [
           {
             role: 'system',
