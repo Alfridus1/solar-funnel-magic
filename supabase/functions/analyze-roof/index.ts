@@ -62,26 +62,21 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are a highly specialized expert in analyzing satellite and aerial imagery. 
-            Your task is to identify roof outlines in satellite images.
+            content: `You are a highly specialized AI trained to analyze satellite imagery and identify roof outlines. 
+            Your task is to return ONLY the coordinates of roof corners in the following JSON format:
+            {"coordinates": [[lat1,lng1], [lat2,lng2], ...]}
             
-            Key features for roof detection:
-            - Rectangular or L-shaped structures
-            - Clear edges and lines
-            - Contrast between roof and surroundings
-            - Typical roof structures (chimneys, windows)
+            If you cannot identify the roof clearly, return:
+            {"error": "Could not identify roof outline clearly"}
             
-            Return coordinates as an array of [lat, lng] pairs.
-            Format: {"coordinates": [[lat1,lng1], [lat2,lng2], ...]}
-            
-            For errors: {"error": "Error description"}`
+            DO NOT return any explanatory text or instructions.`
           },
           {
             role: 'user',
             content: [
               {
                 type: "text",
-                text: `Analyze this satellite image and identify the main roof outline.
+                text: `Analyze this satellite image and return ONLY the roof corner coordinates in the specified JSON format.
                 Location: ${location?.lat}, ${location?.lng}
                 Zoom: ${location?.zoom}`
               },
@@ -116,6 +111,7 @@ serve(async (req) => {
     console.log('Content to parse:', content);
 
     try {
+      // Try to parse the response as JSON
       const parsedContent = JSON.parse(content);
       
       if (parsedContent.error) {
@@ -130,14 +126,12 @@ serve(async (req) => {
         throw new Error('Invalid response format from AI');
       }
 
-      const coordinates = parsedContent.coordinates;
-
       // Validate coordinates
-      if (coordinates.length < 4) {
+      if (parsedContent.coordinates.length < 4) {
         throw new Error('Too few points for a valid polygon');
       }
 
-      const validCoordinates = coordinates.every((coord: any) => 
+      const validCoordinates = parsedContent.coordinates.every((coord: any) => 
         Array.isArray(coord) && 
         coord.length === 2 &&
         typeof coord[0] === 'number' && 
@@ -151,6 +145,7 @@ serve(async (req) => {
       }
 
       // Ensure polygon is closed
+      const coordinates = parsedContent.coordinates;
       const first = coordinates[0];
       const last = coordinates[coordinates.length - 1];
       if (first[0] !== last[0] || first[1] !== last[1]) {
@@ -165,14 +160,20 @@ serve(async (req) => {
     } catch (error) {
       console.error('Error parsing AI response:', error);
       console.error('Raw content that could not be parsed:', content);
-      throw new Error('Error parsing AI response');
+      return new Response(
+        JSON.stringify({ 
+          error: "Could not identify roof outline. Please try drawing it manually.",
+          details: error.message 
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
   } catch (error) {
     console.error('Error in analyze-roof function:', error);
     return new Response(
       JSON.stringify({ 
-        error: error.message,
-        details: 'Error analyzing roof. Please try again.' 
+        error: "Could not analyze roof. Please try drawing it manually.",
+        details: error.message 
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
