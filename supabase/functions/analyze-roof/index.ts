@@ -20,18 +20,23 @@ serve(async (req) => {
 
     console.log('Analyzing image:', imageUrl);
 
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+    if (!openAIApiKey) {
+      throw new Error('OpenAI API key not configured');
+    }
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
+        'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4-vision-preview',
+        model: 'gpt-4o-mini',
         messages: [
           {
             role: 'system',
-            content: 'You are an expert at analyzing satellite images of roofs. For the given satellite image, identify the main roof outline and return the coordinates that form a closed polygon around it. Return ONLY a JSON array in the format [[lat1,lng1], [lat2,lng2], ...] with no additional text.'
+            content: 'You are an expert at analyzing satellite images of roofs. When given a satellite image, identify the main roof outline and return ONLY a JSON array of coordinates that form a closed polygon around it. The format must be [[lat1,lng1], [lat2,lng2], ...]. Do not include any other text or explanation.'
           },
           {
             role: 'user',
@@ -42,7 +47,7 @@ serve(async (req) => {
               },
               {
                 type: 'text',
-                text: 'Return the coordinates of this roof as a JSON array.',
+                text: 'Return only the coordinates of this roof as a JSON array.',
               },
             ],
           },
@@ -54,14 +59,13 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('OpenAI API error:', errorText);
-      throw new Error('Failed to get response from OpenAI');
+      console.error('OpenAI API error response:', errorText);
+      throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
-    console.log('OpenAI raw response:', JSON.stringify(data));
+    console.log('OpenAI response:', JSON.stringify(data));
 
-    // Check for the expected response structure
     if (!data.choices?.[0]?.message?.content) {
       throw new Error('Unexpected response structure from OpenAI');
     }
@@ -69,10 +73,9 @@ serve(async (req) => {
     let content = data.choices[0].message.content.trim();
     console.log('Content to parse:', content);
 
-    // Try to parse the coordinates
     let coordinates;
     try {
-      // First, try to extract just the JSON array if there's additional text
+      // Extract JSON array if there's additional text
       const jsonMatch = content.match(/\[\s*\[.*?\]\s*\]/s);
       if (jsonMatch) {
         content = jsonMatch[0];
@@ -80,7 +83,6 @@ serve(async (req) => {
 
       coordinates = JSON.parse(content);
 
-      // Validate the coordinates array
       if (!Array.isArray(coordinates)) {
         throw new Error('Response is not an array');
       }
@@ -89,7 +91,6 @@ serve(async (req) => {
         throw new Error('Need at least 3 points for a polygon');
       }
 
-      // Validate each coordinate pair
       coordinates.forEach((coord, index) => {
         if (!Array.isArray(coord) || coord.length !== 2 ||
             typeof coord[0] !== 'number' || typeof coord[1] !== 'number') {
@@ -97,7 +98,7 @@ serve(async (req) => {
         }
       });
 
-      // Ensure the polygon is closed
+      // Ensure polygon is closed
       const first = coordinates[0];
       const last = coordinates[coordinates.length - 1];
       if (first[0] !== last[0] || first[1] !== last[1]) {
