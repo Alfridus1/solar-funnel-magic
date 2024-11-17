@@ -1,44 +1,38 @@
-export const calculateRoofArea = (paths: google.maps.LatLng[][]): number => {
+const MODULE_WIDTH = 1.135; // meters
+const MODULE_HEIGHT = 1.962; // meters
+const MODULE_AREA = MODULE_WIDTH * MODULE_HEIGHT;
+const PANEL_WATTS = 400; // Typical watts per panel
+const ANNUAL_KWH_PER_KWP = 1000; // Annual kWh production per kWp in Germany
+const ELECTRICITY_PRICE = 0.40; // Average electricity price in EUR/kWh
+
+export const calculateRoofArea = (paths: google.maps.LatLng[][]) => {
   return paths.reduce((totalArea, path) => {
-    let area = 0;
-    
-    for (let i = 0; i < path.length; i++) {
-      const j = (i + 1) % path.length;
-      area += path[i].lat() * path[j].lng();
-      area -= path[j].lat() * path[i].lng();
-    }
-    
-    area = Math.abs(area) * 111319.9 * 111319.9 / 2;
+    const area = google.maps.geometry.spherical.computeArea(path);
     return totalArea + area;
   }, 0);
 };
 
-export const calculateSolarMetrics = (roofArea: number) => {
-  // Nutzbare Dachfläche (70% der Gesamtfläche)
-  const usableArea = roofArea * 0.7;
+export const calculateSolarMetrics = (totalRoofArea: number) => {
+  // Convert from square meters to actual usable area (considering roof angle and spacing)
+  const usableArea = totalRoofArea * 0.7;
   
-  // Fläche pro Panel: 2m²
-  const panelArea = 2;
+  // Calculate how many panels can fit
+  const possiblePanels = Math.floor(usableArea / MODULE_AREA);
   
-  // Anzahl möglicher Panels
-  const possiblePanels = Math.floor(usableArea / panelArea);
+  // Calculate system size in kWp
+  const kWp = (possiblePanels * PANEL_WATTS) / 1000;
   
-  // Kilowattpeak (kWp) basierend auf 500W pro Modul
-  const kWp = (possiblePanels * 500) / 1000;
+  // Calculate monthly production in kWh
+  const monthlyProduction = Math.round((kWp * ANNUAL_KWH_PER_KWP) / 12);
   
-  // Monatliche Produktion basierend auf 500W Modulen
-  // Annahme: durchschnittlich 3 Sonnenstunden pro Tag
-  // 500W * 3h * 30 Tage = 45 kWh pro Modul pro Monat
-  const monthlyProduction = Math.round(possiblePanels * 45);
-  
-  // Jährliche Einsparung (0,30€ pro kWh)
-  const annualSavings = Math.round(monthlyProduction * 12 * 0.30);
+  // Calculate annual savings in EUR
+  const annualSavings = Math.round(kWp * ANNUAL_KWH_PER_KWP * ELECTRICITY_PRICE);
 
   return {
     usableArea: Math.round(usableArea),
     possiblePanels,
     monthlyProduction,
     annualSavings,
-    kWp: Math.round(kWp * 10) / 10, // Runden auf eine Dezimalstelle
+    kWp: Math.round(kWp * 10) / 10,
   };
 };

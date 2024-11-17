@@ -15,9 +15,14 @@ interface RoofMapProps {
   onRoofOutlineComplete: (paths: google.maps.LatLng[][]) => void;
 }
 
+const MODULE_WIDTH = 1.135; // meters
+const MODULE_HEIGHT = 1.962; // meters
+const METERS_PER_DEGREE = 111319.9; // approximate meters per degree at equator
+
 export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) => {
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [polygons, setPolygons] = useState<google.maps.Polygon[]>([]);
+  const [modules, setModules] = useState<google.maps.Rectangle[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
   const { toast } = useToast();
 
@@ -25,8 +30,68 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
     setMap(map);
   }, []);
 
+  const clearModules = () => {
+    modules.forEach(module => module.setMap(null));
+    setModules([]);
+  };
+
+  const calculateModulePositions = (polygon: google.maps.Polygon) => {
+    clearModules();
+    const bounds = new google.maps.LatLngBounds();
+    const path = polygon.getPath();
+    path.forEach(point => bounds.extend(point));
+
+    const center = bounds.getCenter();
+    const latMetersPerDegree = METERS_PER_DEGREE;
+    const lngMetersPerDegree = METERS_PER_DEGREE * Math.cos(center.lat() * Math.PI / 180);
+
+    const moduleWidthDeg = MODULE_WIDTH / lngMetersPerDegree;
+    const moduleHeightDeg = MODULE_HEIGHT / latMetersPerDegree;
+
+    const newModules: google.maps.Rectangle[] = [];
+    const polygonBounds = polygon.getBounds();
+    if (!polygonBounds) return;
+
+    const north = polygonBounds.getNorthEast().lat();
+    const south = polygonBounds.getSouthWest().lat();
+    const east = polygonBounds.getNorthEast().lng();
+    const west = polygonBounds.getSouthWest().lng();
+
+    for (let lat = south; lat < north; lat += moduleHeightDeg) {
+      for (let lng = west; lng < east; lng += moduleWidthDeg) {
+        const moduleBounds = {
+          north: lat + moduleHeightDeg,
+          south: lat,
+          east: lng + moduleWidthDeg,
+          west: lng
+        };
+
+        const moduleCenter = new google.maps.LatLng(
+          lat + moduleHeightDeg / 2,
+          lng + moduleWidthDeg / 2
+        );
+
+        if (google.maps.geometry.poly.containsLocation(moduleCenter, polygon)) {
+          const moduleRect = new google.maps.Rectangle({
+            bounds: moduleBounds,
+            map: map,
+            fillColor: "#2563eb",
+            fillOpacity: 0.4,
+            strokeColor: "#1e40af",
+            strokeWeight: 1
+          });
+          newModules.push(moduleRect);
+        }
+      }
+    }
+
+    setModules(newModules);
+    return newModules.length;
+  };
+
   const startDrawing = () => {
     setIsDrawing(true);
+    clearModules();
     toast({
       title: "Zeichenmodus aktiviert",
       description: "Klicken Sie nacheinander auf die Ecken Ihres Daches. Klicken Sie zum Abschluss auf den ersten Punkt zurück.",
@@ -39,6 +104,7 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
       const lastPolygon = polygons[polygons.length - 1];
       lastPolygon.setMap(null);
       setPolygons(prev => prev.slice(0, -1));
+      clearModules();
       
       // Recalculate total area
       const allPaths = polygons.slice(0, -1).map(poly => 
@@ -58,6 +124,8 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
     setPolygons(prev => [...prev, polygon]);
     setIsDrawing(false);
     
+    const moduleCount = calculateModulePositions(polygon);
+    
     // Get paths from all polygons including the new one
     const allPaths = [...polygons, polygon].map(poly => 
       poly.getPath().getArray()
@@ -66,9 +134,11 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
     
     toast({
       title: "Sehr gut!",
-      description: polygons.length === 0 
-        ? "Ihre erste Dachfläche wurde erfolgreich eingezeichnet. Sie können weitere Dächer hinzufügen oder die Form durch Ziehen der Punkte anpassen."
-        : "Eine weitere Dachfläche wurde hinzugefügt. Sie können weitere Dächer einzeichnen oder die Formen anpassen.",
+      description: `${moduleCount} Module können auf dieser Dachfläche installiert werden. ${
+        polygons.length === 0 
+          ? "Sie können weitere Dächer hinzufügen oder die Form durch Ziehen der Punkte anpassen."
+          : "Sie können weitere Dachflächen einzeichnen oder die Formen anpassen."
+      }`,
       duration: 5000,
     });
   };
@@ -86,7 +156,7 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
               <li>Klicken Sie auf "Dach hinzufügen" unten</li>
               <li>Klicken Sie nacheinander auf die Ecken Ihres Daches</li>
               <li>Schließen Sie die Form, indem Sie wieder auf den ersten Punkt klicken</li>
-              <li>Wiederholen Sie den Vorgang für weitere Dächer</li>
+              <li>Die möglichen PV-Module werden automatisch eingezeichnet</li>
             </ol>
           </div>
         </div>
