@@ -31,7 +31,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are an expert at analyzing satellite images of roofs. Return the coordinates of the roof edges as a JSON array of coordinates, e.g. [[lat1,lng1], [lat2,lng2], ...]'
+            content: 'You are an expert at analyzing satellite images of roofs. Given a satellite image, identify the roof outline and return ONLY a JSON array of coordinates representing the roof edges, in the format [[lat1,lng1], [lat2,lng2], ...]. The response should contain nothing but the coordinate array.'
           },
           {
             role: 'user',
@@ -42,34 +42,45 @@ serve(async (req) => {
               },
               {
                 type: 'text',
-                text: 'Analyze this satellite image and return the coordinates of the roof edges as a JSON array.',
+                text: 'Return the coordinates of this roof as a JSON array.',
               },
             ],
           },
         ],
-        max_tokens: 500,
+        max_tokens: 1000,
+        temperature: 0.2,
       }),
     });
 
     const data = await response.json();
-    console.log('OpenAI Response:', data);
+    console.log('Raw OpenAI Response:', JSON.stringify(data));
 
-    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-      throw new Error('Invalid response from OpenAI');
+    if (!data.choices?.[0]?.message?.content) {
+      console.error('Invalid OpenAI response structure:', data);
+      throw new Error('Invalid response structure from OpenAI');
     }
 
-    // Parse the response content as JSON
+    const content = data.choices[0].message.content.trim();
+    console.log('OpenAI Response Content:', content);
+
+    // Try to extract JSON array from the response
     let coordinates;
     try {
-      coordinates = JSON.parse(data.choices[0].message.content);
+      // First try direct JSON parse
+      coordinates = JSON.parse(content);
+      
+      // Verify it's an array of coordinate pairs
+      if (!Array.isArray(coordinates) || !coordinates.every(coord => 
+        Array.isArray(coord) && coord.length === 2 && 
+        typeof coord[0] === 'number' && typeof coord[1] === 'number')) {
+        throw new Error('Response is not in the correct coordinate format');
+      }
     } catch (error) {
       console.error('Failed to parse coordinates:', error);
       throw new Error('Failed to parse roof coordinates from AI response');
     }
 
-    if (!Array.isArray(coordinates)) {
-      throw new Error('Invalid coordinates format returned from AI');
-    }
+    console.log('Parsed coordinates:', coordinates);
 
     return new Response(
       JSON.stringify({ coordinates }), 
