@@ -5,7 +5,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useLoadScript } from "@react-google-maps/api";
 import { RoofMap } from "./roof/RoofMap";
 import { RoofMetrics } from "./roof/RoofMetrics";
-import { calculateRoofArea, calculateSolarMetrics } from "@/utils/roofCalculations";
+import {
+  calculateRoofArea,
+  calculateSolarMetrics,
+} from "@/utils/roofCalculations";
 import { Button } from "@/components/ui/button";
 
 const libraries = ["drawing", "places"];
@@ -42,8 +45,13 @@ export const RoofCheck = ({ address }: { address: string }) => {
 
   const handleRoofOutlineComplete = (paths: google.maps.LatLng[][]) => {
     const totalRoofArea = calculateRoofArea(paths);
-    const { usableArea, possiblePanels, monthlyProduction, annualSavings, kWp } = 
-      calculateSolarMetrics(totalRoofArea);
+    const {
+      usableArea,
+      possiblePanels,
+      monthlyProduction,
+      annualSavings,
+      kWp,
+    } = calculateSolarMetrics(totalRoofArea);
 
     setMetrics({
       monthlyProduction,
@@ -55,11 +63,11 @@ export const RoofCheck = ({ address }: { address: string }) => {
   };
 
   const handleContinue = () => {
-    navigate("/recommended-config", { 
-      state: { 
+    navigate("/recommended-config", {
+      state: {
         metrics,
-        address 
-      }
+        address,
+      },
     });
   };
 
@@ -87,14 +95,14 @@ export const RoofCheck = ({ address }: { address: string }) => {
     <div className="w-full max-w-7xl mx-auto space-y-4 sm:space-y-6 p-4 animate-fade-up">
       <Card className="bg-white">
         <CardContent className="p-4 sm:p-6">
-          <RoofMap 
+          <RoofMap
             coordinates={coordinates}
             onRoofOutlineComplete={handleRoofOutlineComplete}
           />
           <RoofMetrics {...metrics} />
           {metrics.roofArea > 0 && (
             <div className="mt-6 flex justify-center">
-              <Button 
+              <Button
                 onClick={handleContinue}
                 className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-6"
               >
