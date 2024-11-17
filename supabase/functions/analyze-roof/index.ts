@@ -64,22 +64,24 @@ serve(async (req) => {
           {
             role: 'system',
             content: `You are a highly specialized AI trained to analyze satellite imagery and identify roof outlines. 
-            Your task is to return ONLY the coordinates of roof corners in the following JSON format:
+            Your task is to identify the roof marked with a red marker and return its corner coordinates in this format:
             {"coordinates": [[lat1,lng1], [lat2,lng2], ...]}
             
-            Look for the roof marked with a red marker in the center of the image.
+            Important guidelines:
+            1. Focus on the building with the red marker
+            2. Return coordinates in clockwise order starting from the top-left corner
+            3. Be precise in coordinate calculations
+            4. If multiple buildings are present, only outline the one with the marker
+            5. If you cannot identify the roof clearly, return {"error": "Could not identify roof outline clearly"}
             
-            If you cannot identify the roof clearly, return:
-            {"error": "Could not identify roof outline clearly"}
-            
-            DO NOT return any explanatory text or instructions.`
+            Return ONLY the JSON response, no explanations.`
           },
           {
             role: 'user',
             content: [
               {
                 type: "text",
-                text: `Analyze this satellite image and return ONLY the roof corner coordinates for the building marked with the red marker in the center.
+                text: `Analyze this satellite image and return the roof corner coordinates for the building marked with the red marker.
                 Location: ${location?.lat}, ${location?.lng}
                 Zoom: ${location?.zoom}`
               },
@@ -93,7 +95,7 @@ serve(async (req) => {
           }
         ],
         max_tokens: 1000,
-        temperature: 0.3,
+        temperature: 0.1, // Lower temperature for more precise responses
       }),
     });
 
@@ -165,7 +167,7 @@ serve(async (req) => {
       console.error('Raw content that could not be parsed:', content);
       return new Response(
         JSON.stringify({ 
-          error: "Could not identify roof outline. Please try drawing it manually.",
+          error: "Konnte Dachform nicht erkennen. Bitte zeichnen Sie den Umriss manuell ein.",
           details: error.message 
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -175,7 +177,7 @@ serve(async (req) => {
     console.error('Error in analyze-roof function:', error);
     return new Response(
       JSON.stringify({ 
-        error: "Could not analyze roof. Please try drawing it manually.",
+        error: "Fehler bei der Analyse. Bitte zeichnen Sie den Umriss manuell ein.",
         details: error.message 
       }),
       { 
