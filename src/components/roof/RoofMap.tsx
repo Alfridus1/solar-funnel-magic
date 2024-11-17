@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { GoogleMap, DrawingManager, Polygon } from "@react-google-maps/api";
-import { Info, Pencil } from "lucide-react";
+import { Info, Pencil, Plus, Trash2 } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -12,12 +12,12 @@ import { useToast } from "@/components/ui/use-toast";
 
 interface RoofMapProps {
   coordinates: { lat: number; lng: number };
-  onRoofOutlineComplete: (path: google.maps.LatLng[]) => void;
+  onRoofOutlineComplete: (paths: google.maps.LatLng[][]) => void;
 }
 
 export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) => {
   const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [currentPolygon, setCurrentPolygon] = useState<google.maps.Polygon | null>(null);
+  const [polygons, setPolygons] = useState<google.maps.Polygon[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
   const { toast } = useToast();
 
@@ -34,18 +34,41 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
     });
   };
 
-  const onPolygonComplete = (polygon: google.maps.Polygon) => {
-    if (currentPolygon) {
-      currentPolygon.setMap(null);
+  const deleteLastRoof = () => {
+    if (polygons.length > 0) {
+      const lastPolygon = polygons[polygons.length - 1];
+      lastPolygon.setMap(null);
+      setPolygons(prev => prev.slice(0, -1));
+      
+      // Recalculate total area
+      const allPaths = polygons.slice(0, -1).map(poly => 
+        poly.getPath().getArray()
+      );
+      onRoofOutlineComplete(allPaths);
+      
+      toast({
+        title: "Dach entfernt",
+        description: "Das zuletzt gezeichnete Dach wurde entfernt.",
+        duration: 3000,
+      });
     }
-    setCurrentPolygon(polygon);
+  };
+
+  const onPolygonComplete = (polygon: google.maps.Polygon) => {
+    setPolygons(prev => [...prev, polygon]);
     setIsDrawing(false);
-    const path = polygon.getPath().getArray();
-    onRoofOutlineComplete(path);
+    
+    // Get paths from all polygons including the new one
+    const allPaths = [...polygons, polygon].map(poly => 
+      poly.getPath().getArray()
+    );
+    onRoofOutlineComplete(allPaths);
     
     toast({
       title: "Sehr gut!",
-      description: "Ihre Dachfläche wurde erfolgreich eingezeichnet. Sie können die Form jederzeit durch Ziehen der Punkte anpassen.",
+      description: polygons.length === 0 
+        ? "Ihre erste Dachfläche wurde erfolgreich eingezeichnet. Sie können weitere Dächer hinzufügen oder die Form durch Ziehen der Punkte anpassen."
+        : "Eine weitere Dachfläche wurde hinzugefügt. Sie können weitere Dächer einzeichnen oder die Formen anpassen.",
       duration: 5000,
     });
   };
@@ -60,10 +83,10 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
           <div>
             <h3 className="text-lg font-semibold mb-1">So zeichnen Sie Ihr Dach ein:</h3>
             <ol className="list-decimal list-inside space-y-2 text-gray-600">
-              <li>Klicken Sie auf den "Dach einzeichnen" Button unten</li>
+              <li>Klicken Sie auf "Dach hinzufügen" unten</li>
               <li>Klicken Sie nacheinander auf die Ecken Ihres Daches</li>
               <li>Schließen Sie die Form, indem Sie wieder auf den ersten Punkt klicken</li>
-              <li>Sie können die Form danach noch durch Ziehen der Punkte anpassen</li>
+              <li>Wiederholen Sie den Vorgang für weitere Dächer</li>
             </ol>
           </div>
         </div>
@@ -110,22 +133,28 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
           />
         </GoogleMap>
 
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
           <Button
-            size="lg"
+            size="sm"
             onClick={startDrawing}
             disabled={isDrawing}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-full shadow-lg text-lg"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full shadow-lg"
           >
-            {isDrawing ? (
-              "Zeichnen Sie jetzt Ihr Dach ein..."
-            ) : (
-              <>
-                <Pencil className="mr-2 h-5 w-5" />
-                Dach einzeichnen
-              </>
-            )}
+            <Plus className="mr-1 h-4 w-4" />
+            Dach hinzufügen
           </Button>
+          
+          {polygons.length > 0 && (
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={deleteLastRoof}
+              className="rounded-full shadow-lg"
+            >
+              <Trash2 className="mr-1 h-4 w-4" />
+              Letztes Dach entfernen
+            </Button>
+          )}
         </div>
       </div>
     </div>

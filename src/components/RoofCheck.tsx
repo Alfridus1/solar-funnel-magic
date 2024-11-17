@@ -36,10 +36,10 @@ export const RoofCheck = ({ address }: { address: string }) => {
     }
   }, [address, isLoaded]);
 
-  const handleRoofOutlineComplete = (path: google.maps.LatLng[]) => {
-    const roofArea = calculateRoofArea(path);
+  const handleRoofOutlineComplete = (paths: google.maps.LatLng[][]) => {
+    const totalRoofArea = calculateRoofArea(paths);
     const { usableArea, possiblePanels, monthlyProduction, annualSavings } = 
-      calculateSolarMetrics(roofArea);
+      calculateSolarMetrics(totalRoofArea);
 
     setMetrics({
       monthlyProduction,
