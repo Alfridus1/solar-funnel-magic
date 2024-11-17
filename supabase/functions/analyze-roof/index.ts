@@ -18,7 +18,7 @@ serve(async (req) => {
       throw new Error('Image URL is required');
     }
 
-    console.log('Analyzing image:', imageUrl);
+    console.log('Analyzing satellite image:', imageUrl);
 
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openAIApiKey) {
@@ -38,18 +38,22 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are a roof analysis expert. When given a satellite image, analyze it and return ONLY a JSON object containing coordinates for the roof outline. 
-            The response must be in this exact format, with no additional text:
-            {"coordinates":[[lat1,lng1],[lat2,lng2],[lat3,lng3],[lat1,lng1]]}
-            
-            Rules:
-            1. Return ONLY valid JSON, no explanatory text
-            2. Each coordinate must be a number
-            3. The polygon must be closed (first and last points must match)
-            4. If you cannot identify the roof, return exactly: {"error":"Could not identify roof"}
-            
-            Example of valid response:
-            {"coordinates":[[52.5200,13.4050],[52.5201,13.4051],[52.5202,13.4052],[52.5200,13.4050]]}`
+            content: `You are a roof analysis expert. Your task is to identify the main roof outline in satellite images and return its coordinates.
+
+Instructions:
+1. Look for the main building structure in the satellite image
+2. Identify the edges of the main roof
+3. Return the coordinates as a closed polygon (first and last point must match)
+4. ONLY return a JSON object in this exact format:
+{"coordinates":[[lat1,lng1],[lat2,lng2],[lat3,lng3],[lat1,lng1]]}
+
+Important rules:
+- Return ONLY the JSON object, no explanations or additional text
+- Each coordinate must be a number (latitude and longitude)
+- The polygon must be closed (first and last points must match)
+- If you cannot identify the roof clearly, return exactly: {"error":"Could not identify roof"}
+- Focus on the main roof structure, ignore smaller attachments or extensions
+- Try to follow the actual roof edges as precisely as possible`
           },
           {
             role: 'user',
