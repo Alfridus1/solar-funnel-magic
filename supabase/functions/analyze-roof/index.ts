@@ -36,7 +36,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are an expert at analyzing satellite images of roofs. When given a satellite image, identify the main roof outline and return ONLY a JSON array of coordinates that form a closed polygon around it. The format must be [[lat1,lng1], [lat2,lng2], ...]. Do not include any other text or explanation.'
+            content: 'You are a roof analysis expert. When given a satellite image, identify the main roof outline and return ONLY a JSON array of coordinates that form a closed polygon around it. The response must be in the exact format [[lat1,lng1], [lat2,lng2], ...] with no additional text. Each coordinate pair must be numbers, not strings.'
           },
           {
             role: 'user',
@@ -47,16 +47,13 @@ serve(async (req) => {
                   url: imageUrl,
                   detail: 'high'
                 }
-              },
-              {
-                type: 'text',
-                text: 'Return only the coordinates of this roof as a JSON array.',
-              },
+              }
             ],
           },
         ],
-        max_tokens: 1000,
         temperature: 0,
+        response_format: { type: "json_object" },
+        max_tokens: 1000,
       }),
     });
 
@@ -78,11 +75,9 @@ serve(async (req) => {
 
     let coordinates;
     try {
-      const jsonMatch = content.match(/\[\s*\[.*?\]\s*\]/s);
-      if (jsonMatch) {
-        content = jsonMatch[0];
-      }
-      coordinates = JSON.parse(content);
+      // Parse the JSON response
+      const parsedContent = JSON.parse(content);
+      coordinates = parsedContent.coordinates || parsedContent;
 
       if (!Array.isArray(coordinates)) {
         throw new Error('Response is not an array');
