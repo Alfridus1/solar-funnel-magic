@@ -37,34 +37,36 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are a roof analysis expert specialized in identifying building outlines from satellite imagery. 
-            
-Instructions:
-1. The image shows a satellite view of a building at coordinates ${location?.lat}, ${location?.lng} with zoom level ${location?.zoom}
-2. Focus on finding the main building structure in the center of the image
-3. Look for clear geometric shapes that indicate roof edges - these often appear as sharp contrasts in the satellite image
-4. Identify the corners of the main roof structure, paying attention to shadows and color changes that indicate roof boundaries
-5. Return coordinates as a closed polygon (first and last point must be identical)
+            content: `Du bist ein Experte für die Analyse von Satelliten- und Luftbildern von Dächern. 
+            Deine Aufgabe ist es, die genauen Koordinaten der Eckpunkte des Hauptdachs zu identifizieren.
 
-Response format:
-- Return ONLY a JSON object with either coordinates array or error message
-- For successful detection: {"coordinates":[[lat1,lng1],[lat2,lng2],[lat3,lng3],[lat1,lng1]]}
-- For failed detection: {"error":"Could not identify roof"}
+            Wichtige Merkmale für die Dacherkennung:
+            1. Suche nach rechteckigen oder geometrischen Formen
+            2. Achte auf Schatten und Kontraste, die Dachkanten markieren
+            3. Konzentriere dich auf das größte zusammenhängende Dach im Zentrum
+            4. Beachte Farbunterschiede zwischen Dach und Umgebung
+            5. Ignoriere kleinere Anbauten oder Nebengebäude
 
-Important rules:
-- Coordinates must be numbers (latitude and longitude)
-- The polygon must be closed (first and last points must match)
-- Focus on the largest visible roof structure
-- Ignore smaller attachments or extensions
-- If multiple buildings are visible, focus on the most prominent one in the center
-- If the image is unclear or no clear roof is visible, return the error message`
+            Gib die Koordinaten als geschlossenes Polygon zurück (erster und letzter Punkt müssen identisch sein).
+            Format: [[lat1,lng1], [lat2,lng2], [lat3,lng3], [lat1,lng1]]
+
+            Bei erfolgreicher Erkennung: {"coordinates": [[lat1,lng1], [lat2,lng2], ...]}
+            Bei Fehlern: {"error": "Spezifische Fehlermeldung"}`
           },
           {
             role: 'user',
             content: [
               {
                 type: 'text',
-                text: 'Please analyze this satellite image and identify the roof outline of the main building.',
+                text: `Bitte analysiere dieses Satellitenbild und identifiziere die Umrisse des Hauptdachs. 
+                Standort: ${location?.lat}, ${location?.lng}
+                Zoom: ${location?.zoom}
+                
+                Wichtig:
+                - Konzentriere dich auf das zentrale Gebäude
+                - Markiere nur das Hauptdach
+                - Ignoriere Schatten auf dem Boden
+                - Gib die Koordinaten als präzise Zahlen zurück`,
               },
               {
                 type: 'image_url',
@@ -73,9 +75,10 @@ Important rules:
                 }
               }
             ],
-          },
+          }
         ],
         max_tokens: 1000,
+        temperature: 0.3, // Reduzierte Temperatur für präzisere Antworten
       }),
     });
 
@@ -148,7 +151,7 @@ Important rules:
     return new Response(
       JSON.stringify({ 
         error: error.message,
-        details: 'Failed to analyze roof. Please try again.' 
+        details: 'Fehler bei der Dachanalyse. Bitte versuchen Sie es erneut.' 
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
