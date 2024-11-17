@@ -5,6 +5,11 @@ import { Instructions } from "./components/Instructions";
 import { MapControls } from "./components/MapControls";
 import { calculateModulePositions } from "./utils/moduleCalculations";
 
+const mapContainerStyle = {
+  width: '100%',
+  height: '100%'
+};
+
 interface RoofMapProps {
   coordinates: { lat: number; lng: number };
   onRoofOutlineComplete: (paths: google.maps.LatLng[][]) => void;
@@ -84,9 +89,9 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
 
       <div className="w-full h-[calc(100vh-400px)] md:h-[400px] rounded-lg overflow-hidden relative">
         <GoogleMap
+          mapContainerStyle={mapContainerStyle}
           zoom={19}
           center={coordinates}
-          mapContainerClassName="w-full h-full"
           onLoad={onLoad}
           options={{
             mapTypeId: "satellite",
