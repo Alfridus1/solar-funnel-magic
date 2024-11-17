@@ -45,14 +45,11 @@ serve(async (req) => {
                 type: 'image_url',
                 image_url: {
                   url: imageUrl,
-                  detail: 'high'
                 }
               }
             ],
           },
         ],
-        temperature: 0,
-        response_format: { type: "json_object" },
         max_tokens: 1000,
       }),
     });
@@ -107,8 +104,6 @@ serve(async (req) => {
       console.error('Content that failed to parse:', content);
       throw new Error(`Invalid coordinate format: ${error.message}`);
     }
-
-    console.log('Final parsed coordinates:', coordinates);
 
     return new Response(
       JSON.stringify({ coordinates }), 
