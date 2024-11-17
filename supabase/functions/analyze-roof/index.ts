@@ -12,13 +12,13 @@ serve(async (req) => {
   }
 
   try {
-    const { imageUrl } = await req.json();
+    const { imageUrl, location } = await req.json();
     
     if (!imageUrl) {
       throw new Error('Image URL is required');
     }
 
-    console.log('Analyzing satellite image:', imageUrl);
+    console.log('Analyzing satellite image at location:', location);
 
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openAIApiKey) {
@@ -26,7 +26,6 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured');
     }
 
-    console.log('Making request to OpenAI API...');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -41,10 +40,11 @@ serve(async (req) => {
             content: `You are a roof analysis expert specialized in identifying building outlines from satellite imagery. 
             
 Instructions:
-1. Focus on finding the main building structure in the center of the image
-2. Look for clear geometric shapes that indicate roof edges
-3. Identify the corners of the main roof structure
-4. Return coordinates as a closed polygon (first and last point must be identical)
+1. The image shows a satellite view of a building at coordinates ${location?.lat}, ${location?.lng} with zoom level ${location?.zoom}
+2. Focus on finding the main building structure in the center of the image
+3. Look for clear geometric shapes that indicate roof edges - these often appear as sharp contrasts in the satellite image
+4. Identify the corners of the main roof structure, paying attention to shadows and color changes that indicate roof boundaries
+5. Return coordinates as a closed polygon (first and last point must be identical)
 
 Response format:
 - Return ONLY a JSON object with either coordinates array or error message

@@ -33,27 +33,42 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
       setIsAnalyzing(true);
       toast.info("Analysiere Dach mit KI...");
 
-      // Capture the current map view
       const center = map.getCenter();
       const zoom = map.getZoom();
       const div = map.getDiv();
       const width = div.clientWidth;
       const height = div.clientHeight;
 
-      // Create a URL for the static map image
-      const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${center?.lat()},${center?.lng()}&zoom=${zoom}&size=${width}x${height}&maptype=satellite&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`;
+      // Verbesserte Bildqualität durch höhere Auflösung und zusätzliche Parameter
+      const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?`
+        + `center=${center?.lat()},${center?.lng()}`
+        + `&zoom=${zoom}`
+        + `&size=${width * 2}x${height * 2}` // Doppelte Auflösung
+        + `&scale=2` // Zusätzliche Skalierung für schärfere Bilder
+        + `&maptype=satellite`
+        + `&style=feature:all|element:labels|visibility:off` // Entfernt alle Labels
+        + `&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`;
 
-      // Call our Edge Function to analyze the roof
       const { data, error } = await supabase.functions.invoke('analyze-roof', {
-        body: { imageUrl: staticMapUrl },
+        body: { 
+          imageUrl: staticMapUrl,
+          location: {
+            lat: center?.lat(),
+            lng: center?.lng(),
+            zoom: zoom
+          }
+        },
       });
 
       if (error) throw error;
 
-      // Parse the coordinates from the AI response
+      if (data.error) {
+        toast.error(data.error);
+        return;
+      }
+
       const coordinates = JSON.parse(data.coordinates);
       
-      // Create a new polygon with the AI-detected coordinates
       if (currentPolygon) {
         currentPolygon.setMap(null);
       }
@@ -86,7 +101,7 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
   };
 
   return (
-    <div className="w-full h-[300px] mb-6 rounded-lg overflow-hidden relative">
+    <div className="w-full h-[400px] mb-6 rounded-lg overflow-hidden relative">
       <GoogleMap
         zoom={19}
         center={coordinates}
@@ -97,6 +112,13 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
           tilt: 0,
           disableDefaultUI: false,
           zoomControl: true,
+          styles: [
+            {
+              featureType: "all",
+              elementType: "labels",
+              stylers: [{ visibility: "off" }]
+            }
+          ]
         }}
       >
         <Marker position={coordinates} />
