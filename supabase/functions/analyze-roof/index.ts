@@ -59,7 +59,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4-vision-preview',
+        model: "gpt-4o-mini",
         messages: [
           {
             role: 'system',
@@ -88,7 +88,8 @@ serve(async (req) => {
               {
                 type: "image_url",
                 image_url: {
-                  url: enhancedImageUrl
+                  url: enhancedImageUrl,
+                  detail: "high" // Using high detail mode for better accuracy
                 }
               }
             ]
