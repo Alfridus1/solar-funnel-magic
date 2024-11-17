@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLoadScript } from "@react-google-maps/api";
 import { RoofMap } from "./roof/RoofMap";
 import { RoofMetrics } from "./roof/RoofMetrics";
 import { calculateRoofArea, calculateSolarMetrics } from "@/utils/roofCalculations";
+import { Button } from "@/components/ui/button";
 
 const libraries = ["drawing", "places"];
 
 export const RoofCheck = ({ address }: { address: string }) => {
+  const navigate = useNavigate();
   const [analyzing, setAnalyzing] = useState(true);
   const [coordinates, setCoordinates] = useState({ lat: 51.1657, lng: 10.4515 });
   const [metrics, setMetrics] = useState({
@@ -51,6 +54,15 @@ export const RoofCheck = ({ address }: { address: string }) => {
     });
   };
 
+  const handleContinue = () => {
+    navigate("/recommended-config", { 
+      state: { 
+        metrics,
+        address 
+      }
+    });
+  };
+
   if (!isLoaded) return <div>Laden...</div>;
 
   if (analyzing) {
@@ -80,6 +92,16 @@ export const RoofCheck = ({ address }: { address: string }) => {
             onRoofOutlineComplete={handleRoofOutlineComplete}
           />
           <RoofMetrics {...metrics} />
+          {metrics.roofArea > 0 && (
+            <div className="mt-6 flex justify-center">
+              <Button 
+                onClick={handleContinue}
+                className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-6"
+              >
+                Ihre optimale Konfiguration anzeigen
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
