@@ -34,7 +34,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4o', // Korrigiert von 'gpt-4o' zu 'gpt-4o'
         messages: [
           {
             role: 'system',
