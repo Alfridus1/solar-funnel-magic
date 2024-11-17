@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -12,7 +12,7 @@ const libraries = ["drawing", "places"];
 const Index = () => {
   const [address, setAddress] = useState("");
   const [showRoofCheck, setShowRoofCheck] = useState(false);
-  const autocompleteRef = useState(null);
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const { toast } = useToast();
 
   const { isLoaded, loadError } = useLoadScript({
