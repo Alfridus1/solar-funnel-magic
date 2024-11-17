@@ -1,10 +1,19 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { ProgressBar } from "@/components/ProgressBar";
 import type { Product } from "@/components/configurator/types";
+
+const steps = [
+  { title: "Verbrauch", description: "Ihr Stromverbrauch" },
+  { title: "Module", description: "Solarmodule wählen" },
+  { title: "Wechselrichter", description: "Leistung anpassen" },
+  { title: "Speicher", description: "Batterie wählen" },
+  { title: "Übersicht", description: "Ihre Konfiguration" },
+];
 
 export const InverterPage = () => {
   const [searchParams] = useSearchParams();
@@ -63,65 +72,74 @@ export const InverterPage = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <h1 className="text-3xl font-bold text-center mb-8">
-        Wählen Sie Ihren Wechselrichter
-      </h1>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="container mx-auto px-4">
+        <ProgressBar currentStep={3} totalSteps={5} steps={steps} />
+        
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-4xl font-bold text-center mb-8">
+            Wählen Sie Ihren Wechselrichter
+          </h1>
 
-      <Card className="mb-8">
-        <CardContent className="p-6">
-          <div className="mb-8">
-            <img 
-              src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d"
-              alt="Wechselrichter"
-              className="w-full h-48 object-cover rounded-lg mb-4"
-            />
-            <p className="text-gray-600 mb-4">
-              Der Wechselrichter wandelt den Gleichstrom Ihrer Solarmodule in nutzbaren Wechselstrom um
-            </p>
-          </div>
+          <Card className="p-8 shadow-lg">
+            <div className="mb-8">
+              <img 
+                src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d"
+                alt="Wechselrichter"
+                className="w-full h-64 object-cover rounded-lg mb-6"
+              />
+              <p className="text-lg text-gray-600 text-center">
+                Der Wechselrichter wandelt den Gleichstrom Ihrer Solarmodule in nutzbaren Wechselstrom um
+              </p>
+            </div>
 
-          <div className="space-y-4">
-            {inverters.map((inverter) => (
-              <div 
-                key={inverter.id} 
-                className={`flex items-center justify-between p-4 border rounded-lg ${
-                  selectedInverter?.id === inverter.id ? 'border-blue-600 bg-blue-50' : ''
-                }`}
+            <div className="space-y-6">
+              {inverters.map((inverter) => (
+                <div 
+                  key={inverter.id} 
+                  className={`flex flex-col md:flex-row items-center justify-between p-6 border rounded-lg transition-colors ${
+                    selectedInverter?.id === inverter.id ? 'border-blue-500 bg-blue-50' : 'hover:border-blue-500'
+                  }`}
+                >
+                  <div>
+                    <h3 className="text-xl font-semibold mb-2">{inverter.name}</h3>
+                    <p className="text-gray-600">{inverter.specs.power}kW Leistung</p>
+                  </div>
+                  <div className="flex items-center gap-6 mt-4 md:mt-0">
+                    <span className="text-2xl font-bold">{inverter.price}€</span>
+                    <Button
+                      variant={selectedInverter?.id === inverter.id ? "secondary" : "default"}
+                      onClick={() => handleSelectInverter(inverter)}
+                      className={`px-6 ${
+                        selectedInverter?.id === inverter.id 
+                          ? "bg-blue-200 hover:bg-blue-300" 
+                          : "bg-blue-600 hover:bg-blue-700"
+                      }`}
+                    >
+                      {selectedInverter?.id === inverter.id ? "Ausgewählt" : "Auswählen"}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex justify-between mt-8">
+              <Button 
+                variant="outline"
+                onClick={() => navigate(`/configurator/modules?consumption=${consumption}`)}
+                className="px-8"
               >
-                <div>
-                  <h3 className="font-semibold">{inverter.name}</h3>
-                  <p className="text-sm text-gray-600">{inverter.specs.power}kW Leistung</p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="font-semibold">{inverter.price}€</span>
-                  <Button
-                    variant={selectedInverter?.id === inverter.id ? "secondary" : "default"}
-                    onClick={() => handleSelectInverter(inverter)}
-                    className={selectedInverter?.id === inverter.id ? "bg-blue-200" : "bg-blue-600 hover:bg-blue-700"}
-                  >
-                    {selectedInverter?.id === inverter.id ? "Ausgewählt" : "Auswählen"}
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="flex justify-between">
-        <Button 
-          variant="outline"
-          onClick={() => navigate(`/configurator/modules?consumption=${consumption}`)}
-        >
-          Zurück
-        </Button>
-        <Button 
-          onClick={handleNext}
-          className="bg-blue-600 hover:bg-blue-700"
-        >
-          Weiter zum Speicher
-        </Button>
+                Zurück
+              </Button>
+              <Button 
+                onClick={handleNext}
+                className="bg-blue-600 hover:bg-blue-700 px-8"
+              >
+                Weiter zum Speicher
+              </Button>
+            </div>
+          </Card>
+        </div>
       </div>
     </div>
   );

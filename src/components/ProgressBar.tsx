@@ -3,29 +3,44 @@ import { cn } from "@/lib/utils";
 interface ProgressBarProps {
   currentStep: number;
   totalSteps: number;
+  steps: { title: string; description: string }[];
 }
 
-export const ProgressBar = ({ currentStep, totalSteps }: ProgressBarProps) => {
+export const ProgressBar = ({ currentStep, totalSteps, steps }: ProgressBarProps) => {
   return (
-    <div className="w-full max-w-md mx-auto mb-8">
-      <div className="relative pt-1">
-        <div className="flex mb-2 items-center justify-between">
-          <div>
-            <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
-              Step {currentStep} of {totalSteps}
-            </span>
+    <div className="w-full max-w-4xl mx-auto mb-8">
+      <div className="relative">
+        <div className="overflow-hidden">
+          <div className="flex justify-between mb-4">
+            {steps.map((step, index) => (
+              <div
+                key={index}
+                className={cn(
+                  "flex flex-col items-center w-1/5",
+                  index < currentStep ? "text-blue-600" : "text-gray-400"
+                )}
+              >
+                <div
+                  className={cn(
+                    "w-8 h-8 rounded-full flex items-center justify-center mb-2",
+                    index < currentStep ? "bg-blue-600 text-white" : "bg-gray-200"
+                  )}
+                >
+                  {index + 1}
+                </div>
+                <div className="text-center">
+                  <div className="font-semibold text-sm">{step.title}</div>
+                  <div className="text-xs hidden md:block">{step.description}</div>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="text-right">
-            <span className="text-xs font-semibold inline-block text-blue-600">
-              {Math.round((currentStep / totalSteps) * 100)}%
-            </span>
+          <div className="h-2 bg-gray-200 rounded-full">
+            <div
+              className="h-full bg-blue-600 rounded-full transition-all duration-500"
+              style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+            />
           </div>
-        </div>
-        <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-blue-200">
-          <div
-            style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-            className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-blue-600 to-purple-600 transition-all duration-500"
-          ></div>
         </div>
       </div>
     </div>
