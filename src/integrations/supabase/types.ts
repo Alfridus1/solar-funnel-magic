@@ -150,6 +150,36 @@ export type Database = {
         }
         Relationships: []
       }
+      solar_products: {
+        Row: {
+          category: string
+          created_at: string | null
+          id: string
+          name: string
+          price: number
+          specs: Json
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          id?: string
+          name: string
+          price: number
+          specs: Json
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          id?: string
+          name?: string
+          price?: number
+          specs?: Json
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
