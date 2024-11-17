@@ -36,7 +36,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a roof analysis expert. When given a satellite image, identify the main roof outline and return ONLY a JSON array of coordinates that form a closed polygon around it. The response must be in the exact format [[lat1,lng1], [lat2,lng2], ...] with no additional text. Each coordinate pair must be numbers, not strings.'
+            content: 'You are a roof analysis expert. Given a satellite image, identify the main roof outline and return coordinates in this exact format: {"coordinates": [[lat1,lng1], [lat2,lng2], ...]}. Each coordinate must be a number, and the polygon must be closed (first and last points must match).'
           },
           {
             role: 'user',
@@ -75,14 +75,15 @@ serve(async (req) => {
 
     let coordinates;
     try {
-      // Parse the JSON response
       const parsedContent = JSON.parse(content);
-      coordinates = parsedContent.coordinates || parsedContent;
-
-      if (!Array.isArray(coordinates)) {
-        throw new Error('Response is not an array');
+      
+      if (!parsedContent.coordinates || !Array.isArray(parsedContent.coordinates)) {
+        throw new Error('Response must contain a coordinates array');
       }
 
+      coordinates = parsedContent.coordinates;
+
+      // Validate coordinates
       if (coordinates.length < 3) {
         throw new Error('Need at least 3 points for a polygon');
       }
