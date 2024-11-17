@@ -1,20 +1,39 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ProgressBar } from "@/components/ProgressBar";
 import { RoofCheck } from "@/components/RoofCheck";
 import { LeadForm } from "@/components/LeadForm";
+import { useLoadScript, Autocomplete } from "@react-google-maps/api";
+
+const libraries = ["places"];
 
 const Index = () => {
   const [step, setStep] = useState(1);
   const [address, setAddress] = useState("");
   const totalSteps = 3;
+  const autocompleteRef = useRef(null);
+
+  const { isLoaded, loadError } = useLoadScript({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    libraries: libraries as ["places"],
+  });
+
+  const onPlaceSelected = () => {
+    const place = autocompleteRef.current.getPlace();
+    if (place.formatted_address) {
+      setAddress(place.formatted_address);
+    }
+  };
 
   const nextStep = () => {
     if (step < totalSteps) {
       setStep(step + 1);
     }
   };
+
+  if (loadError) return <div>Error loading maps</div>;
+  if (!isLoaded) return <div>Loading...</div>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-solar-blue to-white">
@@ -38,13 +57,21 @@ const Index = () => {
                 Let's Check Your Home's Solar Potential
               </h2>
               <div className="space-y-4">
-                <Input
-                  type="text"
-                  placeholder="Enter your address"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  className="w-full"
-                />
+                <Autocomplete
+                  onLoad={(autocomplete) => {
+                    autocompleteRef.current = autocomplete;
+                  }}
+                  onPlaceChanged={onPlaceSelected}
+                  restrictions={{ country: "us" }}
+                >
+                  <Input
+                    type="text"
+                    placeholder="Enter your address"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    className="w-full"
+                  />
+                </Autocomplete>
                 <Button
                   onClick={nextStep}
                   disabled={!address}
