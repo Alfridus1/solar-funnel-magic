@@ -13,6 +13,12 @@ serve(async (req) => {
 
   try {
     const { imageUrl } = await req.json();
+    
+    if (!imageUrl) {
+      throw new Error('Image URL is required');
+    }
+
+    console.log('Analyzing image:', imageUrl);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -21,22 +27,22 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4-vision-preview',
         messages: [
           {
             role: 'system',
-            content: 'Du bist ein Experte für die Analyse von Satellitenbildern von Dächern. Gib die Koordinaten der Dachkanten als Array von Koordinaten zurück, z.B. [[lat1,lng1], [lat2,lng2], ...]'
+            content: 'You are an expert at analyzing satellite images of roofs. Return the coordinates of the roof edges as a JSON array of coordinates, e.g. [[lat1,lng1], [lat2,lng2], ...]'
           },
           {
             role: 'user',
             content: [
               {
-                type: 'image',
+                type: 'image_url',
                 image_url: imageUrl,
               },
               {
                 type: 'text',
-                text: 'Analysiere dieses Satellitenbild und gib mir die Koordinaten der Dachkanten zurück.',
+                text: 'Analyze this satellite image and return the coordinates of the roof edges as a JSON array.',
               },
             ],
           },
@@ -48,16 +54,40 @@ serve(async (req) => {
     const data = await response.json();
     console.log('OpenAI Response:', data);
 
-    return new Response(JSON.stringify({ 
-      coordinates: data.choices[0].message.content 
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  } catch (error) {
-    console.error('Error:', error);
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      throw new Error('Invalid response from OpenAI');
+    }
+
+    // Parse the response content as JSON
+    let coordinates;
+    try {
+      coordinates = JSON.parse(data.choices[0].message.content);
+    } catch (error) {
+      console.error('Failed to parse coordinates:', error);
+      throw new Error('Failed to parse roof coordinates from AI response');
+    }
+
+    if (!Array.isArray(coordinates)) {
+      throw new Error('Invalid coordinates format returned from AI');
+    }
+
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      JSON.stringify({ coordinates }), 
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
+  } catch (error) {
+    console.error('Error in analyze-roof function:', error);
+    return new Response(
+      JSON.stringify({ 
+        error: error.message,
+        details: 'Failed to analyze roof. Please try again.' 
+      }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      }
     );
   }
 });
