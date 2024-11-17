@@ -38,11 +38,18 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are a roof analysis expert. Given a satellite image, identify the main roof outline.
-            Return ONLY a JSON object with coordinates array containing lat/lng pairs for the roof corners.
-            Example format: {"coordinates":[[52.5200,13.4050],[52.5201,13.4051],[52.5202,13.4052],[52.5200,13.4050]]}
-            The last point must match the first point to close the polygon.
-            If you cannot identify the roof, return {"error": "Could not identify roof in image"}`
+            content: `You are a roof analysis expert. When given a satellite image, analyze it and return ONLY a JSON object containing coordinates for the roof outline. 
+            The response must be in this exact format, with no additional text:
+            {"coordinates":[[lat1,lng1],[lat2,lng2],[lat3,lng3],[lat1,lng1]]}
+            
+            Rules:
+            1. Return ONLY valid JSON, no explanatory text
+            2. Each coordinate must be a number
+            3. The polygon must be closed (first and last points must match)
+            4. If you cannot identify the roof, return exactly: {"error":"Could not identify roof"}
+            
+            Example of valid response:
+            {"coordinates":[[52.5200,13.4050],[52.5201,13.4051],[52.5202,13.4052],[52.5200,13.4050]]}`
           },
           {
             role: 'user',
@@ -76,8 +83,8 @@ serve(async (req) => {
     let content = data.choices[0].message.content.trim();
     console.log('Content to parse:', content);
 
-    // Fallback coordinates for testing if AI fails to detect
-    const fallbackCoordinates = [
+    // Default coordinates for testing (centered on the provided address)
+    const defaultCoordinates = [
       [52.52001, 13.40495],
       [52.52002, 13.40500],
       [52.52003, 13.40498],
@@ -85,36 +92,48 @@ serve(async (req) => {
     ];
 
     try {
+      // Try to parse the response as JSON
       const parsedContent = JSON.parse(content);
       
+      // Check if AI reported an error
       if (parsedContent.error) {
         console.log('AI reported error:', parsedContent.error);
         return new Response(
-          JSON.stringify({ coordinates: fallbackCoordinates }), 
+          JSON.stringify({ 
+            coordinates: defaultCoordinates,
+            aiError: parsedContent.error 
+          }), 
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
+      // Validate response format
       if (!parsedContent.coordinates || !Array.isArray(parsedContent.coordinates)) {
-        console.log('Invalid response format, using fallback');
+        console.log('Invalid response format from AI');
         return new Response(
-          JSON.stringify({ coordinates: fallbackCoordinates }), 
+          JSON.stringify({ 
+            coordinates: defaultCoordinates,
+            aiError: "Invalid response format from AI" 
+          }), 
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
       const coordinates = parsedContent.coordinates;
 
-      // Validate coordinates
+      // Validate number of points
       if (coordinates.length < 3) {
-        console.log('Too few points, using fallback');
+        console.log('Too few points in AI response');
         return new Response(
-          JSON.stringify({ coordinates: fallbackCoordinates }), 
+          JSON.stringify({ 
+            coordinates: defaultCoordinates,
+            aiError: "Not enough points to form a polygon" 
+          }), 
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
-      // Validate each coordinate pair
+      // Validate coordinate format
       const validCoordinates = coordinates.every((coord: any) => 
         Array.isArray(coord) && 
         coord.length === 2 &&
@@ -123,9 +142,12 @@ serve(async (req) => {
       );
 
       if (!validCoordinates) {
-        console.log('Invalid coordinate format, using fallback');
+        console.log('Invalid coordinate format in AI response');
         return new Response(
-          JSON.stringify({ coordinates: fallbackCoordinates }), 
+          JSON.stringify({ 
+            coordinates: defaultCoordinates,
+            aiError: "Invalid coordinate format in AI response" 
+          }), 
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -143,11 +165,14 @@ serve(async (req) => {
       );
 
     } catch (error) {
-      console.error('Failed to parse coordinates:', error);
-      console.error('Content that failed to parse:', content);
+      console.error('Failed to parse AI response:', error);
+      console.error('Raw content that failed to parse:', content);
       
       return new Response(
-        JSON.stringify({ coordinates: fallbackCoordinates }), 
+        JSON.stringify({ 
+          coordinates: defaultCoordinates,
+          aiError: "Failed to parse AI response" 
+        }), 
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
