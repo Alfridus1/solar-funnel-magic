@@ -28,9 +28,9 @@ serve(async (req) => {
 
     // Verbesserte Bildqualität durch höhere Auflösung
     const enhancedImageUrl = imageUrl
-      .replace('size=', 'size=1200x1200') // Größeres Bild
-      .replace('zoom=', 'zoom=' + (location?.zoom || 19)) // Maximaler Zoom
-      .concat('&scale=2'); // Höhere Auflösung
+      .replace('size=', 'size=1200x1200')
+      .replace('zoom=', 'zoom=' + (location?.zoom || 19))
+      .concat('&scale=2');
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -43,60 +43,29 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `Du bist ein hochspezialisierter Experte für die Analyse von Satelliten- und Luftbildern, 
-            mit besonderem Fokus auf die Erkennung von Dachstrukturen.
-
-            Deine Hauptaufgabe:
-            1. Identifiziere das Hauptgebäude im Zentrum des Bildes
-            2. Erkenne die exakten Umrisse des Dachs
-            3. Markiere die Eckpunkte des Dachs mit präzisen Koordinaten
-
+            content: `Du bist ein hochspezialisierter Experte für die Analyse von Satelliten- und Luftbildern. 
+            Deine Aufgabe ist es, die Umrisse eines Dachs in einem Satellitenbild zu identifizieren.
+            
             Erkennungsmerkmale für Dächer:
-            - Suche nach klaren geometrischen Formen (meist rechteckig oder L-förmig)
-            - Identifiziere dunkle Linien und Kanten, die Dachränder markieren
-            - Beachte Farbkontraste zwischen Dach und Umgebung
-            - Nutze Schatten zur Bestätigung von Gebäudekanten
-            - Achte auf typische Dachstrukturen wie Schornsteine oder Dachfenster
-
-            Wichtige Regeln:
-            1. Konzentriere dich NUR auf das Hauptdach
-            2. Ignoriere Nebengebäude und Garagen
-            3. Gib die Koordinaten als geschlossenes Polygon zurück
-            4. Der erste und letzte Punkt müssen identisch sein
-            5. Mindestens 4 Punkte sind erforderlich für ein valides Polygon
-
-            Antwortformat:
-            Bei erfolgreicher Erkennung: {"coordinates": [[lat1,lng1], [lat2,lng2], ...]}
-            Bei Fehlern: {"error": "Detaillierte Fehlerbeschreibung"}`
+            - Rechteckige oder L-förmige Strukturen
+            - Klare Kanten und Linien
+            - Kontraste zwischen Dach und Umgebung
+            - Typische Dachstrukturen (Schornsteine, Fenster)
+            
+            Gib die Koordinaten als Array von [lat, lng] Paaren zurück.
+            Format: {"coordinates": [[lat1,lng1], [lat2,lng2], ...]}
+            
+            Bei Fehlern: {"error": "Fehlerbeschreibung"}`
           },
           {
             role: 'user',
-            content: [
-              {
-                type: 'text',
-                text: `Analysiere dieses hochaufgelöste Satellitenbild und identifiziere die präzisen Umrisse des Hauptdachs.
-                
-                Standort: ${location?.lat}, ${location?.lng}
-                Zoom: ${location?.zoom}
-                
-                Beachte folgende Punkte:
-                - Das Hauptgebäude befindet sich im Zentrum des Bildes
-                - Markiere nur die Hauptdachfläche
-                - Ignoriere Schatten auf dem Boden
-                - Gib die Koordinaten als exakte Zahlen zurück
-                - Prüfe die Plausibilität der erkannten Form`,
-              },
-              {
-                type: 'image_url',
-                image_url: {
-                  url: enhancedImageUrl,
-                }
-              }
-            ],
+            content: `Analysiere dieses Satellitenbild und identifiziere die Umrisse des Hauptdachs.
+            Standort: ${location?.lat}, ${location?.lng}
+            Zoom: ${location?.zoom}
+            Bild-URL: ${enhancedImageUrl}`
           }
         ],
-        max_tokens: 1000,
-        temperature: 0.3, // Niedrige Temperatur für präzisere Ergebnisse
+        temperature: 0.3,
       }),
     });
 
