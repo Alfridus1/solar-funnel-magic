@@ -1,27 +1,22 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ProgressBar } from "@/components/ProgressBar";
-import { RoofCheck } from "@/components/RoofCheck";
+import { Card } from "@/components/ui/card";
 import { LeadForm } from "@/components/LeadForm";
 import { SystemConfigurator } from "@/components/SystemConfigurator";
 import { useLoadScript, Autocomplete } from "@react-google-maps/api";
-import { useNavigate } from "react-router-dom";
+import { Calendar, Mail } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 const libraries = ["places"];
 
-const steps = [
-  { title: "Adresse", description: "Ihre Adresse eingeben" },
-  { title: "Dachanalyse", description: "Ihr Dach prüfen" },
-  { title: "Angebot", description: "Ihr Solarangebot" },
-];
-
 const Index = () => {
-  const [step, setStep] = useState(1);
   const [address, setAddress] = useState("");
-  const totalSteps = 3;
+  const [showConfiguration, setShowConfiguration] = useState(false);
+  const [showLeadForm, setShowLeadForm] = useState(false);
+  const [formType, setFormType] = useState<"quote" | "consultation" | null>(null);
   const autocompleteRef = useRef(null);
-  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
@@ -35,12 +30,20 @@ const Index = () => {
     }
   };
 
-  const nextStep = () => {
-    if (step < totalSteps) {
-      setStep(step + 1);
-    } else {
-      navigate("/configurator/consumption");
+  const handleAddressSubmit = () => {
+    if (!address) {
+      toast({
+        title: "Bitte geben Sie eine Adresse ein",
+        variant: "destructive",
+      });
+      return;
     }
+    setShowConfiguration(true);
+  };
+
+  const handleOptionSelect = (type: "quote" | "consultation") => {
+    setFormType(type);
+    setShowLeadForm(true);
   };
 
   if (loadError) return <div>Fehler beim Laden der Karten</div>;
@@ -51,86 +54,98 @@ const Index = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-8 animate-fade-up">
           <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-            Sparen Sie mit Solarenergie
+            Ihre perfekte Solaranlage in wenigen Minuten
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Schließen Sie sich tausenden Hausbesitzern an, die bis zu 60% ihrer Energiekosten mit Solarenergie sparen
+            Erhalten Sie sofort eine passende Konfiguration für Ihr Zuhause
           </p>
         </div>
 
-        <ProgressBar currentStep={step} totalSteps={totalSteps} steps={steps} />
-
-        <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-6 mb-8">
-          {step === 1 && (
-            <div className="animate-fade-up">
-              <h2 className="text-2xl font-semibold mb-4">
-                Lassen Sie uns Ihr Solarpotenzial prüfen
-              </h2>
-              <div className="space-y-4">
-                <Autocomplete
-                  onLoad={(autocomplete) => {
-                    autocompleteRef.current = autocomplete;
-                  }}
-                  onPlaceChanged={onPlaceSelected}
-                  restrictions={{ country: "de" }}
-                >
-                  <Input
-                    type="text"
-                    placeholder="Geben Sie Ihre Adresse ein"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    className="w-full"
-                  />
-                </Autocomplete>
-                <Button
-                  onClick={nextStep}
-                  disabled={!address}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-                >
-                  Dach prüfen
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="animate-fade-up w-full max-w-7xl mx-auto">
-              <h2 className="text-2xl font-semibold mb-4">Analyse Ihres Daches</h2>
-              <RoofCheck address={address} />
-              <div className="mt-8">
-                <h2 className="text-2xl font-semibold mb-4">Konfigurieren Sie Ihr System</h2>
-                <SystemConfigurator />
-              </div>
-              <Button
-                onClick={nextStep}
-                className="w-full mt-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+        {!showConfiguration ? (
+          <Card className="max-w-md mx-auto p-6 mb-8">
+            <h2 className="text-2xl font-semibold mb-4">
+              Wo möchten Sie Ihre Solaranlage installieren?
+            </h2>
+            <div className="space-y-4">
+              <Autocomplete
+                onLoad={(autocomplete) => {
+                  autocompleteRef.current = autocomplete;
+                }}
+                onPlaceChanged={onPlaceSelected}
+                restrictions={{ country: "de" }}
               >
-                Solarangebot erhalten
+                <Input
+                  type="text"
+                  placeholder="Geben Sie Ihre Adresse ein"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="w-full"
+                />
+              </Autocomplete>
+              <Button
+                onClick={handleAddressSubmit}
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+              >
+                Konfiguration anzeigen
               </Button>
             </div>
-          )}
+          </Card>
+        ) : (
+          <div className="max-w-4xl mx-auto">
+            {!showLeadForm ? (
+              <>
+                <SystemConfigurator />
+                <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Button
+                    onClick={() => handleOptionSelect("quote")}
+                    className="p-8 h-auto flex flex-col items-center gap-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                  >
+                    <Mail className="h-8 w-8" />
+                    <div>
+                      <div className="text-lg font-semibold">Angebot erhalten</div>
+                      <div className="text-sm opacity-90">
+                        Kostenloses Angebot per E-Mail
+                      </div>
+                    </div>
+                  </Button>
+                  <Button
+                    onClick={() => handleOptionSelect("consultation")}
+                    className="p-8 h-auto flex flex-col items-center gap-4 bg-gradient-to-r from-green-600 to-teal-600 text-white"
+                  >
+                    <Calendar className="h-8 w-8" />
+                    <div>
+                      <div className="text-lg font-semibold">Beratungstermin</div>
+                      <div className="text-sm opacity-90">
+                        Persönliche Beratung vereinbaren
+                      </div>
+                    </div>
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <Card className="p-6">
+                <h2 className="text-2xl font-semibold mb-4 text-center">
+                  {formType === "quote"
+                    ? "Kostenloses Angebot anfordern"
+                    : "Beratungstermin vereinbaren"}
+                </h2>
+                <LeadForm formType={formType} />
+              </Card>
+            )}
+          </div>
+        )}
 
-          {step === 3 && (
-            <div className="animate-fade-up">
-              <h2 className="text-2xl font-semibold mb-4">
-                Kostenloses Solarangebot erhalten
-              </h2>
-              <LeadForm />
-            </div>
-          )}
-        </div>
-
-        <div className="flex justify-center space-x-8 text-center max-w-4xl mx-auto">
+        <div className="flex justify-center space-x-8 text-center max-w-4xl mx-auto mt-12">
           <div className="flex-1 p-4">
-            <div className="text-4xl font-bold text-solar-orange mb-2">60%</div>
+            <div className="text-4xl font-bold text-blue-600 mb-2">60%</div>
             <div className="text-gray-600">Durchschnittliche Energieeinsparung</div>
           </div>
           <div className="flex-1 p-4">
-            <div className="text-4xl font-bold text-solar-orange mb-2">26%</div>
+            <div className="text-4xl font-bold text-blue-600 mb-2">26%</div>
             <div className="text-gray-600">Staatliche Förderung</div>
           </div>
           <div className="flex-1 p-4">
-            <div className="text-4xl font-bold text-solar-orange mb-2">24/7</div>
+            <div className="text-4xl font-bold text-blue-600 mb-2">24/7</div>
             <div className="text-gray-600">Experten-Support</div>
           </div>
         </div>

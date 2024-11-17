@@ -3,7 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 
-export const LeadForm = () => {
+interface LeadFormProps {
+  formType?: "quote" | "consultation";
+}
+
+export const LeadForm = ({ formType = "quote" }: LeadFormProps) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -24,6 +28,7 @@ export const LeadForm = () => {
         method: "POST",
         body: JSON.stringify({
           ...formData,
+          type: formType,
           timestamp: new Date().toISOString(),
           source: window.location.href,
         }),
@@ -37,11 +42,14 @@ export const LeadForm = () => {
       }
 
       toast({
-        title: "Thanks for your interest!",
-        description: "A solar expert will contact you shortly.",
+        title: formType === "quote" 
+          ? "Vielen Dank für Ihre Anfrage!"
+          : "Vielen Dank für Ihre Terminanfrage!",
+        description: formType === "quote"
+          ? "Wir senden Ihnen in Kürze ein individuelles Angebot zu."
+          : "Wir melden uns zeitnah bei Ihnen zur Terminvereinbarung.",
       });
 
-      // Clear form
       setFormData({
         name: "",
         email: "",
@@ -49,8 +57,8 @@ export const LeadForm = () => {
       });
     } catch (error) {
       toast({
-        title: "Something went wrong",
-        description: "Please try again later.",
+        title: "Ein Fehler ist aufgetreten",
+        description: "Bitte versuchen Sie es später erneut.",
         variant: "destructive",
       });
     } finally {
@@ -63,7 +71,7 @@ export const LeadForm = () => {
       <div>
         <Input
           type="text"
-          placeholder="Full Name"
+          placeholder="Ihr Name"
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           required
@@ -73,7 +81,7 @@ export const LeadForm = () => {
       <div>
         <Input
           type="email"
-          placeholder="Email Address"
+          placeholder="Ihre E-Mail-Adresse"
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           required
@@ -83,7 +91,7 @@ export const LeadForm = () => {
       <div>
         <Input
           type="tel"
-          placeholder="Phone Number"
+          placeholder="Ihre Telefonnummer"
           value={formData.phone}
           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
           required
@@ -95,11 +103,15 @@ export const LeadForm = () => {
         className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:opacity-90"
         disabled={isSubmitting}
       >
-        {isSubmitting ? "Submitting..." : "Get Your Free Quote"}
+        {isSubmitting 
+          ? "Wird gesendet..." 
+          : formType === "quote"
+            ? "Kostenloses Angebot anfordern"
+            : "Beratungstermin anfragen"
+        }
       </Button>
       <p className="text-xs text-center text-gray-500 mt-2">
-        By submitting this form, you agree to our Terms of Service and Privacy
-        Policy
+        Mit dem Absenden stimmen Sie unseren Datenschutzbestimmungen zu
       </p>
     </form>
   );
