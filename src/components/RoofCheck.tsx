@@ -16,6 +16,7 @@ export const RoofCheck = ({ address }: { address: string }) => {
     annualSavings: 0,
     roofArea: 0,
     possiblePanels: 0,
+    kWp: 0,
   });
 
   const { isLoaded } = useLoadScript({
@@ -38,7 +39,7 @@ export const RoofCheck = ({ address }: { address: string }) => {
 
   const handleRoofOutlineComplete = (paths: google.maps.LatLng[][]) => {
     const totalRoofArea = calculateRoofArea(paths);
-    const { usableArea, possiblePanels, monthlyProduction, annualSavings } = 
+    const { usableArea, possiblePanels, monthlyProduction, annualSavings, kWp } = 
       calculateSolarMetrics(totalRoofArea);
 
     setMetrics({
@@ -46,6 +47,7 @@ export const RoofCheck = ({ address }: { address: string }) => {
       annualSavings,
       roofArea: usableArea,
       possiblePanels,
+      kWp,
     });
   };
 
@@ -53,7 +55,7 @@ export const RoofCheck = ({ address }: { address: string }) => {
 
   if (analyzing) {
     return (
-      <Card className="w-full max-w-2xl mx-auto p-6 bg-white animate-fade-up">
+      <Card className="w-full max-w-2xl mx-auto p-4 sm:p-6 bg-white animate-fade-up">
         <CardContent className="text-center">
           <div className="flex items-center justify-center mb-4">
             <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
@@ -70,9 +72,9 @@ export const RoofCheck = ({ address }: { address: string }) => {
   }
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-6 animate-fade-up">
+    <div className="w-full max-w-7xl mx-auto space-y-4 sm:space-y-6 p-4 animate-fade-up">
       <Card className="bg-white">
-        <CardContent className="p-6">
+        <CardContent className="p-4 sm:p-6">
           <RoofMap 
             coordinates={coordinates}
             onRoofOutlineComplete={handleRoofOutlineComplete}

@@ -23,6 +23,9 @@ export const calculateSolarMetrics = (roofArea: number) => {
   // Anzahl möglicher Panels
   const possiblePanels = Math.floor(usableArea / panelArea);
   
+  // Kilowattpeak (kWp) basierend auf 500W pro Modul
+  const kWp = (possiblePanels * 500) / 1000;
+  
   // Monatliche Produktion basierend auf 500W Modulen
   // Annahme: durchschnittlich 3 Sonnenstunden pro Tag
   // 500W * 3h * 30 Tage = 45 kWh pro Modul pro Monat
@@ -36,5 +39,6 @@ export const calculateSolarMetrics = (roofArea: number) => {
     possiblePanels,
     monthlyProduction,
     annualSavings,
+    kWp: Math.round(kWp * 10) / 10, // Runden auf eine Dezimalstelle
   };
 };
