@@ -6,6 +6,7 @@ import { RoofCheck } from "@/components/RoofCheck";
 import { LeadForm } from "@/components/LeadForm";
 import { SystemConfigurator } from "@/components/SystemConfigurator"; // Import the new SystemConfigurator component
 import { useLoadScript, Autocomplete } from "@react-google-maps/api";
+import { useNavigate } from "react-router-dom";
 
 const libraries = ["places"];
 
@@ -14,6 +15,7 @@ const Index = () => {
   const [address, setAddress] = useState("");
   const totalSteps = 3;
   const autocompleteRef = useRef(null);
+  const navigate = useNavigate();
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
@@ -30,6 +32,8 @@ const Index = () => {
   const nextStep = () => {
     if (step < totalSteps) {
       setStep(step + 1);
+    } else {
+      navigate("/configurator/consumption");
     }
   };
 
