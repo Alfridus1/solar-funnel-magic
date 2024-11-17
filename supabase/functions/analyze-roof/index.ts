@@ -33,7 +33,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4-vision-preview',
+        model: 'gpt-4o-mini',
         messages: [
           {
             role: 'system',
@@ -62,6 +62,10 @@ Important rules:
           {
             role: 'user',
             content: [
+              {
+                type: 'text',
+                text: 'Please analyze this satellite image and identify the roof outline of the main building.',
+              },
               {
                 type: 'image_url',
                 image_url: {
