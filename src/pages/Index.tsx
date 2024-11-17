@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { LeadForm } from "@/components/LeadForm";
 import { SystemConfigurator } from "@/components/SystemConfigurator";
 import { useLoadScript, Autocomplete } from "@react-google-maps/api";
-import { Calendar, Mail } from "lucide-react";
+import { ArrowRight, Home, Sun, Sparkles, Battery } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 const libraries = ["places"];
@@ -51,77 +51,90 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-solar-blue to-white">
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center mb-8 animate-fade-up">
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-            Ihre perfekte Solaranlage in wenigen Minuten
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Erhalten Sie sofort eine passende Konfiguration für Ihr Zuhause
-          </p>
-        </div>
-
+      <div className="container mx-auto px-4 py-12">
         {!showConfiguration ? (
-          <Card className="max-w-md mx-auto p-6 mb-8">
-            <h2 className="text-2xl font-semibold mb-4">
-              Wo möchten Sie Ihre Solaranlage installieren?
-            </h2>
-            <div className="space-y-4">
-              <Autocomplete
-                onLoad={(autocomplete) => {
-                  autocompleteRef.current = autocomplete;
-                }}
-                onPlaceChanged={onPlaceSelected}
-                restrictions={{ country: "de" }}
-              >
-                <Input
-                  type="text"
-                  placeholder="Geben Sie Ihre Adresse ein"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  className="w-full"
-                />
-              </Autocomplete>
-              <Button
-                onClick={handleAddressSubmit}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-              >
-                Konfiguration anzeigen
-              </Button>
-            </div>
-          </Card>
-        ) : (
           <div className="max-w-4xl mx-auto">
-            {!showLeadForm ? (
-              <>
-                <SystemConfigurator />
-                <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Button
-                    onClick={() => handleOptionSelect("quote")}
-                    className="p-8 h-auto flex flex-col items-center gap-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+            <div className="text-center mb-12 space-y-4 animate-fade-up">
+              <h1 className="text-4xl md:text-6xl font-bold text-gray-900 tracking-tight">
+                Ihre <span className="text-blue-600">Solaranlage</span> in wenigen Minuten konfigurieren
+              </h1>
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                Erhalten Sie eine maßgeschneiderte Lösung für Ihr Zuhause
+              </p>
+            </div>
+
+            <Card className="max-w-xl mx-auto p-8 shadow-lg bg-white/90 backdrop-blur animate-fade-up">
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <h2 className="text-2xl font-semibold text-gray-900">
+                    Wo möchten Sie Ihre Solaranlage installieren?
+                  </h2>
+                  <p className="text-gray-600">
+                    Geben Sie Ihre Adresse ein, um Ihre optimale Konfiguration zu erhalten
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  <Autocomplete
+                    onLoad={(autocomplete) => {
+                      autocompleteRef.current = autocomplete;
+                    }}
+                    onPlaceChanged={onPlaceSelected}
+                    restrictions={{ country: "de" }}
                   >
-                    <Mail className="h-8 w-8" />
-                    <div>
-                      <div className="text-lg font-semibold">Angebot erhalten</div>
-                      <div className="text-sm opacity-90">
-                        Kostenloses Angebot per E-Mail
-                      </div>
+                    <div className="relative">
+                      <Home className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                      <Input
+                        type="text"
+                        placeholder="Ihre Adresse eingeben..."
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        className="pl-10 h-12 text-lg"
+                      />
                     </div>
-                  </Button>
+                  </Autocomplete>
+                  
                   <Button
-                    onClick={() => handleOptionSelect("consultation")}
-                    className="p-8 h-auto flex flex-col items-center gap-4 bg-gradient-to-r from-green-600 to-teal-600 text-white"
+                    onClick={handleAddressSubmit}
+                    className="w-full h-12 text-lg bg-blue-600 hover:bg-blue-700 transition-colors"
                   >
-                    <Calendar className="h-8 w-8" />
-                    <div>
-                      <div className="text-lg font-semibold">Beratungstermin</div>
-                      <div className="text-sm opacity-90">
-                        Persönliche Beratung vereinbaren
-                      </div>
-                    </div>
+                    Solar-Potenzial berechnen
+                    <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </div>
-              </>
+              </div>
+            </Card>
+
+            <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+              <div className="flex flex-col items-center text-center space-y-3 p-6 rounded-lg bg-white/80 backdrop-blur shadow-sm">
+                <div className="p-3 bg-yellow-100 rounded-full">
+                  <Sun className="h-6 w-6 text-yellow-600" />
+                </div>
+                <h3 className="text-xl font-semibold">Maximale Effizienz</h3>
+                <p className="text-gray-600">Optimale Ausrichtung für maximalen Ertrag</p>
+              </div>
+
+              <div className="flex flex-col items-center text-center space-y-3 p-6 rounded-lg bg-white/80 backdrop-blur shadow-sm">
+                <div className="p-3 bg-green-100 rounded-full">
+                  <Sparkles className="h-6 w-6 text-green-600" />
+                </div>
+                <h3 className="text-xl font-semibold">Staatliche Förderung</h3>
+                <p className="text-gray-600">Bis zu 26% Förderung sichern</p>
+              </div>
+
+              <div className="flex flex-col items-center text-center space-y-3 p-6 rounded-lg bg-white/80 backdrop-blur shadow-sm">
+                <div className="p-3 bg-blue-100 rounded-full">
+                  <Battery className="h-6 w-6 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-semibold">Energieunabhängig</h3>
+                <p className="text-gray-600">Speichern Sie Ihren eigenen Strom</p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="max-w-6xl mx-auto">
+            {!showLeadForm ? (
+              <SystemConfigurator />
             ) : (
               <Card className="p-6">
                 <h2 className="text-2xl font-semibold mb-4 text-center">
@@ -134,21 +147,6 @@ const Index = () => {
             )}
           </div>
         )}
-
-        <div className="flex justify-center space-x-8 text-center max-w-4xl mx-auto mt-12">
-          <div className="flex-1 p-4">
-            <div className="text-4xl font-bold text-blue-600 mb-2">60%</div>
-            <div className="text-gray-600">Durchschnittliche Energieeinsparung</div>
-          </div>
-          <div className="flex-1 p-4">
-            <div className="text-4xl font-bold text-blue-600 mb-2">26%</div>
-            <div className="text-gray-600">Staatliche Förderung</div>
-          </div>
-          <div className="flex-1 p-4">
-            <div className="text-4xl font-bold text-blue-600 mb-2">24/7</div>
-            <div className="text-gray-600">Experten-Support</div>
-          </div>
-        </div>
       </div>
     </div>
   );
