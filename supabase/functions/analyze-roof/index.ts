@@ -31,7 +31,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are an expert at analyzing satellite images of roofs. Given a satellite image, identify the roof outline and return ONLY a JSON array of coordinates representing the roof edges, in the format [[lat1,lng1], [lat2,lng2], ...]. The response should contain nothing but the coordinate array.'
+            content: 'You are an expert at analyzing satellite images of roofs. When given a satellite image, identify the roof outline and return a JSON array of coordinates in the format [[lat1,lng1], [lat2,lng2], ...]. The coordinates should form a closed polygon around the main roof structure. Return ONLY the coordinate array, no additional text.'
           },
           {
             role: 'user',
@@ -42,45 +42,67 @@ serve(async (req) => {
               },
               {
                 type: 'text',
-                text: 'Return the coordinates of this roof as a JSON array.',
+                text: 'Analyze this roof and return its coordinates as a JSON array.',
               },
             ],
           },
         ],
         max_tokens: 1000,
-        temperature: 0.2,
+        temperature: 0,
       }),
     });
+
+    if (!response.ok) {
+      console.error('OpenAI API error:', await response.text());
+      throw new Error('Failed to get response from OpenAI');
+    }
 
     const data = await response.json();
     console.log('Raw OpenAI Response:', JSON.stringify(data));
 
     if (!data.choices?.[0]?.message?.content) {
-      console.error('Invalid OpenAI response structure:', data);
-      throw new Error('Invalid response structure from OpenAI');
+      console.error('Invalid response structure:', data);
+      throw new Error('Invalid response from OpenAI');
     }
 
-    const content = data.choices[0].message.content.trim();
-    console.log('OpenAI Response Content:', content);
+    let content = data.choices[0].message.content.trim();
+    console.log('Content before parsing:', content);
 
-    // Try to extract JSON array from the response
+    // Try to extract just the JSON array if there's additional text
+    const jsonMatch = content.match(/\[\s*\[.*?\]\s*\]/s);
+    if (jsonMatch) {
+      content = jsonMatch[0];
+    }
+
     let coordinates;
     try {
-      // First try direct JSON parse
       coordinates = JSON.parse(content);
       
-      // Verify it's an array of coordinate pairs
-      if (!Array.isArray(coordinates) || !coordinates.every(coord => 
-        Array.isArray(coord) && coord.length === 2 && 
-        typeof coord[0] === 'number' && typeof coord[1] === 'number')) {
-        throw new Error('Response is not in the correct coordinate format');
+      if (!Array.isArray(coordinates) || coordinates.length < 3) {
+        throw new Error('Invalid polygon: needs at least 3 points');
+      }
+
+      // Validate each coordinate pair
+      coordinates.forEach((coord, index) => {
+        if (!Array.isArray(coord) || coord.length !== 2 || 
+            typeof coord[0] !== 'number' || typeof coord[1] !== 'number') {
+          throw new Error(`Invalid coordinate at index ${index}`);
+        }
+      });
+
+      // Ensure the polygon is closed
+      const first = coordinates[0];
+      const last = coordinates[coordinates.length - 1];
+      if (first[0] !== last[0] || first[1] !== last[1]) {
+        coordinates.push([...first]); // Close the polygon
       }
     } catch (error) {
-      console.error('Failed to parse coordinates:', error);
-      throw new Error('Failed to parse roof coordinates from AI response');
+      console.error('Coordinate parsing error:', error);
+      console.error('Content that failed to parse:', content);
+      throw new Error(`Failed to parse coordinates: ${error.message}`);
     }
 
-    console.log('Parsed coordinates:', coordinates);
+    console.log('Final coordinates:', coordinates);
 
     return new Response(
       JSON.stringify({ coordinates }), 
