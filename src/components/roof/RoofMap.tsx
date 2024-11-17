@@ -20,14 +20,14 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
     const marker = new google.maps.Marker({
       position: coordinates,
       map: map,
+      animation: google.maps.Animation.BOUNCE,
       icon: {
         path: google.maps.SymbolPath.CIRCLE,
         scale: 10,
         fillColor: "#FF0000",
         fillOpacity: 0.8,
         strokeWeight: 2,
-        strokeColor: "#FF0000",
-        animation: google.maps.Animation.BOUNCE
+        strokeColor: "#FF0000"
       }
     });
     setTargetMarker(marker);
