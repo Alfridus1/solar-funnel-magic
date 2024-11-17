@@ -78,7 +78,6 @@ serve(async (req) => {
 
     let coordinates;
     try {
-      // Extract JSON array if there's additional text
       const jsonMatch = content.match(/\[\s*\[.*?\]\s*\]/s);
       if (jsonMatch) {
         content = jsonMatch[0];
