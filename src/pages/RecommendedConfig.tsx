@@ -3,10 +3,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
-  Car, 
+  Plug, 
   Battery, 
   HomeIcon, 
-  ChargingPile, 
   Calendar,
   Mail
 } from "lucide-react";

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChargingPile, Battery, HomeIcon } from "lucide-react";
+import { Plug, Battery, HomeIcon } from "lucide-react";
 
 interface Extra {
   id: string;
@@ -20,7 +20,7 @@ export const Extras = () => {
       name: "Wallbox",
       description: "11kW Ladeleistung für Ihr E-Auto",
       price: 1299,
-      icon: <ChargingPile className="h-6 w-6" />,
+      icon: <Plug className="h-6 w-6" />,
     },
     {
       id: "battery",
