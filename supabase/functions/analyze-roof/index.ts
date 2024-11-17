@@ -15,22 +15,24 @@ serve(async (req) => {
     const { imageUrl, location } = await req.json();
     
     if (!imageUrl) {
-      throw new Error('Bild-URL ist erforderlich');
+      throw new Error('Image URL is required');
     }
 
-    console.log('Analysiere Satellitenbild an Position:', location);
+    console.log('Analyzing satellite image at location:', location);
 
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openAIApiKey) {
-      console.error('OpenAI API Schlüssel nicht konfiguriert');
-      throw new Error('OpenAI API Schlüssel nicht konfiguriert');
+      console.error('OpenAI API key not configured');
+      throw new Error('OpenAI API key not configured');
     }
 
-    // Verbesserte Bildqualität durch höhere Auflösung
+    // Enhanced image quality with higher resolution
     const enhancedImageUrl = imageUrl
       .replace('size=', 'size=1200x1200')
       .replace('zoom=', 'zoom=' + (location?.zoom || 19))
       .concat('&scale=2');
+
+    console.log('Enhanced image URL:', enhancedImageUrl);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -39,57 +41,68 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4-vision-preview',
         messages: [
           {
             role: 'system',
-            content: `Du bist ein hochspezialisierter Experte für die Analyse von Satelliten- und Luftbildern. 
-            Deine Aufgabe ist es, die Umrisse eines Dachs in einem Satellitenbild zu identifizieren.
+            content: `You are a highly specialized expert in analyzing satellite and aerial imagery. 
+            Your task is to identify roof outlines in satellite images.
             
-            Erkennungsmerkmale für Dächer:
-            - Rechteckige oder L-förmige Strukturen
-            - Klare Kanten und Linien
-            - Kontraste zwischen Dach und Umgebung
-            - Typische Dachstrukturen (Schornsteine, Fenster)
+            Key features for roof detection:
+            - Rectangular or L-shaped structures
+            - Clear edges and lines
+            - Contrast between roof and surroundings
+            - Typical roof structures (chimneys, windows)
             
-            Gib die Koordinaten als Array von [lat, lng] Paaren zurück.
+            Return coordinates as an array of [lat, lng] pairs.
             Format: {"coordinates": [[lat1,lng1], [lat2,lng2], ...]}
             
-            Bei Fehlern: {"error": "Fehlerbeschreibung"}`
+            For errors: {"error": "Error description"}`
           },
           {
             role: 'user',
-            content: `Analysiere dieses Satellitenbild und identifiziere die Umrisse des Hauptdachs.
-            Standort: ${location?.lat}, ${location?.lng}
-            Zoom: ${location?.zoom}
-            Bild-URL: ${enhancedImageUrl}`
+            content: [
+              {
+                type: "text",
+                text: `Analyze this satellite image and identify the main roof outline.
+                Location: ${location?.lat}, ${location?.lng}
+                Zoom: ${location?.zoom}`
+              },
+              {
+                type: "image_url",
+                image_url: {
+                  url: enhancedImageUrl
+                }
+              }
+            ]
           }
         ],
+        max_tokens: 1000,
         temperature: 0.3,
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('OpenAI API Fehler:', errorText);
-      throw new Error(`OpenAI API Fehler: ${response.status} ${response.statusText}`);
+      console.error('OpenAI API Error:', errorText);
+      throw new Error(`OpenAI API Error: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
-    console.log('OpenAI Antwort:', JSON.stringify(data));
+    console.log('OpenAI Response:', JSON.stringify(data));
 
     if (!data.choices?.[0]?.message?.content) {
-      throw new Error('Unerwartete Antwortstruktur von OpenAI');
+      throw new Error('Unexpected response structure from OpenAI');
     }
 
     let content = data.choices[0].message.content.trim();
-    console.log('Zu parsender Inhalt:', content);
+    console.log('Content to parse:', content);
 
     try {
       const parsedContent = JSON.parse(content);
       
       if (parsedContent.error) {
-        console.log('KI meldet Fehler:', parsedContent.error);
+        console.log('AI reports error:', parsedContent.error);
         return new Response(
           JSON.stringify({ error: parsedContent.error }), 
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -97,14 +110,14 @@ serve(async (req) => {
       }
 
       if (!parsedContent.coordinates || !Array.isArray(parsedContent.coordinates)) {
-        throw new Error('Ungültiges Antwortformat von der KI');
+        throw new Error('Invalid response format from AI');
       }
 
       const coordinates = parsedContent.coordinates;
 
-      // Validierung der Koordinaten
+      // Validate coordinates
       if (coordinates.length < 4) {
-        throw new Error('Zu wenige Punkte für ein valides Polygon');
+        throw new Error('Too few points for a valid polygon');
       }
 
       const validCoordinates = coordinates.every((coord: any) => 
@@ -117,10 +130,10 @@ serve(async (req) => {
       );
 
       if (!validCoordinates) {
-        throw new Error('Ungültiges Koordinatenformat in der KI-Antwort');
+        throw new Error('Invalid coordinate format in AI response');
       }
 
-      // Sicherstellen, dass das Polygon geschlossen ist
+      // Ensure polygon is closed
       const first = coordinates[0];
       const last = coordinates[coordinates.length - 1];
       if (first[0] !== last[0] || first[1] !== last[1]) {
@@ -133,16 +146,16 @@ serve(async (req) => {
       );
 
     } catch (error) {
-      console.error('Fehler beim Parsen der KI-Antwort:', error);
-      console.error('Roher Inhalt, der nicht geparst werden konnte:', content);
-      throw new Error('Fehler beim Parsen der KI-Antwort');
+      console.error('Error parsing AI response:', error);
+      console.error('Raw content that could not be parsed:', content);
+      throw new Error('Error parsing AI response');
     }
   } catch (error) {
-    console.error('Fehler in der analyze-roof Funktion:', error);
+    console.error('Error in analyze-roof function:', error);
     return new Response(
       JSON.stringify({ 
         error: error.message,
-        details: 'Fehler bei der Dachanalyse. Bitte versuchen Sie es erneut.' 
+        details: 'Error analyzing roof. Please try again.' 
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
