@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { ProgressBar } from "@/components/ProgressBar";
 import { RoofCheck } from "@/components/RoofCheck";
 import { LeadForm } from "@/components/LeadForm";
+import { SystemConfigurator } from "@/components/SystemConfigurator"; // Import the new SystemConfigurator component
 import { useLoadScript, Autocomplete } from "@react-google-maps/api";
 
 const libraries = ["places"];
@@ -83,9 +84,13 @@ const Index = () => {
           )}
 
           {step === 2 && (
-            <div className="animate-fade-up">
+            <div className="animate-fade-up w-full max-w-7xl mx-auto">
               <h2 className="text-2xl font-semibold mb-4">Analyse Ihres Daches</h2>
               <RoofCheck address={address} />
+              <div className="mt-8">
+                <h2 className="text-2xl font-semibold mb-4">Konfigurieren Sie Ihr System</h2>
+                <SystemConfigurator />
+              </div>
               <Button
                 onClick={nextStep}
                 className="w-full mt-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white"
