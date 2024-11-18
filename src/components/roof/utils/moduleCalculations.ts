@@ -30,13 +30,10 @@ export const calculateModulePositions = (
   const modulesInRow = Math.floor(gridWidth / (moduleWidthDeg + marginDeg));
   const modulesInColumn = Math.floor(gridHeight / (moduleHeightDeg + marginDeg));
 
-  // Rotation angle in radians (10 degrees counterclockwise)
-  const rotationAngle = -10 * (Math.PI / 180);
-
   // Create modules
   for (let row = 0; row < modulesInColumn; row++) {
     for (let col = 0; col < modulesInRow; col++) {
-      // Calculate center position before rotation
+      // Calculate center position
       const baseLat = bounds.getSouthWest().lat() + marginDeg + 
         (row * (moduleHeightDeg + marginDeg)) + (moduleHeightDeg / 2);
       const baseLng = bounds.getSouthWest().lng() + marginDeg + 
@@ -60,8 +57,7 @@ export const calculateModulePositions = (
           fillColor: "#2563eb",
           fillOpacity: 0.4,
           strokeColor: "#1e40af",
-          strokeWeight: 1,
-          rotation: -10 // 10 degrees counterclockwise
+          strokeWeight: 1
         });
 
         modules.push(moduleRect);
