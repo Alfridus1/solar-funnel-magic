@@ -36,6 +36,33 @@ export type Database = {
         }
         Relationships: []
       }
+      faqs: {
+        Row: {
+          answer: string
+          created_at: string | null
+          id: string
+          order_number: number
+          question: string
+          updated_at: string | null
+        }
+        Insert: {
+          answer: string
+          created_at?: string | null
+          id?: string
+          order_number: number
+          question: string
+          updated_at?: string | null
+        }
+        Update: {
+          answer?: string
+          created_at?: string | null
+          id?: string
+          order_number?: number
+          question?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       opensolar_installations: {
         Row: {
           contract_value: number
@@ -176,6 +203,36 @@ export type Database = {
           name?: string
           price?: number
           specs?: Json
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      testimonials: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          rating: number
+          role: string
+          text: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          rating: number
+          role: string
+          text: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          rating?: number
+          role?: string
+          text?: string
           updated_at?: string | null
         }
         Relationships: []

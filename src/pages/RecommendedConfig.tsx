@@ -2,17 +2,14 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { 
-  Plug, 
-  Battery, 
-  HomeIcon, 
-  Calendar,
-  Mail
-} from "lucide-react";
+import { Mail, Calendar } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { ConfigurationSummary } from "@/components/configurator/ConfigurationSummary";
 import { Extras } from "@/components/configurator/Extras";
 import { LeadForm } from "@/components/LeadForm";
+import { SavingsCalculator } from "@/components/SavingsCalculator";
+import { Testimonials } from "@/components/Testimonials";
+import { FAQ } from "@/components/FAQ";
 
 export const RecommendedConfig = () => {
   const location = useLocation();
@@ -33,8 +30,10 @@ export const RecommendedConfig = () => {
     setShowLeadForm(true);
   };
 
+  const yearlyProduction = metrics.moduleCount * 400 * 0.9; // Rough estimate: moduleCount * nominal power * performance ratio
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-solar-blue to-white py-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#F75c03]/5 to-white py-8">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold text-center mb-8">
@@ -44,12 +43,15 @@ export const RecommendedConfig = () => {
           {!showLeadForm ? (
             <>
               <ConfigurationSummary metrics={metrics} address={address} />
+              <div className="mt-8">
+                <SavingsCalculator yearlyProduction={yearlyProduction} />
+              </div>
               <Extras />
               
               <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Button
                   onClick={() => handleOptionSelect("quote")}
-                  className="p-8 h-auto flex flex-col items-center gap-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                  className="p-8 h-auto flex flex-col items-center gap-4 bg-gradient-to-r from-[#F75c03] to-[#F75c03]/80 text-white"
                 >
                   <Mail className="h-8 w-8" />
                   <div>
@@ -61,7 +63,8 @@ export const RecommendedConfig = () => {
                 </Button>
                 <Button
                   onClick={() => handleOptionSelect("consultation")}
-                  className="p-8 h-auto flex flex-col items-center gap-4 bg-gradient-to-r from-green-600 to-teal-600 text-white"
+                  variant="outline"
+                  className="p-8 h-auto flex flex-col items-center gap-4 border-[#F75c03] text-[#F75c03] hover:bg-[#F75c03]/10"
                 >
                   <Calendar className="h-8 w-8" />
                   <div>
@@ -72,6 +75,9 @@ export const RecommendedConfig = () => {
                   </div>
                 </Button>
               </div>
+
+              <Testimonials />
+              <FAQ />
             </>
           ) : (
             <Card className="p-6">
