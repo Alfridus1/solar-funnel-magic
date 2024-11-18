@@ -91,24 +91,36 @@ export const calculateModulePositions = (
 
       // Only place module if its center is within the polygon
       if (google.maps.geometry.poly.containsLocation(moduleCenter, polygon)) {
-        const moduleBounds = {
-          north: rotatedY + (moduleHeightDeg / 2),
-          south: rotatedY - (moduleHeightDeg / 2),
-          east: rotatedX + (moduleWidthDeg / 2),
-          west: rotatedX - (moduleWidthDeg / 2)
-        };
+        // Instead of using rotation property, we adjust the module corners based on rotation
+        const cornerOffsetX = moduleWidthDeg / 2;
+        const cornerOffsetY = moduleHeightDeg / 2;
+        
+        // Calculate rotated corners
+        const corners = [
+          [-cornerOffsetX, -cornerOffsetY],
+          [cornerOffsetX, -cornerOffsetY],
+          [cornerOffsetX, cornerOffsetY],
+          [-cornerOffsetX, cornerOffsetY]
+        ].map(([x, y]) => {
+          const rotX = x * cos - y * sin;
+          const rotY = x * sin + y * cos;
+          return new google.maps.LatLng(
+            rotatedY + rotY,
+            rotatedX + rotX
+          );
+        });
 
-        const moduleRect = new google.maps.Rectangle({
-          bounds: moduleBounds,
+        // Create a polygon for each module instead of a rectangle
+        const modulePolygon = new google.maps.Polygon({
+          paths: corners,
           map: map,
           fillColor: "#2563eb",
           fillOpacity: 0.4,
           strokeColor: "#1e40af",
-          strokeWeight: 1,
-          rotation: (rotationAngle * 180 / Math.PI)
+          strokeWeight: 1
         });
 
-        modules.push(moduleRect);
+        modules.push(modulePolygon as unknown as google.maps.Rectangle);
       }
     }
   }
