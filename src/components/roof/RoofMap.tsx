@@ -47,11 +47,13 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
       const lastPolygon = polygons[polygons.length - 1];
       lastPolygon.setMap(null);
       setPolygons((prev) => prev.slice(0, -1));
-      setRoofDetails((prev) => prev.slice(0, -1));
+      
+      const updatedRoofDetails = roofDetails.slice(0, -1);
+      setRoofDetails(updatedRoofDetails);
       clearModules();
 
       const allPaths = polygons.slice(0, -1).map((poly) => poly.getPath().getArray());
-      onRoofOutlineComplete(allPaths, roofDetails.slice(0, -1));
+      onRoofOutlineComplete(allPaths, updatedRoofDetails);
 
       toast({
         title: "Dach entfernt",

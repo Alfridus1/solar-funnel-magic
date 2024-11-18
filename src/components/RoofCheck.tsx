@@ -49,9 +49,10 @@ export const RoofCheck = ({ address }: { address: string }) => {
     newRoofDetails: { roofId: string; moduleCount: number }[]
   ) => {
     const totalRoofArea = calculateRoofArea(paths);
+    const totalModules = newRoofDetails.reduce((sum, roof) => sum + roof.moduleCount, 0);
+    
     const {
       usableArea,
-      possiblePanels,
       monthlyProduction,
       annualSavings,
       kWp,
@@ -62,7 +63,7 @@ export const RoofCheck = ({ address }: { address: string }) => {
       monthlyProduction,
       annualSavings,
       roofArea: usableArea,
-      possiblePanels,
+      possiblePanels: totalModules,
       kWp,
     });
   };
