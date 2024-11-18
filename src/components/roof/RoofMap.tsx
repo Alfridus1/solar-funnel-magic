@@ -7,7 +7,7 @@ import { calculateModulePositions } from "./utils/moduleCalculations";
 
 interface RoofMapProps {
   coordinates: { lat: number; lng: number };
-  onRoofOutlineComplete: (paths: google.maps.LatLng[][]) => void;
+  onRoofOutlineComplete: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number }[]) => void;
 }
 
 export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) => {
@@ -15,6 +15,7 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
   const [polygons, setPolygons] = useState<google.maps.Polygon[]>([]);
   const [modules, setModules] = useState<google.maps.Rectangle[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [roofDetails, setRoofDetails] = useState<{ roofId: string; moduleCount: number }[]>([]);
   const { toast } = useToast();
 
   const mapContainerStyle = {
@@ -36,8 +37,7 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
     clearModules();
     toast({
       title: "Zeichenmodus aktiviert",
-      description:
-        "Klicken Sie nacheinander auf die Ecken Ihres Daches. Klicken Sie zum Abschluss auf den ersten Punkt zurück.",
+      description: "Klicken Sie nacheinander auf die Ecken Ihres Daches. Klicken Sie zum Abschluss auf den ersten Punkt zurück.",
       duration: 5000,
     });
   };
@@ -47,10 +47,11 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
       const lastPolygon = polygons[polygons.length - 1];
       lastPolygon.setMap(null);
       setPolygons((prev) => prev.slice(0, -1));
+      setRoofDetails((prev) => prev.slice(0, -1));
       clearModules();
 
       const allPaths = polygons.slice(0, -1).map((poly) => poly.getPath().getArray());
-      onRoofOutlineComplete(allPaths);
+      onRoofOutlineComplete(allPaths, roofDetails.slice(0, -1));
 
       toast({
         title: "Dach entfernt",
@@ -64,12 +65,15 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
     setPolygons((prev) => [...prev, polygon]);
     setIsDrawing(false);
 
-    const moduleCount = calculateModulePositions(polygon, map, setModules);
+    const { moduleCount, roofId } = calculateModulePositions(polygon, map, setModules);
+    
+    const newRoofDetails = [...roofDetails, { roofId, moduleCount }];
+    setRoofDetails(newRoofDetails);
 
     const allPaths = [...polygons, polygon].map((poly) =>
       poly.getPath().getArray()
     );
-    onRoofOutlineComplete(allPaths);
+    onRoofOutlineComplete(allPaths, newRoofDetails);
 
     toast({
       title: "Sehr gut!",

@@ -17,6 +17,7 @@ export const RoofCheck = ({ address }: { address: string }) => {
   const navigate = useNavigate();
   const [analyzing, setAnalyzing] = useState(true);
   const [coordinates, setCoordinates] = useState({ lat: 51.1657, lng: 10.4515 });
+  const [roofDetails, setRoofDetails] = useState<{ roofId: string; moduleCount: number }[]>([]);
   const [metrics, setMetrics] = useState({
     monthlyProduction: 0,
     annualSavings: 0,
@@ -43,7 +44,10 @@ export const RoofCheck = ({ address }: { address: string }) => {
     }
   }, [address, isLoaded]);
 
-  const handleRoofOutlineComplete = (paths: google.maps.LatLng[][]) => {
+  const handleRoofOutlineComplete = (
+    paths: google.maps.LatLng[][],
+    newRoofDetails: { roofId: string; moduleCount: number }[]
+  ) => {
     const totalRoofArea = calculateRoofArea(paths);
     const {
       usableArea,
@@ -53,6 +57,7 @@ export const RoofCheck = ({ address }: { address: string }) => {
       kWp,
     } = calculateSolarMetrics(totalRoofArea);
 
+    setRoofDetails(newRoofDetails);
     setMetrics({
       monthlyProduction,
       annualSavings,
@@ -67,6 +72,7 @@ export const RoofCheck = ({ address }: { address: string }) => {
       state: {
         metrics,
         address,
+        roofDetails,
       },
     });
   };
@@ -99,7 +105,7 @@ export const RoofCheck = ({ address }: { address: string }) => {
             coordinates={coordinates}
             onRoofOutlineComplete={handleRoofOutlineComplete}
           />
-          <RoofMetrics {...metrics} />
+          <RoofMetrics {...metrics} roofDetails={roofDetails} />
           {metrics.roofArea > 0 && (
             <div className="mt-6 flex justify-center">
               <Button
