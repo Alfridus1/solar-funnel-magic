@@ -23,10 +23,10 @@ export const calculateModulePositions = (
   const moduleHeightDeg = MODULE_HEIGHT / latMetersPerDegree;
   const marginDeg = FRAME_MARGIN / latMetersPerDegree;
 
-  // Calculate the angle of the roof based on the drawn polygon
+  // Calculate the angle based on the shortest side of the polygon
   const points = path.getArray();
-  let maxLength = 0;
-  let longestSegmentAngle = 0;
+  let minLength = Infinity;
+  let shortestSegmentAngle = 0;
 
   for (let i = 0; i < points.length; i++) {
     const p1 = points[i];
@@ -35,9 +35,9 @@ export const calculateModulePositions = (
     const dy = p2.lat() - p1.lat();
     const length = Math.sqrt(dx * dx + dy * dy);
     
-    if (length > maxLength) {
-      maxLength = length;
-      longestSegmentAngle = Math.atan2(dy, dx);
+    if (length < minLength) {
+      minLength = length;
+      shortestSegmentAngle = Math.atan2(dy, dx);
     }
   }
 
@@ -56,9 +56,9 @@ export const calculateModulePositions = (
   const roofId = Math.random().toString(36).substr(2, 9);
   polygon.set('roofId', roofId);
 
-  // Rotate module placement grid to align with roof angle
-  const cos = Math.cos(-longestSegmentAngle);
-  const sin = Math.sin(-longestSegmentAngle);
+  // Rotate module placement grid to align with shortest side
+  const cos = Math.cos(-shortestSegmentAngle + Math.PI/2); // Add 90 degrees to align parallel
+  const sin = Math.sin(-shortestSegmentAngle + Math.PI/2);
 
   for (let lat = south; lat < north; lat += moduleHeightDeg) {
     for (let lng = west; lng < east; lng += moduleWidthDeg) {
