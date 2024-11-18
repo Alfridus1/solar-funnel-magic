@@ -19,10 +19,6 @@ export const calculateModulePositions = (
   const latMetersPerDegree = METERS_PER_DEGREE;
   const lngMetersPerDegree = METERS_PER_DEGREE * Math.cos(center.lat() * Math.PI / 180);
 
-  const moduleWidthDeg = MODULE_WIDTH / lngMetersPerDegree;
-  const moduleHeightDeg = MODULE_HEIGHT / latMetersPerDegree;
-  const marginDeg = FRAME_MARGIN / latMetersPerDegree;
-
   // Calculate the angle based on the shortest side of the polygon
   const points = path.getArray();
   let minLength = Infinity;
@@ -41,7 +37,12 @@ export const calculateModulePositions = (
     }
   }
 
-  // Adjust bounds to use reduced area with safety margin
+  // Convert module dimensions to degrees
+  const moduleWidthDeg = MODULE_WIDTH / lngMetersPerDegree;
+  const moduleHeightDeg = MODULE_HEIGHT / latMetersPerDegree;
+  const marginDeg = FRAME_MARGIN / latMetersPerDegree;
+
+  // Calculate usable area with safety margin
   const fullHeight = bounds.getNorthEast().lat() - bounds.getSouthWest().lat();
   const fullWidth = bounds.getNorthEast().lng() - bounds.getSouthWest().lng();
   
@@ -56,32 +57,45 @@ export const calculateModulePositions = (
   const roofId = Math.random().toString(36).substr(2, 9);
   polygon.set('roofId', roofId);
 
-  // Rotate module placement grid to align with shortest side
-  const cos = Math.cos(-shortestSegmentAngle + Math.PI/2); // Add 90 degrees to align parallel
-  const sin = Math.sin(-shortestSegmentAngle + Math.PI/2);
+  // Calculate grid dimensions
+  const gridWidth = east - west;
+  const gridHeight = north - south;
 
-  for (let lat = south; lat < north; lat += moduleHeightDeg) {
-    for (let lng = west; lng < east; lng += moduleWidthDeg) {
-      // Calculate module center point
-      const centerLat = lat + moduleHeightDeg / 2;
-      const centerLng = lng + moduleWidthDeg / 2;
+  // Calculate number of modules that can fit in each direction
+  const modulesInRow = Math.floor(gridWidth / moduleWidthDeg);
+  const modulesInColumn = Math.floor(gridHeight / moduleHeightDeg);
+
+  // Rotate module placement grid to align with shortest side
+  const rotationAngle = shortestSegmentAngle + Math.PI/2; // Add 90 degrees to align parallel
+  const cos = Math.cos(-rotationAngle);
+  const sin = Math.sin(-rotationAngle);
+
+  // Place modules in a grid pattern
+  for (let row = 0; row < modulesInColumn; row++) {
+    for (let col = 0; col < modulesInRow; col++) {
+      // Calculate base position for this module
+      const baseX = west + (col * moduleWidthDeg);
+      const baseY = south + (row * moduleHeightDeg);
+
+      // Calculate center point for this module
+      const centerX = baseX + (moduleWidthDeg / 2);
+      const centerY = baseY + (moduleHeightDeg / 2);
 
       // Rotate point around roof center
-      const dx = centerLng - center.lng();
-      const dy = centerLat - center.lat();
-      const rotatedLng = center.lng() + (dx * cos - dy * sin);
-      const rotatedLat = center.lat() + (dx * sin + dy * cos);
+      const dx = centerX - center.lng();
+      const dy = centerY - center.lat();
+      const rotatedX = center.lng() + (dx * cos - dy * sin);
+      const rotatedY = center.lat() + (dx * sin + dy * cos);
 
-      const moduleCenter = new google.maps.LatLng(rotatedLat, rotatedLng);
+      const moduleCenter = new google.maps.LatLng(rotatedY, rotatedX);
 
-      // Check if module center is within polygon with additional safety check
+      // Only place module if its center is within the polygon
       if (google.maps.geometry.poly.containsLocation(moduleCenter, polygon)) {
-        // Create module rectangle with rotation
         const moduleBounds = {
-          north: rotatedLat + (moduleHeightDeg / 2),
-          south: rotatedLat - (moduleHeightDeg / 2),
-          east: rotatedLng + (moduleWidthDeg / 2),
-          west: rotatedLng - (moduleWidthDeg / 2)
+          north: rotatedY + (moduleHeightDeg / 2),
+          south: rotatedY - (moduleHeightDeg / 2),
+          east: rotatedX + (moduleWidthDeg / 2),
+          west: rotatedX - (moduleWidthDeg / 2)
         };
 
         const moduleRect = new google.maps.Rectangle({
@@ -90,7 +104,8 @@ export const calculateModulePositions = (
           fillColor: "#2563eb",
           fillOpacity: 0.4,
           strokeColor: "#1e40af",
-          strokeWeight: 1
+          strokeWeight: 1,
+          rotation: (rotationAngle * 180 / Math.PI)
         });
 
         modules.push(moduleRect);
