@@ -1,5 +1,7 @@
 import { MODULE_WIDTH, MODULE_HEIGHT, FRAME_MARGIN, METERS_PER_DEGREE } from './constants';
 
+const USABLE_AREA_FACTOR = 0.75; // Only use 75% of the marked area
+
 export const calculateModulePositions = (
   polygon: google.maps.Polygon,
   map: google.maps.Map | null,
@@ -21,10 +23,17 @@ export const calculateModulePositions = (
   const moduleHeightDeg = MODULE_HEIGHT / latMetersPerDegree;
   const marginDeg = FRAME_MARGIN / latMetersPerDegree;
 
-  const north = bounds.getNorthEast().lat() - marginDeg;
-  const south = bounds.getSouthWest().lat() + marginDeg;
-  const east = bounds.getNorthEast().lng() - marginDeg;
-  const west = bounds.getSouthWest().lng() + marginDeg;
+  // Adjust bounds to use only 75% of the area
+  const fullHeight = bounds.getNorthEast().lat() - bounds.getSouthWest().lat();
+  const fullWidth = bounds.getNorthEast().lng() - bounds.getSouthWest().lng();
+  
+  const heightReduction = fullHeight * (1 - Math.sqrt(USABLE_AREA_FACTOR)) / 2;
+  const widthReduction = fullWidth * (1 - Math.sqrt(USABLE_AREA_FACTOR)) / 2;
+
+  const north = bounds.getNorthEast().lat() - heightReduction - marginDeg;
+  const south = bounds.getSouthWest().lat() + heightReduction + marginDeg;
+  const east = bounds.getNorthEast().lng() - widthReduction - marginDeg;
+  const west = bounds.getSouthWest().lng() + widthReduction + marginDeg;
 
   const roofId = Math.random().toString(36).substr(2, 9);
   polygon.set('roofId', roofId);

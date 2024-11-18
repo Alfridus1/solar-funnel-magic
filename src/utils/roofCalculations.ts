@@ -4,6 +4,7 @@ const MODULE_AREA = MODULE_WIDTH * MODULE_HEIGHT;
 const PANEL_WATTS = 400; // Typical watts per panel
 const ANNUAL_KWH_PER_KWP = 1000; // Annual kWh production per kWp in Germany
 const ELECTRICITY_PRICE = 0.40; // Average electricity price in EUR/kWh
+const USABLE_AREA_FACTOR = 0.75; // Only use 75% of the marked area
 
 export const calculateRoofArea = (paths: google.maps.LatLng[][]) => {
   return paths.reduce((totalArea, path) => {
@@ -14,7 +15,7 @@ export const calculateRoofArea = (paths: google.maps.LatLng[][]) => {
 
 export const calculateSolarMetrics = (totalRoofArea: number) => {
   // Convert from square meters to actual usable area (considering roof angle and spacing)
-  const usableArea = totalRoofArea * 0.7;
+  const usableArea = totalRoofArea * USABLE_AREA_FACTOR;
   
   // Calculate how many panels can fit
   const possiblePanels = Math.floor(usableArea / MODULE_AREA);
