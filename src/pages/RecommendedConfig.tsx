@@ -30,7 +30,7 @@ export const RecommendedConfig = () => {
     setShowLeadForm(true);
   };
 
-  const yearlyProduction = metrics.moduleCount * 400 * 0.9; // Rough estimate: moduleCount * nominal power * performance ratio
+  const yearlyProduction = metrics.monthlyProduction * 12;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F75c03]/5 to-white py-8">
@@ -43,9 +43,25 @@ export const RecommendedConfig = () => {
           {!showLeadForm ? (
             <>
               <ConfigurationSummary metrics={metrics} address={address} />
+              
+              <div className="mt-8">
+                <h2 className="text-2xl font-semibold mb-4">Unsere Full Black Module</h2>
+                <div className="flex items-center justify-center mb-6">
+                  <img 
+                    src="/lovable-uploads/fe437c08-df76-4ced-92d4-e82b0a6afe5c.png" 
+                    alt="Full Black Solar Module 500W" 
+                    className="max-w-full h-auto rounded-lg shadow-lg"
+                  />
+                </div>
+                <p className="text-center text-gray-700 mb-8">
+                  Hocheffiziente 500W Full Black Module für maximale Leistung und ästhetisches Design
+                </p>
+              </div>
+
               <div className="mt-8">
                 <SavingsCalculator yearlyProduction={yearlyProduction} />
               </div>
+              
               <Extras />
               
               <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
