@@ -1,4 +1,4 @@
-import { Sun, Battery, Zap, Thermometer } from "lucide-react";
+import { Sun, Battery, Zap, Thermometer, Power } from "lucide-react";
 
 const featureConfigs = {
   solar: {
@@ -60,6 +60,21 @@ const featureConfigs = {
       "7 Jahre Garantie"
     ],
     image: "/heatpump-image.png"
+  },
+  wallbox: {
+    icon: Power,
+    position: "bottom-1/4 right-1/4",
+    backgroundColor: "bg-purple-500",
+    iconColor: "text-purple-500",
+    label: "Wallbox",
+    title: "Smart Wallbox",
+    description: "Intelligente Ladestation für Ihr Elektrofahrzeug",
+    specs: [
+      "11kW Ladeleistung",
+      "Bidirektionales Laden",
+      "Smart Home Integration"
+    ],
+    image: "/wallbox-image.png"
   }
 } as const;
 

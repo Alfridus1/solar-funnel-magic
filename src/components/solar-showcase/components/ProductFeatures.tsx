@@ -10,11 +10,11 @@ interface ProductFeaturesProps {
 }
 
 export const ProductFeatures = ({ activeFeature, onFeatureSelect }: ProductFeaturesProps) => {
-  const features = ["solar", "inverter", "battery", "heatpump"];
+  const features = ["solar", "inverter", "battery", "heatpump", "wallbox"];
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-center gap-4">
+      <div className="flex justify-center gap-4 flex-wrap">
         {features.map((feature) => {
           const config = getFeatureConfig(feature);
           return (
@@ -79,3 +79,5 @@ const ProductDetail = ({ feature }: { feature: string }) => {
     </Card>
   );
 };
+
+export default ProductFeatures;
