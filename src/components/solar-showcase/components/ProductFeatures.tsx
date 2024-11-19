@@ -1,7 +1,8 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getFeatureConfig } from "../utils/featureConfig";
+import { cn } from "@/lib/utils";
 
 interface ProductFeaturesProps {
   activeFeature: string;

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Sun, Battery, TrendingUp } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface SolarMetricsProps {
   kWp: number;

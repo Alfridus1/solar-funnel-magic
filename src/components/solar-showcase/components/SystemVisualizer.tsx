@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { getFeatureConfig } from "../utils/featureConfig";
+import { cn } from "@/lib/utils";
 
 interface SystemVisualizerProps {
   activeFeature: string;
