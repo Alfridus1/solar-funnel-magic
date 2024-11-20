@@ -26,32 +26,6 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured');
     }
 
-    // Parse and validate the URL
-    const url = new URL(imageUrl);
-    const sizeParam = url.searchParams.get('size');
-    if (!sizeParam) {
-      throw new Error('Size parameter is missing from the image URL');
-    }
-
-    // Validate size format
-    const [width, height] = sizeParam.split('x').map(Number);
-    if (isNaN(width) || isNaN(height)) {
-      throw new Error('Invalid size format in image URL');
-    }
-
-    // Enhance image quality and zoom level for better roof detection
-    const enhancedImageUrl = `https://maps.googleapis.com/maps/api/staticmap`
-      + `?center=${location?.lat},${location?.lng}`
-      + `&zoom=${location?.zoom || 20}` // Increased zoom level for better detail
-      + `&size=${Math.min(width * 2, 1024)}x${Math.min(height * 2, 1024)}` // Increased resolution
-      + `&scale=2`
-      + `&maptype=satellite`
-      + `&markers=color:red|${location?.lat},${location?.lng}`
-      + `&style=feature:all|element:labels|visibility:off`
-      + `&key=${url.searchParams.get('key')}`;
-
-    console.log('Enhanced image URL:', enhancedImageUrl);
-
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -59,7 +33,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: 'gpt-4o-mini',
         messages: [
           {
             role: 'system',
@@ -94,7 +68,7 @@ serve(async (req) => {
               {
                 type: "image_url",
                 image_url: {
-                  url: enhancedImageUrl,
+                  url: imageUrl,
                   detail: "high"
                 }
               }
@@ -102,7 +76,7 @@ serve(async (req) => {
           }
         ],
         max_tokens: 1000,
-        temperature: 0.1, // Lower temperature for more precise outputs
+        temperature: 0.1,
       }),
     });
 

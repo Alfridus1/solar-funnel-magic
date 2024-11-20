@@ -3,7 +3,7 @@ import { calculateModulePositions } from "../utils/moduleCalculations";
 interface UseRoofMapHandlersProps {
   map: google.maps.Map | null;
   polygons: google.maps.Polygon[];
-  setPolygons: (polygons: google.maps.Polygon[]) => void;
+  setPolygons: React.Dispatch<React.SetStateAction<google.maps.Polygon[]>>;
   modules: google.maps.Rectangle[];
   setModules: (modules: google.maps.Rectangle[]) => void;
   isDrawing: boolean;
@@ -85,7 +85,7 @@ export const useRoofMapHandlers = ({
           map: mapInstance
         });
 
-        setPolygons(prev => [...prev, polygon]);
+        setPolygons(prevPolygons => [...prevPolygons, polygon]);
         const { moduleCount, roofId } = calculateModulePositions(polygon, mapInstance, setModules);
         
         const newRoofDetails = [...roofDetails, { roofId, moduleCount }];
@@ -139,7 +139,7 @@ export const useRoofMapHandlers = ({
       onLog?.("Lösche letztes Dach");
       const lastPolygon = polygons[polygons.length - 1];
       lastPolygon.setMap(null);
-      setPolygons((prev) => prev.slice(0, -1));
+      setPolygons(prevPolygons => prevPolygons.slice(0, -1));
       
       const updatedRoofDetails = roofDetails.slice(0, -1);
       setRoofDetails(updatedRoofDetails);
@@ -158,7 +158,7 @@ export const useRoofMapHandlers = ({
 
   const onPolygonComplete = (polygon: google.maps.Polygon) => {
     onLog?.("Polygon-Zeichnung abgeschlossen");
-    setPolygons((prev) => [...prev, polygon]);
+    setPolygons(prevPolygons => [...prevPolygons, polygon]);
     setIsDrawing(false);
 
     const { moduleCount, roofId } = calculateModulePositions(polygon, map, setModules);
