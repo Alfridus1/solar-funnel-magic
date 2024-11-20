@@ -1,11 +1,15 @@
 import { useState, useCallback } from "react";
 import { GoogleMap, DrawingManager, Marker } from "@react-google-maps/api";
+import { MapControls } from "./MapControls";
 
 interface RoofMapUIProps {
   coordinates: { lat: number; lng: number };
   isDrawing: boolean;
   onLoad: (map: google.maps.Map) => void;
   onPolygonComplete: (polygon: google.maps.Polygon) => void;
+  onStartDrawing: () => void;
+  onDeleteLastRoof: () => void;
+  polygonsExist: boolean;
 }
 
 export const RoofMapUI = ({
@@ -13,6 +17,9 @@ export const RoofMapUI = ({
   isDrawing,
   onLoad,
   onPolygonComplete,
+  onStartDrawing,
+  onDeleteLastRoof,
+  polygonsExist,
 }: RoofMapUIProps) => {
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
 
@@ -81,6 +88,13 @@ export const RoofMapUI = ({
           options={drawingManagerOptions}
         />
       </GoogleMap>
+      
+      <MapControls
+        isDrawing={isDrawing}
+        polygonsExist={polygonsExist}
+        onStartDrawing={onStartDrawing}
+        onDeleteLastRoof={onDeleteLastRoof}
+      />
     </div>
   );
 };

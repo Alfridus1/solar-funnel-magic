@@ -15,7 +15,7 @@ export const MapControls = ({
   onDeleteLastRoof
 }: MapControlsProps) => {
   return (
-    <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
+    <div className="absolute top-4 left-4 flex flex-col gap-2">
       <Button
         size="sm"
         onClick={onStartDrawing}

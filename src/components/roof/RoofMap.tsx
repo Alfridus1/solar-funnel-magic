@@ -54,7 +54,6 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
     onLog
   });
 
-  // Geocode the address to get coordinates
   useEffect(() => {
     const geocoder = new google.maps.Geocoder();
     geocoder.geocode({ address }, (results, status) => {
@@ -85,12 +84,9 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
         onLoad={onLoad}
         isDrawing={isDrawing}
         onPolygonComplete={onPolygonComplete}
-      />
-      <MapControls
-        isDrawing={isDrawing}
-        polygonsExist={polygons.length > 0}
         onStartDrawing={startDrawing}
         onDeleteLastRoof={deleteLastRoof}
+        polygonsExist={polygons.length > 0}
       />
     </div>
   );
