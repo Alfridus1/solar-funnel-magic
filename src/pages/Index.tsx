@@ -24,6 +24,59 @@ const Index = () => {
     libraries: libraries as ["drawing", "places"],
   });
 
+  const handleGeolocation = () => {
+    if (!navigator.geolocation) {
+      toast({
+        title: "Nicht unterstützt",
+        description: "Ihr Browser unterstützt keine Standorterkennung.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Standorterkennung",
+      description: "Ihr Standort wird ermittelt...",
+    });
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        const geocoder = new google.maps.Geocoder();
+        try {
+          const response = await geocoder.geocode({ location: { lat: latitude, lng: longitude } });
+          if (response.results[0]) {
+            const newAddress = response.results[0].formatted_address;
+            setAddress(newAddress);
+            toast({
+              title: "Erfolg",
+              description: "Ihr Standort wurde erfolgreich erkannt.",
+            });
+          }
+        } catch (error) {
+          console.error('Geocoding error:', error);
+          toast({
+            title: "Fehler",
+            description: "Die Adresse konnte nicht ermittelt werden.",
+            variant: "destructive",
+          });
+        }
+      },
+      (error) => {
+        console.error('Geolocation error:', error);
+        let errorMessage = "Ihr Standort konnte nicht ermittelt werden.";
+        if (error.code === error.PERMISSION_DENIED) {
+          errorMessage = "Bitte erlauben Sie den Zugriff auf Ihren Standort.";
+        }
+        toast({
+          title: "Fehler",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
+    );
+  };
+
   const onPlaceSelected = () => {
     const place = autocompleteRef.current?.getPlace();
     if (place?.formatted_address) {
@@ -70,7 +123,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-solar-blue to-white">
-      {/* Hero Section */}
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto text-center mb-12 space-y-6 animate-fade-up">
           <img src="/logo.svg" alt="Logo" className="h-16 mx-auto mb-8" />
@@ -107,6 +159,7 @@ const Index = () => {
                       placeholder="Ihre Adresse eingeben..."
                       value={address}
                       onChange={(e) => setAddress(e.target.value)}
+                      onFocus={handleGeolocation}
                       className="pl-10 h-12 text-lg"
                     />
                   </div>
@@ -123,16 +176,9 @@ const Index = () => {
           </Card>
         </div>
 
-        {/* Stats Section */}
         <Stats />
-
-        {/* Benefits Section */}
         <Benefits />
-
-        {/* Testimonials Section */}
         <Testimonials />
-
-        {/* FAQ Section */}
         <FAQ />
       </div>
     </div>

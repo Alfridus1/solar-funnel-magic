@@ -22,6 +22,7 @@ export const RoofMapUI = ({
   polygonsExist,
 }: RoofMapUIProps) => {
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
+  const [markerPosition, setMarkerPosition] = useState(coordinates);
 
   const mapContainerStyle = {
     width: "100%",
@@ -35,6 +36,19 @@ export const RoofMapUI = ({
       onLoad(map);
     }
   }, [mapInstance, onLoad]);
+
+  const handleMarkerDragEnd = (e: google.maps.MapMouseEvent) => {
+    if (e.latLng) {
+      const newPosition = {
+        lat: e.latLng.lat(),
+        lng: e.latLng.lng()
+      };
+      setMarkerPosition(newPosition);
+      if (mapInstance) {
+        mapInstance.panTo(newPosition);
+      }
+    }
+  };
 
   const mapOptions = {
     mapTypeId: "satellite",
@@ -67,12 +81,14 @@ export const RoofMapUI = ({
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
         zoom={19}
-        center={coordinates}
+        center={markerPosition}
         onLoad={handleMapLoad}
         options={mapOptions}
       >
         <Marker
-          position={coordinates}
+          position={markerPosition}
+          draggable={true}
+          onDragEnd={handleMarkerDragEnd}
           icon={{
             path: google.maps.SymbolPath.CIRCLE,
             scale: 10,
