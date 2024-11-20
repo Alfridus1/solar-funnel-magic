@@ -42,7 +42,7 @@ export const HeroSection = ({
               Wo möchten Sie Ihre Solaranlage installieren?
             </h2>
             <p className="text-gray-600">
-              Geben Sie Ihre Adresse ein, um Ihr Dach zu vermessen
+              Geben Sie Ihre Adresse ein oder nutzen Sie die Standorterkennung
             </p>
           </div>
 
@@ -55,15 +55,16 @@ export const HeroSection = ({
                   autocomplete.setComponentRestrictions({ country: 'de' });
                   autocomplete.setOptions({
                     types: ['address'],
-                    fields: ['formatted_address', 'geometry']
+                    fields: ['formatted_address', 'geometry'],
+                    language: 'de'
                   });
                 }}
                 onPlaceChanged={() => {
                   const place = autocompleteRef.current?.getPlace();
                   if (place?.formatted_address) {
                     setAddress(place.formatted_address);
+                    onPlaceSelected();
                   }
-                  onPlaceSelected();
                 }}
               >
                 <Input
@@ -71,11 +72,18 @@ export const HeroSection = ({
                   placeholder="Ihre Adresse eingeben..."
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  onFocus={handleGeolocation}
                   className="pl-10 h-12 text-lg w-full bg-white"
                 />
               </Autocomplete>
             </div>
+
+            <Button
+              onClick={handleGeolocation}
+              variant="outline"
+              className="w-full h-12 text-lg"
+            >
+              Standort automatisch ermitteln
+            </Button>
 
             <Button
               onClick={handleAddressSubmit}

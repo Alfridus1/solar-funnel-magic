@@ -12,6 +12,7 @@ export const useGeolocation = ({ onSuccess, onError, toast }: UseGeolocationProp
     try {
       const response = await geocoder.geocode({
         location: { lat, lng },
+        language: 'de',
         region: 'DE'
       });
 
@@ -19,8 +20,12 @@ export const useGeolocation = ({ onSuccess, onError, toast }: UseGeolocationProp
         throw new Error("Keine Adresse gefunden");
       }
 
-      // Nehme das erste Ergebnis, das eine Straßenadresse ist
-      const address = response.results[0];
+      // Suche nach der genauesten Adresse
+      const address = response.results.find(result => 
+        result.types.includes('street_address') ||
+        result.types.includes('premise')
+      ) || response.results[0];
+
       onSuccess(address.formatted_address);
     } catch (error) {
       console.error('Geocoding error:', error);
@@ -34,30 +39,37 @@ export const useGeolocation = ({ onSuccess, onError, toast }: UseGeolocationProp
       return;
     }
 
-    toast({
-      title: "Standorterkennung",
-      description: "Ihr Standort wird ermittelt...",
-    });
-
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-        await reverseGeocode(latitude, longitude);
-      },
-      (error) => {
-        console.error('Geolocation error:', error);
-        let errorMessage = "Ihr Standort konnte nicht ermittelt werden.";
-        if (error.code === error.PERMISSION_DENIED) {
-          errorMessage = "Bitte erlauben Sie den Zugriff auf Ihren Standort.";
-        }
-        onError(errorMessage);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 5000,
-        maximumAge: 0
+    navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+      if (result.state === 'denied') {
+        onError("Bitte erlauben Sie den Zugriff auf Ihren Standort in Ihren Browsereinstellungen.");
+        return;
       }
-    );
+
+      toast({
+        title: "Standorterkennung",
+        description: "Ihr Standort wird ermittelt...",
+      });
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          await reverseGeocode(latitude, longitude);
+        },
+        (error) => {
+          console.error('Geolocation error:', error);
+          let errorMessage = "Ihr Standort konnte nicht ermittelt werden.";
+          if (error.code === error.PERMISSION_DENIED) {
+            errorMessage = "Bitte erlauben Sie den Zugriff auf Ihren Standort.";
+          }
+          onError(errorMessage);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
+        }
+      );
+    });
   }, [onSuccess, onError, toast]);
 
   return { handleGeolocation };
