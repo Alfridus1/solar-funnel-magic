@@ -15,13 +15,22 @@ export const ProductList = ({ products, onAddProduct }: ProductListProps) => {
       <div className="space-y-4">
         {products.map((product) => (
           <div key={product.id} className="flex items-center justify-between p-3 border rounded-lg">
-            <div>
-              <h3 className="font-semibold">{product.name}</h3>
-              <p className="text-sm text-gray-600">
-                {product.category === 'module' && `${product.specs.watts}W`}
-                {product.category === 'battery' && `${product.specs.capacity}kWh`}
-                {product.category === 'inverter' && `${product.specs.power}kW`}
-              </p>
+            <div className="flex items-center gap-4">
+              {product.image_url && (
+                <img 
+                  src={product.image_url} 
+                  alt={product.name}
+                  className="w-16 h-16 object-contain rounded-md"
+                />
+              )}
+              <div>
+                <h3 className="font-semibold">{product.name}</h3>
+                <p className="text-sm text-gray-600">
+                  {product.category === 'module' && `${product.specs.watts}W`}
+                  {product.category === 'battery' && `${product.specs.capacity}kWh`}
+                  {product.category === 'inverter' && `${product.specs.power}kW`}
+                </p>
+              </div>
             </div>
             <div className="flex items-center gap-4">
               <span className="font-semibold">{product.price}€</span>
