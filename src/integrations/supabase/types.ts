@@ -200,6 +200,45 @@ export type Database = {
           },
         ]
       }
+      leads: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          name: string
+          notes: string | null
+          phone: string
+          source: string | null
+          status: string | null
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          name: string
+          notes?: string | null
+          phone: string
+          source?: string | null
+          status?: string | null
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string
+          source?: string | null
+          status?: string | null
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       opensolar_installations: {
         Row: {
           contract_value: number

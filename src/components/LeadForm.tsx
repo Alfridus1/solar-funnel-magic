@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface LeadFormProps {
   formType?: "quote" | "consultation";
@@ -21,25 +22,16 @@ export const LeadForm = ({ formType = "quote" }: LeadFormProps) => {
     setIsSubmitting(true);
 
     try {
-      // Replace this URL with your actual Zapier webhook URL
-      const webhookUrl = "YOUR_ZAPIER_WEBHOOK_URL";
-      
-      const response = await fetch(webhookUrl, {
-        method: "POST",
-        body: JSON.stringify({
+      const { error } = await supabase
+        .from('leads')
+        .insert([{
           ...formData,
           type: formType,
-          timestamp: new Date().toISOString(),
           source: window.location.href,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+          status: 'new'
+        }]);
 
-      if (!response.ok) {
-        throw new Error("Failed to submit form");
-      }
+      if (error) throw error;
 
       toast({
         title: formType === "quote" 
@@ -55,7 +47,7 @@ export const LeadForm = ({ formType = "quote" }: LeadFormProps) => {
         email: "",
         phone: "",
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Ein Fehler ist aufgetreten",
         description: "Bitte versuchen Sie es später erneut.",
