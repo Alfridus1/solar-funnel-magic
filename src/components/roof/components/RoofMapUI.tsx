@@ -1,22 +1,19 @@
 import { useState, useCallback } from "react";
 import { GoogleMap, DrawingManager, Marker } from "@react-google-maps/api";
-import { Loader2 } from "lucide-react";
 import { RoofGrid } from "./RoofGrid";
 
 interface RoofMapUIProps {
-  isAnalyzing: boolean;
   coordinates: { lat: number; lng: number };
-  onLoad: (map: google.maps.Map) => void;
   isDrawing: boolean;
+  onLoad: (map: google.maps.Map) => void;
   onPolygonComplete: (polygon: google.maps.Polygon) => void;
 }
 
 export const RoofMapUI = ({
-  isAnalyzing,
   coordinates,
-  onLoad,
   isDrawing,
-  onPolygonComplete
+  onLoad,
+  onPolygonComplete,
 }: RoofMapUIProps) => {
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
 
@@ -61,15 +58,6 @@ export const RoofMapUI = ({
 
   return (
     <div className="relative w-full h-[500px] rounded-lg overflow-hidden border border-gray-200">
-      {isAnalyzing && (
-        <div className="absolute inset-0 bg-black/50 z-10 flex items-center justify-center">
-          <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg">
-            <Loader2 className="animate-spin" />
-            <span>Analysiere Dach...</span>
-          </div>
-        </div>
-      )}
-      
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
         zoom={19}
@@ -88,6 +76,7 @@ export const RoofMapUI = ({
             strokeWeight: 2,
           }}
         />
+        
         {mapInstance && <RoofGrid map={mapInstance} coordinates={coordinates} />}
         <DrawingManager
           onPolygonComplete={onPolygonComplete}

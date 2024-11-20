@@ -36,6 +36,98 @@ export type Database = {
         }
         Relationships: []
       }
+      customers: {
+        Row: {
+          city: string
+          company_name: string | null
+          created_at: string | null
+          email: string
+          first_name: string
+          house_number: string
+          id: string
+          last_name: string
+          notes: string | null
+          phone: string | null
+          postal_code: string
+          street: string
+          updated_at: string | null
+        }
+        Insert: {
+          city: string
+          company_name?: string | null
+          created_at?: string | null
+          email: string
+          first_name: string
+          house_number: string
+          id?: string
+          last_name: string
+          notes?: string | null
+          phone?: string | null
+          postal_code: string
+          street: string
+          updated_at?: string | null
+        }
+        Update: {
+          city?: string
+          company_name?: string | null
+          created_at?: string | null
+          email?: string
+          first_name?: string
+          house_number?: string
+          id?: string
+          last_name?: string
+          notes?: string | null
+          phone?: string | null
+          postal_code?: string
+          street?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      employees: {
+        Row: {
+          created_at: string | null
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          personio_id: string | null
+          role: string
+          team_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          personio_id?: string | null
+          role: string
+          team_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          personio_id?: string | null
+          role?: string
+          team_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employees_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       faqs: {
         Row: {
           answer: string
@@ -62,6 +154,51 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      inventory: {
+        Row: {
+          created_at: string | null
+          id: string
+          minimum_quantity: number
+          product_id: string | null
+          quantity: number
+          updated_at: string | null
+          warehouse_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          minimum_quantity?: number
+          product_id?: string | null
+          quantity?: number
+          updated_at?: string | null
+          warehouse_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          minimum_quantity?: number
+          product_id?: string | null
+          quantity?: number
+          updated_at?: string | null
+          warehouse_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "solar_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_warehouse_id_fkey"
+            columns: ["warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       opensolar_installations: {
         Row: {
@@ -147,6 +284,257 @@ export type Database = {
         }
         Relationships: []
       }
+      product_categories: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      product_specifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          product_id: string | null
+          template_id: string | null
+          updated_at: string | null
+          value: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          product_id?: string | null
+          template_id?: string | null
+          updated_at?: string | null
+          value: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          product_id?: string | null
+          template_id?: string | null
+          updated_at?: string | null
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_specifications_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "solar_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_specifications_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "specification_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_documentation: {
+        Row: {
+          created_at: string | null
+          file_path: string
+          id: string
+          notes: string | null
+          project_id: string | null
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          file_path: string
+          id?: string
+          notes?: string | null
+          project_id?: string | null
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          file_path?: string
+          id?: string
+          notes?: string | null
+          project_id?: string | null
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_documentation_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          address: string
+          completion_date: string | null
+          created_at: string | null
+          customer_id: string | null
+          customer_name: string
+          estimated_completion_date: string | null
+          id: string
+          project_type: string
+          site_conditions: string | null
+          special_requirements: string | null
+          start_date: string | null
+          status: string
+          system_size: number | null
+          team_id: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          address: string
+          completion_date?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          customer_name: string
+          estimated_completion_date?: string | null
+          id?: string
+          project_type: string
+          site_conditions?: string | null
+          special_requirements?: string | null
+          start_date?: string | null
+          status: string
+          system_size?: number | null
+          team_id?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string
+          completion_date?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          customer_name?: string
+          estimated_completion_date?: string | null
+          id?: string
+          project_type?: string
+          site_conditions?: string | null
+          special_requirements?: string | null
+          start_date?: string | null
+          status?: string
+          system_size?: number | null
+          team_id?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projects_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projects_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchase_order_items: {
+        Row: {
+          created_at: string | null
+          id: string
+          product_id: string | null
+          purchase_order_id: string | null
+          quantity: number
+          unit_price: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          product_id?: string | null
+          purchase_order_id?: string | null
+          quantity: number
+          unit_price: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          product_id?: string | null
+          purchase_order_id?: string | null
+          quantity?: number
+          unit_price?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "solar_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_order_items_purchase_order_id_fkey"
+            columns: ["purchase_order_id"]
+            isOneToOne: false
+            referencedRelation: "purchase_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchase_orders: {
+        Row: {
+          created_at: string | null
+          expected_delivery_date: string | null
+          id: string
+          order_date: string
+          status: string
+          supplier_name: string
+          total_amount: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expected_delivery_date?: string | null
+          id?: string
+          order_date: string
+          status: string
+          supplier_name: string
+          total_amount: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expected_delivery_date?: string | null
+          id?: string
+          order_date?: string
+          status?: string
+          supplier_name?: string
+          total_amount?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       smart_m_config: {
         Row: {
           api_url: string
@@ -207,6 +595,68 @@ export type Database = {
         }
         Relationships: []
       }
+      specification_templates: {
+        Row: {
+          category_id: string | null
+          created_at: string | null
+          id: string
+          name: string
+          options: Json | null
+          type: string
+          unit: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string | null
+          id?: string
+          name: string
+          options?: Json | null
+          type: string
+          unit?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          options?: Json | null
+          type?: string
+          unit?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "specification_templates_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "product_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       testimonials: {
         Row: {
           created_at: string | null
@@ -233,6 +683,84 @@ export type Database = {
           rating?: number
           role?: string
           text?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      time_tracking: {
+        Row: {
+          created_at: string | null
+          date: string
+          end_time: string
+          id: string
+          notes: string | null
+          project_id: string | null
+          start_time: string
+          team_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          end_time: string
+          id?: string
+          notes?: string | null
+          project_id?: string | null
+          start_time: string
+          team_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          end_time?: string
+          id?: string
+          notes?: string | null
+          project_id?: string | null
+          start_time?: string
+          team_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_tracking_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_tracking_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      warehouses: {
+        Row: {
+          created_at: string | null
+          id: string
+          location: string
+          name: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          location: string
+          name: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          location?: string
+          name?: string
+          type?: string
           updated_at?: string | null
         }
         Relationships: []
