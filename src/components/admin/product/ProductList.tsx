@@ -3,6 +3,8 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Product } from "@/components/configurator/types";
 import { Pencil, X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 interface ProductListProps {
   products: Product[];
@@ -21,6 +23,44 @@ export const ProductList = ({
   onSaveEdit,
   onEditingProductChange,
 }: ProductListProps) => {
+  const { toast } = useToast();
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0 || !editingProduct) return;
+    
+    const file = e.target.files[0];
+    const fileExt = file.name.split('.').pop();
+    const filePath = `${Math.random()}.${fileExt}`;
+
+    try {
+      const { error: uploadError } = await supabase.storage
+        .from('product_images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('product_images')
+        .getPublicUrl(filePath);
+
+      onEditingProductChange({
+        ...editingProduct,
+        image_url: publicUrl
+      });
+
+      toast({
+        title: "Bild hochgeladen",
+        description: "Das Produktbild wurde erfolgreich aktualisiert.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Fehler beim Hochladen",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <Card className="p-6">
       <h3 className="text-xl font-semibold mb-4">Produktliste</h3>
@@ -33,13 +73,19 @@ export const ProductList = ({
             {editingProduct?.id === product.id ? (
               <form onSubmit={onSaveEdit} className="w-full space-y-4">
                 <div className="flex items-center gap-4">
-                  {product.image_url && (
+                  <div className="relative w-16 h-16">
                     <img 
-                      src={product.image_url} 
-                      alt={product.name}
+                      src={editingProduct.image_url || '/placeholder.svg'} 
+                      alt={editingProduct.name}
                       className="w-16 h-16 object-contain rounded-md"
                     />
-                  )}
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="absolute inset-0 opacity-0 cursor-pointer"
+                    />
+                  </div>
                   <div className="flex-1">
                     <Input
                       value={editingProduct.name}
@@ -75,13 +121,11 @@ export const ProductList = ({
             ) : (
               <>
                 <div className="flex items-center gap-4">
-                  {product.image_url && (
-                    <img 
-                      src={product.image_url} 
-                      alt={product.name}
-                      className="w-16 h-16 object-contain rounded-md"
-                    />
-                  )}
+                  <img 
+                    src={product.image_url || '/placeholder.svg'} 
+                    alt={product.name}
+                    className="w-16 h-16 object-contain rounded-md"
+                  />
                   <div>
                     <h4 className="font-medium">{product.name}</h4>
                     <p className="text-sm text-gray-500">{product.category}</p>
