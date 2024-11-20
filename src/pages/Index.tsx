@@ -125,7 +125,11 @@ export function Index() {
     <div className="min-h-screen bg-gradient-to-br from-solar-blue to-white">
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto text-center mb-12 space-y-6 animate-fade-up">
-          <img src="/logo.svg" alt="Logo" className="h-16 mx-auto mb-8" />
+          <img 
+            src="/lovable-uploads/230bf2e3-b64a-4f51-bb2f-f246df2597be.png" 
+            alt="COPPEN Logo" 
+            className="h-24 mx-auto mb-8" 
+          />
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 tracking-tight">
             Ihre <span className="text-solar-orange">Solaranlage</span> in wenigen Minuten planen
           </h1>
