@@ -5,6 +5,7 @@ import { RoofMetrics } from "@/components/roof/RoofMetrics";
 import { ProgressBar } from "@/components/ProgressBar";
 
 interface RoofCheckContentProps {
+  address: string;
   handleRoofOutlineComplete: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number }[]) => void;
   paths: google.maps.LatLng[][];
   metrics: any;
@@ -13,6 +14,7 @@ interface RoofCheckContentProps {
 }
 
 export const RoofCheckContent = ({
+  address,
   handleRoofOutlineComplete,
   paths,
   metrics,
@@ -42,7 +44,7 @@ export const RoofCheckContent = ({
             </div>
 
             <RoofMap
-              address=""
+              address={address}
               onRoofOutlineComplete={handleRoofOutlineComplete}
               onLog={onLog}
             />

@@ -4,6 +4,7 @@ import { useLoadScript } from "@react-google-maps/api";
 import { Card } from "@/components/ui/card";
 import { calculateRoofArea, calculateSolarMetrics } from "@/utils/roofCalculations";
 import { RoofCheckContent } from "./RoofCheck/RoofCheckContent";
+import { RoofCheckLoading } from "./RoofCheck/RoofCheckLoading";
 
 // Define libraries outside component to prevent reloading
 const libraries: ("places" | "drawing" | "geometry")[] = ["places", "drawing"];
@@ -75,15 +76,12 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
   }
 
   if (!isLoaded) {
-    return (
-      <Card className="max-w-5xl mx-auto p-6">
-        <div className="text-center">Laden...</div>
-      </Card>
-    );
+    return <RoofCheckLoading />;
   }
 
   return (
     <RoofCheckContent
+      address={address}
       handleRoofOutlineComplete={handleRoofOutlineComplete}
       paths={paths}
       metrics={metrics}
