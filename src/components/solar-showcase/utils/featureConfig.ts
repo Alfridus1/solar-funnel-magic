@@ -12,7 +12,7 @@ const featureConfigs = {
     specs: [
       "500W Nennleistung",
       "21% Wirkungsgrad",
-      "25 Jahre Garantie"
+      "30 Jahre Garantie"
     ],
     image: "/module-image.png"
   },
