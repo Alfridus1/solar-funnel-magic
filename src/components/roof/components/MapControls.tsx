@@ -15,7 +15,7 @@ export const MapControls = ({
   onDeleteLastRoof
 }: MapControlsProps) => {
   return (
-    <div className="absolute top-4 left-4 flex flex-col gap-2">
+    <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
       <Button
         size="sm"
         onClick={onStartDrawing}
@@ -23,7 +23,7 @@ export const MapControls = ({
         className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full shadow-lg whitespace-nowrap"
       >
         <Plus className="mr-1 h-4 w-4" />
-        Dach hinzufügen
+        Dach vermessen
       </Button>
       
       {polygonsExist && (

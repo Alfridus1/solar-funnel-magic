@@ -1,6 +1,5 @@
 import { useState, useCallback } from "react";
 import { GoogleMap, DrawingManager, Marker } from "@react-google-maps/api";
-import { RoofGrid } from "./RoofGrid";
 
 interface RoofMapUIProps {
   coordinates: { lat: number; lng: number };
@@ -76,10 +75,6 @@ export const RoofMapUI = ({
             strokeWeight: 2,
           }}
         />
-        
-        {mapInstance && coordinates && (
-          <RoofGrid map={mapInstance} coordinates={coordinates} />
-        )}
         
         <DrawingManager
           onPolygonComplete={onPolygonComplete}
