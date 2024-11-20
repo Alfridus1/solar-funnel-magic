@@ -8,24 +8,36 @@ import { calculateRoofArea, calculateSolarMetrics } from "@/utils/roofCalculatio
 
 interface RoofCheckProps {
   address: string;
+  onLog?: (message: string) => void;
 }
 
-export const RoofCheck = ({ address }: RoofCheckProps) => {
+export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
   const [paths, setPaths] = useState<google.maps.LatLng[][]>([]);
+  const [metrics, setMetrics] = useState({
+    monthlyProduction: 0,
+    annualSavings: 0,
+    roofArea: 0,
+    possiblePanels: 0,
+    kWp: 0,
+    roofDetails: [] as { roofId: string; moduleCount: number }[]
+  });
   const navigate = useNavigate();
 
-  const handleRoofOutlineComplete = (
-    paths: google.maps.LatLng[][],
-    roofDetails: { roofId: string; moduleCount: number }[]
-  ) => {
-    setPaths(paths);
-  };
+  const handleRoofOutlineComplete = useCallback(
+    (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number }[]) => {
+      setPaths(paths);
+      const totalArea = calculateRoofArea(paths);
+      const calculatedMetrics = calculateSolarMetrics(totalArea);
+      setMetrics({
+        ...calculatedMetrics,
+        roofDetails
+      });
+    },
+    []
+  );
 
   const handleContinue = () => {
     if (paths.length === 0) return;
-
-    const totalArea = calculateRoofArea(paths);
-    const metrics = calculateSolarMetrics(totalArea);
 
     navigate("/recommended-config", {
       state: {
@@ -50,11 +62,12 @@ export const RoofCheck = ({ address }: RoofCheckProps) => {
             <RoofMap
               address={address}
               onRoofOutlineComplete={handleRoofOutlineComplete}
+              onLog={onLog}
             />
 
             {paths.length > 0 && (
               <>
-                <RoofMetrics paths={paths} />
+                <RoofMetrics {...metrics} />
                 <div className="flex justify-end">
                   <Button
                     onClick={handleContinue}

@@ -77,7 +77,10 @@ export const RoofMapUI = ({
           }}
         />
         
-        {mapInstance && <RoofGrid map={mapInstance} coordinates={coordinates} />}
+        {mapInstance && coordinates && (
+          <RoofGrid map={mapInstance} coordinates={coordinates} />
+        )}
+        
         <DrawingManager
           onPolygonComplete={onPolygonComplete}
           options={drawingManagerOptions}

@@ -4,11 +4,11 @@ interface RoofGridProps {
 }
 
 export const RoofGrid = ({ map, coordinates }: RoofGridProps) => {
-  if (!map) return null;
+  if (!map || !coordinates) return null;
 
-  // Erstelle ein Raster von 10x10 Punkten um die Koordinaten
+  // Create a grid of 10x10 points around the coordinates
   const gridSize = 10;
-  const spacing = 0.0001; // Abstand zwischen den Punkten
+  const spacing = 0.0001; // spacing between points
 
   const markers: google.maps.Marker[] = [];
 

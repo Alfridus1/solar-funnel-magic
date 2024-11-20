@@ -4,19 +4,19 @@ import { useToast } from "@/components/ui/use-toast";
 import { Instructions } from "./components/Instructions";
 import { MapControls } from "./components/MapControls";
 import { calculateModulePositions } from "./utils/moduleCalculations";
-import { Loader2 } from "lucide-react";
 import { RoofMapUI } from "./components/RoofMapUI";
 import { useRoofMapHandlers } from "./hooks/useRoofMapHandlers";
 import { useRoofMapState } from "./hooks/useRoofMapState";
 
 interface RoofMapProps {
-  coordinates: { lat: number; lng: number };
+  address: string;
   onRoofOutlineComplete: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number }[]) => void;
   onLog?: (message: string) => void;
 }
 
-export const RoofMap = ({ coordinates, onRoofOutlineComplete, onLog }: RoofMapProps) => {
+export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps) => {
   const { toast } = useToast();
+  const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
   const {
     map,
     setMap,
@@ -54,17 +54,33 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete, onLog }: RoofMapPr
     onLog
   });
 
+  // Geocode the address to get coordinates
+  useState(() => {
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ address }, (results, status) => {
+      if (status === "OK" && results?.[0]?.geometry?.location) {
+        const location = results[0].geometry.location;
+        setCoordinates({
+          lat: location.lat(),
+          lng: location.lng()
+        });
+      }
+    });
+  }, [address]);
+
   const onLoad = useCallback((map: google.maps.Map) => {
-    onLog?.("Karte geladen, starte automatische Analyse");
+    onLog?.("Karte geladen");
     setMap(map);
-    handleAutoDetect(map);
-  }, [handleAutoDetect, setMap, onLog]);
+  }, [setMap, onLog]);
+
+  if (!coordinates) {
+    return <div>Lade Kartenposition...</div>;
+  }
 
   return (
     <div className="space-y-4">
       <Instructions />
       <RoofMapUI
-        isAnalyzing={isAnalyzing}
         coordinates={coordinates}
         onLoad={onLoad}
         isDrawing={isDrawing}
