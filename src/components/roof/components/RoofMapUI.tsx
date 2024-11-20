@@ -20,16 +20,13 @@ const mapContainerStyle = {
   position: "relative" as const,
 };
 
-const mapOptions = {
+const defaultMapOptions = {
   mapTypeId: "satellite",
   tilt: 0,
   mapTypeControl: false,
   fullscreenControl: false,
   streetViewControl: false,
   zoomControl: true,
-  zoomControlOptions: {
-    position: google.maps.ControlPosition.RIGHT_TOP,
-  },
 };
 
 export const RoofMapUI = ({
@@ -65,8 +62,26 @@ export const RoofMapUI = ({
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="relative w-full h-[500px] rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center bg-gray-50">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+          <p className="text-gray-600">Lade Karte...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const mapOptions = {
+    ...defaultMapOptions,
+    zoomControlOptions: {
+      position: window.google?.maps?.ControlPosition?.RIGHT_TOP,
+    },
+  };
+
   const drawingManagerOptions = {
-    drawingMode: isDrawing ? google.maps.drawing.OverlayType.POLYGON : null,
+    drawingMode: isDrawing ? window.google?.maps?.drawing?.OverlayType?.POLYGON : null,
     drawingControl: false,
     polygonOptions: {
       fillColor: "#2563eb",
@@ -78,17 +93,6 @@ export const RoofMapUI = ({
       clickable: true,
     },
   };
-
-  if (isLoading) {
-    return (
-      <div className="relative w-full h-[500px] rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center bg-gray-50">
-        <div className="flex flex-col items-center gap-2">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-          <p className="text-gray-600">Lade Karte...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="relative w-full h-[500px] rounded-lg overflow-hidden border border-gray-200">
@@ -104,7 +108,7 @@ export const RoofMapUI = ({
           draggable={true}
           onDragEnd={handleMarkerDragEnd}
           icon={{
-            path: google.maps.SymbolPath.CIRCLE,
+            path: window.google?.maps?.SymbolPath?.CIRCLE,
             scale: 10,
             fillColor: "#2563eb",
             fillOpacity: 1,

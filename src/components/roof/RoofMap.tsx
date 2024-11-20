@@ -32,9 +32,9 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
   } = useRoofMapState();
 
   const {
-    onPolygonComplete,
-    onStartDrawing,
-    onDeleteLastRoof
+    startDrawing,
+    deleteLastRoof,
+    onPolygonComplete
   } = useRoofMapHandlers({
     map,
     polygons,
@@ -43,11 +43,11 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
     setModules,
     isDrawing,
     setIsDrawing,
-    isAnalyzing,
-    setIsAnalyzing,
     roofDetails,
     setRoofDetails,
     onRoofOutlineComplete,
+    setIsAnalyzing,
+    toast,
     onLog
   });
 
@@ -59,10 +59,10 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
 
     try {
       onLog?.("Starte Geocoding für Adresse: " + address);
-      const geocoder = new google.maps.Geocoder();
+      const geocoder = new window.google.maps.Geocoder();
       const result = await new Promise<google.maps.GeocoderResult[]>((resolve, reject) => {
         geocoder.geocode({ address }, (results, status) => {
-          if (status === google.maps.GeocoderStatus.OK && results) {
+          if (status === window.google.maps.GeocoderStatus.OK && results) {
             resolve(results);
           } else {
             reject(new Error(`Geocoding failed: ${status}`));
@@ -99,7 +99,7 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
 
   useEffect(() => {
     if (map && formattedAddress) {
-      const bounds = new google.maps.LatLngBounds();
+      const bounds = new window.google.maps.LatLngBounds();
       polygons.forEach(polygon => {
         polygon.getPath().forEach(latLng => {
           bounds.extend(latLng);
@@ -121,8 +121,8 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
       }}
       isDrawing={isDrawing}
       onPolygonComplete={onPolygonComplete}
-      onStartDrawing={onStartDrawing}
-      onDeleteLastRoof={onDeleteLastRoof}
+      onStartDrawing={startDrawing}
+      onDeleteLastRoof={deleteLastRoof}
       polygonsExist={polygons.length > 0}
       isLoading={isLoading}
     />
