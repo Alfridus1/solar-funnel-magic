@@ -25,7 +25,7 @@ export const FAQ = () => {
     <div className="py-16">
       <div className="flex items-center justify-center gap-4 mb-12">
         <MessageSquare className="h-8 w-8 text-[#F75c03]" />
-        <h2 className="text-3xl font-bold">Häufig gestellte Fragen</h2>
+        <h2 className="text-3xl font-bold text-[#F75c03]">Häufig gestellte Fragen</h2>
       </div>
       <div className="max-w-3xl mx-auto">
         <Accordion type="single" collapsible className="space-y-4">

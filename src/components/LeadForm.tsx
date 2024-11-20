@@ -92,7 +92,7 @@ export const LeadForm = ({ formType = "quote" }: LeadFormProps) => {
       </div>
       <Button
         type="submit"
-        className="w-full bg-gradient-to-r from-solar-orange-400 to-solar-orange-500 text-white hover:from-solar-orange-500 hover:to-solar-orange-600"
+        className="w-full bg-gradient-to-r from-[#F75c03] to-[#FF8A3D] text-white hover:from-[#FF8A3D] hover:to-[#F75c03]"
         disabled={isSubmitting}
       >
         {isSubmitting 
