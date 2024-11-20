@@ -167,7 +167,7 @@ export function Index() {
 
                 <Button
                   onClick={handleAddressSubmit}
-                  className="w-full h-12 text-lg bg-blue-600 hover:bg-blue-700 transition-colors"
+                  className="w-full h-12 text-lg bg-solar-orange hover:bg-solar-orange-dark transition-colors"
                 >
                   Dach vermessen
                 </Button>
