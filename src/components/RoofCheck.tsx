@@ -123,6 +123,10 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
     }
   };
 
+  const handleInputFocus = () => {
+    handleGeolocation();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-8">
       <div className="container mx-auto px-4">
@@ -152,6 +156,7 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
                     placeholder="Geben Sie Ihre Adresse ein..."
                     value={selectedAddress}
                     onChange={(e) => setSelectedAddress(e.target.value)}
+                    onFocus={handleInputFocus}
                     className="w-full p-2 border rounded"
                   />
                 </Autocomplete>
