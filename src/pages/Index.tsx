@@ -13,7 +13,7 @@ import { Stats } from "@/components/Stats";
 
 const libraries = ["drawing", "places"];
 
-const Index = () => {
+export function Index() {
   const [address, setAddress] = useState("");
   const [showRoofCheck, setShowRoofCheck] = useState(false);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
@@ -183,6 +183,4 @@ const Index = () => {
       </div>
     </div>
   );
-};
-
-export default Index;
+}

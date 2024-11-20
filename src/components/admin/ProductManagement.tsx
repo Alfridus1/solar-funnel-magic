@@ -11,7 +11,7 @@ export const ProductManagement = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [newProduct, setNewProduct] = useState({
     name: "",
-    category: "module",
+    category: "module" as const,
     price: 0,
     specs: {},
   });
@@ -36,7 +36,10 @@ export const ProductManagement = () => {
       return;
     }
 
-    setProducts(data);
+    setProducts(data.map(product => ({
+      ...product,
+      category: product.category as "module" | "inverter" | "battery"
+    })));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -62,7 +65,7 @@ export const ProductManagement = () => {
 
     setNewProduct({
       name: "",
-      category: "module",
+      category: "module" as const,
       price: 0,
       specs: {},
     });
@@ -92,7 +95,7 @@ export const ProductManagement = () => {
                 id="category"
                 className="w-full border rounded-md p-2"
                 value={newProduct.category}
-                onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value as any })}
+                onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value as "module" | "inverter" | "battery" })}
                 required
               >
                 <option value="module">Solarmodul</option>
