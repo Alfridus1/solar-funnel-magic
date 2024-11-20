@@ -13,7 +13,12 @@ import { Button } from "@/components/ui/button";
 
 const libraries = ["drawing", "places"];
 
-export const RoofCheck = ({ address }: { address: string }) => {
+interface RoofCheckProps {
+  address: string;
+  onLog?: (message: string) => void;
+}
+
+export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
   const navigate = useNavigate();
   const [analyzing, setAnalyzing] = useState(true);
   const [coordinates, setCoordinates] = useState({ lat: 51.1657, lng: 10.4515 });
@@ -33,23 +38,30 @@ export const RoofCheck = ({ address }: { address: string }) => {
 
   useEffect(() => {
     if (isLoaded) {
+      onLog?.("Google Maps API geladen");
       const geocoder = new google.maps.Geocoder();
       geocoder.geocode({ address }, (results, status) => {
         if (status === "OK" && results?.[0]?.geometry?.location) {
           const location = results[0].geometry.location;
+          onLog?.(`Adresse gefunden: ${location.lat()}, ${location.lng()}`);
           setCoordinates({ lat: location.lat(), lng: location.lng() });
           setAnalyzing(false);
+        } else {
+          onLog?.(`Geocoding Fehler: ${status}`);
         }
       });
     }
-  }, [address, isLoaded]);
+  }, [address, isLoaded, onLog]);
 
   const handleRoofOutlineComplete = (
     paths: google.maps.LatLng[][],
     newRoofDetails: { roofId: string; moduleCount: number }[]
   ) => {
     const totalRoofArea = calculateRoofArea(paths);
+    onLog?.(`Dachfläche berechnet: ${totalRoofArea}m²`);
+    
     const totalModules = newRoofDetails.reduce((sum, roof) => sum + roof.moduleCount, 0);
+    onLog?.(`Mögliche Module: ${totalModules}`);
     
     const {
       usableArea,
@@ -66,9 +78,12 @@ export const RoofCheck = ({ address }: { address: string }) => {
       possiblePanels: totalModules,
       kWp,
     });
+
+    onLog?.(`Metriken berechnet: ${kWp}kWp, ${monthlyProduction}kWh/Monat`);
   };
 
   const handleContinue = () => {
+    onLog?.("Navigation zur Konfigurationsseite");
     navigate("/recommended-config", {
       state: {
         metrics,
@@ -78,7 +93,10 @@ export const RoofCheck = ({ address }: { address: string }) => {
     });
   };
 
-  if (!isLoaded) return <div>Laden...</div>;
+  if (!isLoaded) {
+    onLog?.("Lade Google Maps...");
+    return <div>Laden...</div>;
+  }
 
   if (analyzing) {
     return (
@@ -105,6 +123,7 @@ export const RoofCheck = ({ address }: { address: string }) => {
           <RoofMap
             coordinates={coordinates}
             onRoofOutlineComplete={handleRoofOutlineComplete}
+            onLog={onLog}
           />
           <RoofMetrics {...metrics} roofDetails={roofDetails} />
           {metrics.roofArea > 0 && (
