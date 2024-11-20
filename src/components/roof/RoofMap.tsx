@@ -4,6 +4,7 @@ import { Instructions } from "./components/Instructions";
 import { RoofMapUI } from "./components/RoofMapUI";
 import { useRoofMapHandlers } from "./hooks/useRoofMapHandlers";
 import { useRoofMapState } from "./hooks/useRoofMapState";
+import { Loader2 } from "lucide-react";
 
 interface RoofMapProps {
   address: string;
@@ -85,6 +86,7 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
           });
           setFormattedAddress(result[0].formatted_address);
           onLog?.(`Koordinaten gefunden: ${location.lat()}, ${location.lng()}`);
+          setIsLoading(false);
         }
       } catch (err: any) {
         const errorMessage = "Adresse konnte nicht gefunden werden";
@@ -95,7 +97,6 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
           description: errorMessage
         });
         onLog?.(`Geocoding Fehler: ${err.message}`);
-      } finally {
         setIsLoading(false);
       }
     };
@@ -105,14 +106,26 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
     }
   }, [address, toast, onLog]);
 
-  const onLoad = useCallback((map: google.maps.Map) => {
-    onLog?.("Karte geladen");
-    setMap(map);
-    setIsLoading(false);
-  }, [setMap, onLog]);
-
   if (error) {
-    return <div className="text-red-600 p-4">{error}</div>;
+    return (
+      <div className="flex items-center justify-center h-[500px] bg-gray-50 rounded-lg border border-gray-200">
+        <div className="text-red-600 text-center">
+          <p className="font-semibold mb-2">Fehler beim Laden der Karte</p>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-[500px] bg-gray-50 rounded-lg border border-gray-200">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-500 mx-auto mb-2" />
+          <p className="text-gray-600">Lade Kartenposition...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -124,7 +137,10 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
       <Instructions />
       <RoofMapUI
         coordinates={coordinates}
-        onLoad={onLoad}
+        onLoad={(map) => {
+          setMap(map);
+          setIsLoading(false);
+        }}
         isDrawing={isDrawing}
         onPolygonComplete={onPolygonComplete}
         onStartDrawing={startDrawing}

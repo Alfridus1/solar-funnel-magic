@@ -84,7 +84,7 @@ export const RoofMapUI = ({
       <div className="relative w-full h-[500px] rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center bg-gray-50">
         <div className="flex flex-col items-center gap-2">
           <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-          <p className="text-gray-600">Lade Kartenposition...</p>
+          <p className="text-gray-600">Lade Karte...</p>
         </div>
       </div>
     );
