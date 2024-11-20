@@ -10,9 +10,21 @@ export const useGeolocation = ({ onSuccess, onError, toast }: UseGeolocationProp
   const reverseGeocode = async (lat: number, lng: number) => {
     const geocoder = new google.maps.Geocoder();
     try {
-      const response = await geocoder.geocode({ location: { lat, lng } });
+      const response = await geocoder.geocode({ 
+        location: { lat, lng },
+        region: 'DE' // Ensure German results
+      });
+      
       if (response.results[0]) {
-        onSuccess(response.results[0].formatted_address);
+        // Filter for the most accurate address (usually the first result)
+        const result = response.results.find(r => 
+          r.types.includes('street_address') || 
+          r.types.includes('premise')
+        ) || response.results[0];
+        
+        onSuccess(result.formatted_address);
+      } else {
+        onError("Die Adresse konnte nicht ermittelt werden.");
       }
     } catch (error) {
       console.error('Geocoding error:', error);

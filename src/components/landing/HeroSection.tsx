@@ -52,6 +52,12 @@ export const HeroSection = ({
               <Autocomplete
                 onLoad={(autocomplete) => {
                   autocompleteRef.current = autocomplete;
+                  // Set German bounds and restrictions
+                  autocomplete.setComponentRestrictions({ country: 'de' });
+                  autocomplete.setOptions({
+                    types: ['address'],
+                    fields: ['formatted_address', 'geometry']
+                  });
                 }}
                 onPlaceChanged={onPlaceSelected}
                 restrictions={{ country: "de" }}
