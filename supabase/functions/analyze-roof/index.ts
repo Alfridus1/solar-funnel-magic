@@ -1,6 +1,8 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
+const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -13,14 +15,12 @@ serve(async (req) => {
 
   try {
     const { imageUrl, location } = await req.json();
+    console.log('Analyzing image at location:', location);
     
     if (!imageUrl) {
       throw new Error('Image URL is required');
     }
 
-    console.log('Analyzing satellite image at location:', location);
-
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openAIApiKey) {
       console.error('OpenAI API key not configured');
       throw new Error('OpenAI API key not configured');
@@ -89,12 +89,8 @@ serve(async (req) => {
     const data = await response.json();
     console.log('OpenAI Response:', JSON.stringify(data));
 
-    if (!data.choices?.[0]?.message?.content) {
-      throw new Error('Unexpected response structure from OpenAI');
-    }
-
-    let content = data.choices[0].message.content.trim();
-    console.log('Content to parse:', content);
+    const content = data.choices[0].message.content.trim();
+    console.log('Parsed content:', content);
 
     try {
       const parsedContent = JSON.parse(content);
@@ -111,40 +107,13 @@ serve(async (req) => {
         throw new Error('Invalid response format from AI');
       }
 
-      // Validate coordinates
-      if (parsedContent.coordinates.length < 4) {
-        throw new Error('Too few points for a valid polygon');
-      }
-
-      const validCoordinates = parsedContent.coordinates.every((coord: any) => 
-        Array.isArray(coord) && 
-        coord.length === 2 &&
-        typeof coord[0] === 'number' && 
-        typeof coord[1] === 'number' &&
-        !isNaN(coord[0]) &&
-        !isNaN(coord[1])
-      );
-
-      if (!validCoordinates) {
-        throw new Error('Invalid coordinate format in AI response');
-      }
-
-      // Ensure polygon is closed
-      const coordinates = parsedContent.coordinates;
-      const first = coordinates[0];
-      const last = coordinates[coordinates.length - 1];
-      if (first[0] !== last[0] || first[1] !== last[1]) {
-        coordinates.push([...first]);
-      }
-
       return new Response(
-        JSON.stringify({ coordinates }), 
+        JSON.stringify({ coordinates: parsedContent.coordinates }), 
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
 
     } catch (error) {
       console.error('Error parsing AI response:', error);
-      console.error('Raw content that could not be parsed:', content);
       return new Response(
         JSON.stringify({ 
           error: "Konnte Dachform nicht erkennen. Bitte zeichnen Sie den Umriss manuell ein.",

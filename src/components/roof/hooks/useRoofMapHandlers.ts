@@ -34,19 +34,25 @@ export const useRoofMapHandlers = ({
   const handleAutoDetect = async (mapInstance: google.maps.Map) => {
     setIsAnalyzing(true);
     onLog?.("Starte automatische Dacherkennung");
+    
     try {
       const bounds = mapInstance.getBounds();
       const zoom = mapInstance.getZoom();
-      if (!bounds) return;
+      if (!bounds || !zoom) {
+        throw new Error("Kartendaten nicht verfügbar");
+      }
 
       const center = mapInstance.getCenter();
-      if (!center) return;
+      if (!center) {
+        throw new Error("Kartenposition nicht verfügbar");
+      }
 
       onLog?.(`Kartenposition: ${center.lat()}, ${center.lng()}, Zoom: ${zoom}`);
 
+      // Get static map image for AI analysis
       const imageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${center.lat()},${center.lng()}&zoom=${zoom}&size=640x640&maptype=satellite&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`;
 
-      onLog?.("Sende Anfrage an analyze-roof Funktion");
+      onLog?.("Sende Anfrage an KI-Analyse");
       const response = await fetch('/functions/v1/analyze-roof', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -60,8 +66,12 @@ export const useRoofMapHandlers = ({
         }),
       });
 
+      if (!response.ok) {
+        throw new Error(`Fehler bei der KI-Analyse: ${response.statusText}`);
+      }
+
       const data = await response.json();
-      onLog?.(`Antwort von analyze-roof: ${JSON.stringify(data)}`);
+      onLog?.(`Antwort von KI-Analyse erhalten: ${JSON.stringify(data)}`);
 
       if (data.error) {
         throw new Error(data.error);
@@ -102,6 +112,8 @@ export const useRoofMapHandlers = ({
           duration: 5000,
         });
         onLog?.("Automatische Erkennung erfolgreich abgeschlossen");
+      } else {
+        throw new Error("Keine Dachkoordinaten in der KI-Antwort gefunden");
       }
     } catch (error) {
       console.error('Error during roof detection:', error);

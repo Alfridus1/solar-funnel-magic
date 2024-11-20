@@ -20,7 +20,7 @@ interface RoofCheckProps {
 
 export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
   const navigate = useNavigate();
-  const [analyzing, setAnalyzing] = useState(true);
+  const [analyzing, setAnalyzing] = useState(false);
   const [coordinates, setCoordinates] = useState({ lat: 51.1657, lng: 10.4515 });
   const [roofDetails, setRoofDetails] = useState<{ roofId: string; moduleCount: number }[]>([]);
   const [metrics, setMetrics] = useState({
@@ -45,7 +45,6 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
           const location = results[0].geometry.location;
           onLog?.(`Adresse gefunden: ${location.lat()}, ${location.lng()}`);
           setCoordinates({ lat: location.lat(), lng: location.lng() });
-          setAnalyzing(false);
         } else {
           onLog?.(`Geocoding Fehler: ${status}`);
         }
@@ -96,24 +95,6 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
   if (!isLoaded) {
     onLog?.("Lade Google Maps...");
     return <div>Laden...</div>;
-  }
-
-  if (analyzing) {
-    return (
-      <Card className="w-full max-w-2xl mx-auto p-4 sm:p-6 bg-white animate-fade-up">
-        <CardContent className="text-center">
-          <div className="flex items-center justify-center mb-4">
-            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-          </div>
-          <h3 className="text-lg font-semibold mb-2">
-            Vermesse Ihr Dach mit KI...
-          </h3>
-          <p className="text-gray-600">
-            Bitte zeichnen Sie die Umrisse Ihres Daches ein
-          </p>
-        </CardContent>
-      </Card>
-    );
   }
 
   return (
