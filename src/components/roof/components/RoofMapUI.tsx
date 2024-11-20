@@ -1,5 +1,6 @@
 import { GoogleMap, DrawingManager, Marker } from "@react-google-maps/api";
-import { Loader2, MapPin } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { RoofGrid } from "./RoofGrid";
 
 interface RoofMapUIProps {
   isAnalyzing: boolean;
@@ -67,6 +68,7 @@ export const RoofMapUI = ({
             strokeWeight: 2,
           }}
         />
+        <RoofGrid map={map} coordinates={coordinates} />
         <DrawingManager
           onPolygonComplete={onPolygonComplete}
           options={{
