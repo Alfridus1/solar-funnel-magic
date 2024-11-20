@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { RoofMetrics } from "@/components/roof/RoofMetrics";
 import { calculateRoofArea, calculateSolarMetrics } from "@/utils/roofCalculations";
 import { Input } from "@/components/ui/input";
 import { Autocomplete } from "@react-google-maps/api";
+import { useToast } from "@/hooks/use-toast";
 
 interface RoofCheckProps {
   address: string;
@@ -25,6 +26,7 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
     roofDetails: [] as { roofId: string; moduleCount: number }[]
   });
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleRoofOutlineComplete = useCallback(
     (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number }[]) => {
@@ -39,6 +41,62 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
     },
     []
   );
+
+  const reverseGeocode = async (lat: number, lng: number) => {
+    const geocoder = new google.maps.Geocoder();
+    try {
+      const response = await geocoder.geocode({ location: { lat, lng } });
+      if (response.results[0]) {
+        setSelectedAddress(response.results[0].formatted_address);
+        onLog?.(`Standort erkannt: ${response.results[0].formatted_address}`);
+      }
+    } catch (error) {
+      console.error('Geocoding error:', error);
+      toast({
+        title: "Fehler",
+        description: "Die Adresse konnte nicht ermittelt werden.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      toast({
+        title: "Standorterkennung",
+        description: "Ihr Standort wird ermittelt...",
+      });
+      
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          await reverseGeocode(latitude, longitude);
+          toast({
+            title: "Erfolg",
+            description: "Ihr Standort wurde erfolgreich erkannt.",
+          });
+        },
+        (error) => {
+          console.error('Geolocation error:', error);
+          let errorMessage = "Ihr Standort konnte nicht ermittelt werden.";
+          if (error.code === error.PERMISSION_DENIED) {
+            errorMessage = "Bitte erlauben Sie den Zugriff auf Ihren Standort.";
+          }
+          toast({
+            title: "Fehler",
+            description: errorMessage,
+            variant: "destructive",
+          });
+        }
+      );
+    } else {
+      toast({
+        title: "Nicht unterstützt",
+        description: "Ihr Browser unterstützt keine Standorterkennung.",
+        variant: "destructive",
+      });
+    }
+  }, []);
 
   const handleContinue = () => {
     if (paths.length === 0) return;
@@ -84,7 +142,8 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
                 <Input
                   type="text"
                   placeholder="Geben Sie Ihre Adresse ein..."
-                  defaultValue={selectedAddress}
+                  value={selectedAddress}
+                  onChange={(e) => setSelectedAddress(e.target.value)}
                   className="w-full p-2 border rounded"
                 />
               </Autocomplete>
