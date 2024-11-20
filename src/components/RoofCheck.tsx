@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLoadScript } from "@react-google-maps/api";
 import { RoofMap } from "./roof/RoofMap";
@@ -36,31 +35,34 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
     libraries: libraries as ["drawing", "places"],
   });
 
+  const geocodeAddress = useCallback(() => {
+    if (!isLoaded) return;
+    
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ address }, (results, status) => {
+      if (status === "OK" && results?.[0]?.geometry?.location) {
+        const location = results[0].geometry.location;
+        setCoordinates({ lat: location.lat(), lng: location.lng() });
+        onLog?.(`Adresse gefunden: ${location.lat()}, ${location.lng()}`);
+      } else {
+        onLog?.(`Geocoding Fehler: ${status}`);
+      }
+    });
+  }, [address, isLoaded, onLog]);
+
   useEffect(() => {
     if (isLoaded) {
       onLog?.("Google Maps API geladen");
-      const geocoder = new google.maps.Geocoder();
-      geocoder.geocode({ address }, (results, status) => {
-        if (status === "OK" && results?.[0]?.geometry?.location) {
-          const location = results[0].geometry.location;
-          onLog?.(`Adresse gefunden: ${location.lat()}, ${location.lng()}`);
-          setCoordinates({ lat: location.lat(), lng: location.lng() });
-        } else {
-          onLog?.(`Geocoding Fehler: ${status}`);
-        }
-      });
+      geocodeAddress();
     }
-  }, [address, isLoaded, onLog]);
+  }, [isLoaded, geocodeAddress]);
 
-  const handleRoofOutlineComplete = (
+  const handleRoofOutlineComplete = useCallback((
     paths: google.maps.LatLng[][],
     newRoofDetails: { roofId: string; moduleCount: number }[]
   ) => {
     const totalRoofArea = calculateRoofArea(paths);
-    onLog?.(`Dachfläche berechnet: ${totalRoofArea}m²`);
-    
     const totalModules = newRoofDetails.reduce((sum, roof) => sum + roof.moduleCount, 0);
-    onLog?.(`Mögliche Module: ${totalModules}`);
     
     const {
       usableArea,
@@ -78,10 +80,12 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
       kWp,
     });
 
+    onLog?.(`Dachfläche berechnet: ${totalRoofArea}m²`);
+    onLog?.(`Mögliche Module: ${totalModules}`);
     onLog?.(`Metriken berechnet: ${kWp}kWp, ${monthlyProduction}kWh/Monat`);
-  };
+  }, [onLog]);
 
-  const handleContinue = () => {
+  const handleContinue = useCallback(() => {
     onLog?.("Navigation zur Konfigurationsseite");
     navigate("/recommended-config", {
       state: {
@@ -90,10 +94,9 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
         roofDetails,
       },
     });
-  };
+  }, [navigate, metrics, address, roofDetails, onLog]);
 
   if (!isLoaded) {
-    onLog?.("Lade Google Maps...");
     return <div>Laden...</div>;
   }
 
