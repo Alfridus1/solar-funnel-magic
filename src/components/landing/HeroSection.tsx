@@ -48,6 +48,7 @@ export const HeroSection = ({
 
           <div className="space-y-4">
             <div className="relative">
+              <Home className="absolute left-3 top-3 h-5 w-5 text-gray-400 pointer-events-none z-10" />
               <Autocomplete
                 onLoad={(autocomplete) => {
                   autocompleteRef.current = autocomplete;
@@ -55,17 +56,14 @@ export const HeroSection = ({
                 onPlaceChanged={onPlaceSelected}
                 restrictions={{ country: "de" }}
               >
-                <div className="relative">
-                  <Home className="absolute left-3 top-3 h-5 w-5 text-gray-400 pointer-events-none" />
-                  <Input
-                    type="text"
-                    placeholder="Ihre Adresse eingeben..."
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    onFocus={handleGeolocation}
-                    className="pl-10 h-12 text-lg w-full bg-white"
-                  />
-                </div>
+                <Input
+                  type="text"
+                  placeholder="Ihre Adresse eingeben..."
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  onFocus={handleGeolocation}
+                  className="pl-10 h-12 text-lg w-full bg-white"
+                />
               </Autocomplete>
             </div>
 
