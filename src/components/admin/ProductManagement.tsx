@@ -9,11 +9,17 @@ import { Product } from "@/components/configurator/types";
 
 export const ProductManagement = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [newProduct, setNewProduct] = useState({
+  const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>({
     name: "",
-    category: "module" as const,
+    category: "module",
     price: 0,
-    specs: {},
+    specs: {
+      watts: undefined,
+      capacity: undefined,
+      power: undefined,
+      efficiency: undefined,
+      warranty: undefined
+    },
   });
   const { toast } = useToast();
 
@@ -38,7 +44,8 @@ export const ProductManagement = () => {
 
     setProducts(data.map(product => ({
       ...product,
-      category: product.category as "module" | "inverter" | "battery"
+      category: product.category as "module" | "inverter" | "battery",
+      specs: product.specs as Product['specs']
     })));
   };
 
@@ -65,9 +72,15 @@ export const ProductManagement = () => {
 
     setNewProduct({
       name: "",
-      category: "module" as const,
+      category: "module",
       price: 0,
-      specs: {},
+      specs: {
+        watts: undefined,
+        capacity: undefined,
+        power: undefined,
+        efficiency: undefined,
+        warranty: undefined
+      },
     });
     
     loadProducts();
@@ -95,7 +108,7 @@ export const ProductManagement = () => {
                 id="category"
                 className="w-full border rounded-md p-2"
                 value={newProduct.category}
-                onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value as "module" | "inverter" | "battery" })}
+                onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value as Product['category'] })}
                 required
               >
                 <option value="module">Solarmodul</option>
