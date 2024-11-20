@@ -52,15 +52,37 @@ export const HeroSection = ({
               <Autocomplete
                 onLoad={(autocomplete) => {
                   autocompleteRef.current = autocomplete;
-                  // Set German bounds and restrictions
                   autocomplete.setComponentRestrictions({ country: 'de' });
                   autocomplete.setOptions({
                     types: ['address'],
-                    fields: ['formatted_address', 'geometry']
+                    fields: ['formatted_address', 'geometry', 'address_components'],
+                    language: 'de'
                   });
                 }}
-                onPlaceChanged={onPlaceSelected}
-                restrictions={{ country: "de" }}
+                onPlaceChanged={() => {
+                  const place = autocompleteRef.current?.getPlace();
+                  if (place?.address_components) {
+                    const streetNumber = place.address_components.find(c => 
+                      c.types.includes('street_number')
+                    )?.long_name || '';
+
+                    const street = place.address_components.find(c => 
+                      c.types.includes('route')
+                    )?.long_name || '';
+
+                    const city = place.address_components.find(c => 
+                      c.types.includes('locality')
+                    )?.long_name || '';
+
+                    const postalCode = place.address_components.find(c => 
+                      c.types.includes('postal_code')
+                    )?.long_name || '';
+
+                    const formattedAddress = `${street} ${streetNumber}, ${postalCode} ${city}`;
+                    setAddress(formattedAddress);
+                  }
+                  onPlaceSelected();
+                }}
               >
                 <Input
                   type="text"
