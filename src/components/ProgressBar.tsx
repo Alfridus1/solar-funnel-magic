@@ -30,7 +30,7 @@ export const ProgressBar = ({ currentStep, totalSteps, steps = [], baseUrl = "/c
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto mb-8">
+    <div className="w-full max-w-4xl mx-auto px-4 mb-8">
       <div className="relative">
         <div className="overflow-hidden">
           <div className="flex justify-between mb-4">
@@ -38,8 +38,9 @@ export const ProgressBar = ({ currentStep, totalSteps, steps = [], baseUrl = "/c
               <div
                 key={index}
                 className={cn(
-                  "flex flex-col items-center w-1/5 cursor-pointer transition-opacity",
-                  index < currentStep ? "text-solar-orange hover:opacity-80" : "text-gray-400",
+                  "flex flex-col items-center flex-1 px-2",
+                  "transition-all duration-200 ease-in-out",
+                  index < currentStep ? "text-solar-orange hover:opacity-80 cursor-pointer" : "text-gray-400",
                   index >= currentStep && "cursor-not-allowed opacity-50"
                 )}
                 onClick={() => handleStepClick(index)}
@@ -53,15 +54,20 @@ export const ProgressBar = ({ currentStep, totalSteps, steps = [], baseUrl = "/c
               >
                 <div
                   className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center mb-2",
+                    "w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center mb-2",
+                    "text-xs sm:text-sm transition-colors duration-200",
                     index < currentStep ? "bg-solar-orange text-white" : "bg-gray-200"
                   )}
                 >
                   {index + 1}
                 </div>
                 <div className="text-center">
-                  <div className="font-semibold text-sm">{step.title}</div>
-                  <div className="text-xs hidden md:block">{step.description}</div>
+                  <div className="font-semibold text-xs sm:text-sm whitespace-nowrap">
+                    {step.title}
+                  </div>
+                  <div className="text-xs hidden sm:block text-gray-500">
+                    {step.description}
+                  </div>
                 </div>
               </div>
             ))}
