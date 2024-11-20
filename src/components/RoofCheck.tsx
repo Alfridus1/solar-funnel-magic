@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLoadScript } from "@react-google-maps/api";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RoofMap } from "@/components/roof/RoofMap";
@@ -8,6 +9,8 @@ import { calculateRoofArea, calculateSolarMetrics } from "@/utils/roofCalculatio
 import { Input } from "@/components/ui/input";
 import { Autocomplete } from "@react-google-maps/api";
 import { useToast } from "@/hooks/use-toast";
+
+const libraries = ["places", "drawing"] as ["places", "drawing"];
 
 interface RoofCheckProps {
   address: string;
@@ -28,6 +31,11 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const { isLoaded, loadError } = useLoadScript({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    libraries,
+  });
+
   const handleRoofOutlineComplete = useCallback(
     (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number }[]) => {
       setPaths(paths);
@@ -43,6 +51,8 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
   );
 
   const reverseGeocode = async (lat: number, lng: number) => {
+    if (!isLoaded) return;
+    
     const geocoder = new google.maps.Geocoder();
     try {
       const response = await geocoder.geocode({ location: { lat, lng } });
@@ -116,16 +126,27 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
     });
   };
 
-  const handlePlaceSelect = (place: google.maps.places.PlaceResult) => {
-    if (place.formatted_address) {
-      setSelectedAddress(place.formatted_address);
-      onLog?.(`Adresse ausgewählt: ${place.formatted_address}`);
-    }
-  };
-
   const handleInputFocus = () => {
     handleGeolocation();
   };
+
+  if (loadError) {
+    return (
+      <Card className="max-w-5xl mx-auto p-6">
+        <div className="text-center text-red-600">
+          Fehler beim Laden der Google Maps API. Bitte versuchen Sie es später erneut.
+        </div>
+      </Card>
+    );
+  }
+
+  if (!isLoaded) {
+    return (
+      <Card className="max-w-5xl mx-auto p-6">
+        <div className="text-center">Laden...</div>
+      </Card>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-8">
