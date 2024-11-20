@@ -55,31 +55,13 @@ export const HeroSection = ({
                   autocomplete.setComponentRestrictions({ country: 'de' });
                   autocomplete.setOptions({
                     types: ['address'],
-                    fields: ['formatted_address', 'geometry', 'address_components'],
-                    language: 'de'
+                    fields: ['formatted_address', 'geometry']
                   });
                 }}
                 onPlaceChanged={() => {
                   const place = autocompleteRef.current?.getPlace();
-                  if (place?.address_components) {
-                    const streetNumber = place.address_components.find(c => 
-                      c.types.includes('street_number')
-                    )?.long_name || '';
-
-                    const street = place.address_components.find(c => 
-                      c.types.includes('route')
-                    )?.long_name || '';
-
-                    const city = place.address_components.find(c => 
-                      c.types.includes('locality')
-                    )?.long_name || '';
-
-                    const postalCode = place.address_components.find(c => 
-                      c.types.includes('postal_code')
-                    )?.long_name || '';
-
-                    const formattedAddress = `${street} ${streetNumber}, ${postalCode} ${city}`;
-                    setAddress(formattedAddress);
+                  if (place?.formatted_address) {
+                    setAddress(place.formatted_address);
                   }
                   onPlaceSelected();
                 }}

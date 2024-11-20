@@ -10,10 +10,8 @@ export const useGeolocation = ({ onSuccess, onError, toast }: UseGeolocationProp
   const reverseGeocode = async (lat: number, lng: number) => {
     const geocoder = new google.maps.Geocoder();
     try {
-      // Erste Geocoding-Anfrage mit deutschen Parametern
       const response = await geocoder.geocode({
         location: { lat, lng },
-        language: 'de',
         region: 'DE'
       });
 
@@ -21,36 +19,9 @@ export const useGeolocation = ({ onSuccess, onError, toast }: UseGeolocationProp
         throw new Error("Keine Adresse gefunden");
       }
 
-      // Suche nach der genauesten Adresse
-      const address = response.results.find(result => 
-        result.types.includes('street_address') ||
-        result.types.includes('premise')
-      );
-
-      if (address) {
-        // Extrahiere die relevanten Adresskomponenten
-        const streetNumber = address.address_components.find(c => 
-          c.types.includes('street_number')
-        )?.long_name || '';
-
-        const street = address.address_components.find(c => 
-          c.types.includes('route')
-        )?.long_name || '';
-
-        const city = address.address_components.find(c => 
-          c.types.includes('locality')
-        )?.long_name || '';
-
-        const postalCode = address.address_components.find(c => 
-          c.types.includes('postal_code')
-        )?.long_name || '';
-
-        // Formatiere die Adresse im deutschen Format
-        const formattedAddress = `${street} ${streetNumber}, ${postalCode} ${city}`;
-        onSuccess(formattedAddress);
-      } else {
-        onSuccess(response.results[0].formatted_address);
-      }
+      // Nehme das erste Ergebnis, das eine Straßenadresse ist
+      const address = response.results[0];
+      onSuccess(address.formatted_address);
     } catch (error) {
       console.error('Geocoding error:', error);
       onError("Die Adresse konnte nicht ermittelt werden.");
