@@ -1,5 +1,5 @@
-import { GoogleMap, DrawingManager } from "@react-google-maps/api";
-import { Loader2 } from "lucide-react";
+import { GoogleMap, DrawingManager, Marker } from "@react-google-maps/api";
+import { Loader2, MapPin } from "lucide-react";
 
 interface RoofMapUIProps {
   isAnalyzing: boolean;
@@ -56,6 +56,17 @@ export const RoofMapUI = ({
           ],
         }}
       >
+        <Marker
+          position={coordinates}
+          icon={{
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 8,
+            fillColor: "#ef4444",
+            fillOpacity: 1,
+            strokeColor: "#ffffff",
+            strokeWeight: 2,
+          }}
+        />
         <DrawingManager
           onPolygonComplete={onPolygonComplete}
           options={{
