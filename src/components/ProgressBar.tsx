@@ -1,15 +1,33 @@
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 interface ProgressBarProps {
   currentStep: number;
   totalSteps: number;
   steps: { title: string; description: string }[];
+  baseUrl?: string;
 }
 
-export const ProgressBar = ({ currentStep, totalSteps, steps = [] }: ProgressBarProps) => {
+export const ProgressBar = ({ currentStep, totalSteps, steps = [], baseUrl = "/configurator" }: ProgressBarProps) => {
+  const navigate = useNavigate();
+
   if (!steps || steps.length === 0) {
     return null;
   }
+
+  const handleStepClick = (index: number) => {
+    if (index >= currentStep) return; // Don't allow clicking future steps
+
+    const routes = [
+      "consumption",
+      "modules",
+      "inverter",
+      "battery",
+      "summary"
+    ];
+
+    navigate(`${baseUrl}/${routes[index]}`);
+  };
 
   return (
     <div className="w-full max-w-4xl mx-auto mb-8">
@@ -20,9 +38,18 @@ export const ProgressBar = ({ currentStep, totalSteps, steps = [] }: ProgressBar
               <div
                 key={index}
                 className={cn(
-                  "flex flex-col items-center w-1/5",
-                  index < currentStep ? "text-solar-orange" : "text-gray-400"
+                  "flex flex-col items-center w-1/5 cursor-pointer transition-opacity",
+                  index < currentStep ? "text-solar-orange hover:opacity-80" : "text-gray-400",
+                  index >= currentStep && "cursor-not-allowed opacity-50"
                 )}
+                onClick={() => handleStepClick(index)}
+                role="button"
+                tabIndex={index < currentStep ? 0 : -1}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    handleStepClick(index);
+                  }
+                }}
               >
                 <div
                   className={cn(
