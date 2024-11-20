@@ -12,7 +12,6 @@ export const Debug = () => {
   const defaultAddress = "Dornfelderweg 9 67157 Wachenheim an der Weinstraße";
   const { toast } = useToast();
 
-  // Function to add logs that can be called from child components
   const addLog = (message: string) => {
     setLogs((prev) => [...prev, `${new Date().toISOString()}: ${message}`]);
   };
@@ -82,8 +81,7 @@ export const Debug = () => {
               <h2 className="text-xl font-semibold mb-4">Map View</h2>
               <RoofCheck 
                 address={defaultAddress} 
-                onLog={addLog} 
-                apiKey={apiKey}
+                onLog={addLog}
               />
             </CardContent>
           </Card>

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { GoogleMap, DrawingManager } from "@react-google-maps/api";
 import { useToast } from "@/components/ui/use-toast";
 import { Instructions } from "./components/Instructions";
@@ -55,7 +55,7 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
   });
 
   // Geocode the address to get coordinates
-  useState(() => {
+  useEffect(() => {
     const geocoder = new google.maps.Geocoder();
     geocoder.geocode({ address }, (results, status) => {
       if (status === "OK" && results?.[0]?.geometry?.location) {
