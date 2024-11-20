@@ -127,7 +127,7 @@ export function Index() {
         <div className="max-w-4xl mx-auto text-center mb-12 space-y-6 animate-fade-up">
           <img src="/logo.svg" alt="Logo" className="h-16 mx-auto mb-8" />
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 tracking-tight">
-            Ihre <span className="text-blue-600">Solaranlage</span> in wenigen Minuten planen
+            Ihre <span className="text-solar-orange">Solaranlage</span> in wenigen Minuten planen
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Zeichnen Sie Ihr Dach ein und erhalten Sie sofort Ihre optimale Konfiguration
