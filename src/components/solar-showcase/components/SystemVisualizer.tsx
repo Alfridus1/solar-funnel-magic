@@ -14,8 +14,8 @@ export const SystemVisualizer = ({ activeFeature }: SystemVisualizerProps) => {
     <Card className="relative aspect-[16/9] overflow-hidden bg-gradient-to-b from-blue-50/50 to-white border-none">
       <div className="absolute inset-0 p-6">
         <img 
-          src="/house-visualization.png" 
-          alt="Haus Visualisierung"
+          src="/lovable-uploads/2b67e439-3bd1-4ad6-8498-ee34e8f6d45f.png"
+          alt="Modernes Solarhaus mit Elektroauto"
           className="w-full h-full object-contain"
         />
         
