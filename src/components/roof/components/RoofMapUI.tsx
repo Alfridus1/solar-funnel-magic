@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { GoogleMap, DrawingManager, Marker } from "@react-google-maps/api";
 import { Loader2 } from "lucide-react";
 import { RoofGrid } from "./RoofGrid";
@@ -17,9 +18,16 @@ export const RoofMapUI = ({
   isDrawing,
   onPolygonComplete
 }: RoofMapUIProps) => {
+  const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
+
   const mapContainerStyle = {
     width: "100%",
     height: "100%",
+  };
+
+  const handleMapLoad = (map: google.maps.Map) => {
+    setMapInstance(map);
+    onLoad(map);
   };
 
   return (
@@ -38,7 +46,7 @@ export const RoofMapUI = ({
         mapContainerStyle={mapContainerStyle}
         zoom={19}
         center={coordinates}
-        onLoad={onLoad}
+        onLoad={handleMapLoad}
         options={{
           mapTypeId: "satellite",
           tilt: 0,
@@ -68,7 +76,7 @@ export const RoofMapUI = ({
             strokeWeight: 2,
           }}
         />
-        <RoofGrid map={map} coordinates={coordinates} />
+        {mapInstance && <RoofGrid map={mapInstance} coordinates={coordinates} />}
         <DrawingManager
           onPolygonComplete={onPolygonComplete}
           options={{
