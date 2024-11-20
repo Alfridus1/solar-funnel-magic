@@ -28,21 +28,26 @@ export const ProductList = ({
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0 || !editingProduct) return;
     
-    const file = e.target.files[0];
-    const fileExt = file.name.split('.').pop();
-    const filePath = `${Math.random()}.${fileExt}`;
-
     try {
+      const file = e.target.files[0];
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+
+      // Upload the file to Supabase storage
       const { error: uploadError } = await supabase.storage
         .from('product_images')
-        .upload(filePath, file);
+        .upload(fileName, file);
 
       if (uploadError) throw uploadError;
 
+      // Get the public URL
       const { data: { publicUrl } } = supabase.storage
         .from('product_images')
-        .getPublicUrl(filePath);
+        .getPublicUrl(fileName);
 
+      if (!publicUrl) throw new Error('Failed to get public URL');
+
+      // Update the product with the new image URL
       onEditingProductChange({
         ...editingProduct,
         image_url: publicUrl
@@ -53,6 +58,7 @@ export const ProductList = ({
         description: "Das Produktbild wurde erfolgreich aktualisiert.",
       });
     } catch (error: any) {
+      console.error('Image upload error:', error);
       toast({
         title: "Fehler beim Hochladen",
         description: error.message,
@@ -73,12 +79,15 @@ export const ProductList = ({
             {editingProduct?.id === product.id ? (
               <form onSubmit={onSaveEdit} className="w-full space-y-4">
                 <div className="flex items-center gap-4">
-                  <div className="relative w-16 h-16">
+                  <div className="relative w-16 h-16 group">
                     <img 
                       src={editingProduct.image_url || '/placeholder.svg'} 
                       alt={editingProduct.name}
                       className="w-16 h-16 object-contain rounded-md"
                     />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                      <span className="text-white text-xs">Klicken zum Ändern</span>
+                    </div>
                     <Input
                       type="file"
                       accept="image/*"
