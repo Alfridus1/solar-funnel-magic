@@ -55,7 +55,8 @@ export const HeroSection = ({
                   autocomplete.setComponentRestrictions({ country: 'de' });
                   autocomplete.setOptions({
                     types: ['address'],
-                    fields: ['formatted_address', 'geometry']
+                    fields: ['formatted_address', 'geometry'],
+                    language: 'de'
                   });
                 }}
                 onPlaceChanged={() => {
