@@ -15,9 +15,10 @@ const libraries = ["drawing", "places"];
 interface RoofCheckProps {
   address: string;
   onLog?: (message: string) => void;
+  apiKey?: string;
 }
 
-export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
+export const RoofCheck = ({ address, onLog, apiKey }: RoofCheckProps) => {
   const navigate = useNavigate();
   const [analyzing, setAnalyzing] = useState(false);
   const [coordinates, setCoordinates] = useState({ lat: 51.1657, lng: 10.4515 });
@@ -31,7 +32,7 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
   });
 
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    googleMapsApiKey: apiKey || import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
     libraries: libraries as ["drawing", "places"],
   });
 
