@@ -69,7 +69,7 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
         const geocoder = new google.maps.Geocoder();
         const result = await new Promise<google.maps.GeocoderResult[]>((resolve, reject) => {
           geocoder.geocode({ address }, (results, status) => {
-            if (status === "OK" && results) {
+            if (status === "OK" && results && results.length > 0) {
               resolve(results);
             } else {
               reject(new Error(`Geocoding failed: ${status}`));
@@ -86,7 +86,7 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
           setFormattedAddress(result[0].formatted_address);
           onLog?.(`Koordinaten gefunden: ${location.lat()}, ${location.lng()}`);
         }
-      } catch (err) {
+      } catch (err: any) {
         const errorMessage = "Adresse konnte nicht gefunden werden";
         setError(errorMessage);
         toast({
@@ -100,7 +100,9 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
       }
     };
 
-    geocodeAddress();
+    if (address) {
+      geocodeAddress();
+    }
   }, [address, toast, onLog]);
 
   const onLoad = useCallback((map: google.maps.Map) => {
@@ -117,7 +119,7 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
     <div className="space-y-4">
       <div className="bg-white p-4 rounded-lg shadow-sm">
         <h2 className="text-lg font-semibold mb-2">Ausgewählte Adresse</h2>
-        <p className="text-gray-700">{formattedAddress}</p>
+        <p className="text-gray-700">{formattedAddress || address}</p>
       </div>
       <Instructions />
       <RoofMapUI
