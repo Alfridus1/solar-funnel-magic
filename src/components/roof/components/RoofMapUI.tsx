@@ -1,10 +1,15 @@
 import { useState, useCallback } from "react";
 import { GoogleMap, DrawingManager, Marker } from "@react-google-maps/api";
 import { MapControls } from "./MapControls";
+import { Loader2 } from "lucide-react";
+
+// Define libraries array outside of component to prevent reloading
+const libraries: ("drawing" | "geometry" | "places")[] = ["drawing", "geometry"];
 
 interface RoofMapUIProps {
   coordinates: { lat: number; lng: number };
   isDrawing: boolean;
+  isLoading: boolean;
   onLoad: (map: google.maps.Map) => void;
   onPolygonComplete: (polygon: google.maps.Polygon) => void;
   onStartDrawing: () => void;
@@ -15,6 +20,7 @@ interface RoofMapUIProps {
 export const RoofMapUI = ({
   coordinates,
   isDrawing,
+  isLoading,
   onLoad,
   onPolygonComplete,
   onStartDrawing,
@@ -76,6 +82,17 @@ export const RoofMapUI = ({
     },
   };
 
+  if (isLoading) {
+    return (
+      <div className="relative w-full h-[500px] rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center bg-gray-50">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+          <p className="text-gray-600">Lade Kartenposition...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative w-full h-[500px] rounded-lg overflow-hidden border border-gray-200">
       <GoogleMap
@@ -84,6 +101,7 @@ export const RoofMapUI = ({
         center={markerPosition}
         onLoad={handleMapLoad}
         options={mapOptions}
+        libraries={libraries}
       >
         <Marker
           position={markerPosition}

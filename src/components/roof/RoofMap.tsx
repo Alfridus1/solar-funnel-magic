@@ -1,8 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
-import { GoogleMap, DrawingManager } from "@react-google-maps/api";
 import { useToast } from "@/components/ui/use-toast";
 import { Instructions } from "./components/Instructions";
-import { MapControls } from "./components/MapControls";
 import { RoofMapUI } from "./components/RoofMapUI";
 import { useRoofMapHandlers } from "./hooks/useRoofMapHandlers";
 import { useRoofMapState } from "./hooks/useRoofMapState";
@@ -16,7 +14,7 @@ interface RoofMapProps {
 export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps) => {
   const { toast } = useToast();
   const [coordinates, setCoordinates] = useState<{ lat: number; lng: number }>({
-    lat: 49.5316, // Default to central Germany
+    lat: 49.5316,
     lng: 8.3491
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -61,10 +59,10 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
 
   useEffect(() => {
     const geocodeAddress = async () => {
-      if (!address) return;
-      
-      setIsLoading(true);
-      setError(null);
+      if (!address) {
+        setIsLoading(false);
+        return;
+      }
       
       try {
         const geocoder = new google.maps.Geocoder();
@@ -106,14 +104,11 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
   const onLoad = useCallback((map: google.maps.Map) => {
     onLog?.("Karte geladen");
     setMap(map);
+    setIsLoading(false);
   }, [setMap, onLog]);
 
   if (error) {
     return <div className="text-red-600 p-4">{error}</div>;
-  }
-
-  if (isLoading) {
-    return <div className="flex items-center justify-center p-4">Lade Kartenposition...</div>;
   }
 
   return (
@@ -127,6 +122,7 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
         onStartDrawing={startDrawing}
         onDeleteLastRoof={deleteLastRoof}
         polygonsExist={polygons.length > 0}
+        isLoading={isLoading}
       />
     </div>
   );
