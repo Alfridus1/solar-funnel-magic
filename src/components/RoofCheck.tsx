@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { RoofMap } from "@/components/roof/RoofMap";
 import { RoofMetrics } from "@/components/roof/RoofMetrics";
 import { calculateRoofArea, calculateSolarMetrics } from "@/utils/roofCalculations";
+import { Input } from "@/components/ui/input";
+import { Autocomplete } from "@react-google-maps/api";
 
 interface RoofCheckProps {
   address: string;
@@ -12,6 +14,7 @@ interface RoofCheckProps {
 }
 
 export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
+  const [selectedAddress, setSelectedAddress] = useState(address);
   const [paths, setPaths] = useState<google.maps.LatLng[][]>([]);
   const [metrics, setMetrics] = useState({
     monthlyProduction: 0,
@@ -30,6 +33,7 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
       const calculatedMetrics = calculateSolarMetrics(totalArea);
       setMetrics({
         ...calculatedMetrics,
+        roofArea: totalArea,
         roofDetails
       });
     },
@@ -42,9 +46,16 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
     navigate("/recommended-config", {
       state: {
         metrics,
-        address,
+        address: selectedAddress,
       },
     });
+  };
+
+  const handlePlaceSelect = (place: google.maps.places.PlaceResult) => {
+    if (place.formatted_address) {
+      setSelectedAddress(place.formatted_address);
+      onLog?.(`Adresse ausgewählt: ${place.formatted_address}`);
+    }
   };
 
   return (
@@ -54,13 +65,33 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
           <div className="space-y-6">
             <div>
               <h1 className="text-2xl font-bold mb-2">Zeichnen Sie Ihr Dach ein</h1>
-              <p className="text-gray-600">
+              <p className="text-gray-600 mb-4">
                 Klicken Sie auf die Ecken Ihres Daches, um die Fläche einzuzeichnen
               </p>
+              <Autocomplete
+                onLoad={(autocomplete) => {
+                  autocomplete.setComponentRestrictions({ country: "de" });
+                }}
+                onPlaceChanged={() => {
+                  const autocomplete = document.querySelector('input') as HTMLInputElement;
+                  const place = autocomplete?.value;
+                  if (place) {
+                    setSelectedAddress(place);
+                    onLog?.(`Neue Adresse ausgewählt: ${place}`);
+                  }
+                }}
+              >
+                <Input
+                  type="text"
+                  placeholder="Geben Sie Ihre Adresse ein..."
+                  defaultValue={selectedAddress}
+                  className="w-full p-2 border rounded"
+                />
+              </Autocomplete>
             </div>
 
             <RoofMap
-              address={address}
+              address={selectedAddress}
               onRoofOutlineComplete={handleRoofOutlineComplete}
               onLog={onLog}
             />
