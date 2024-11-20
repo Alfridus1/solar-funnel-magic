@@ -4,6 +4,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Instructions } from "./components/Instructions";
 import { MapControls } from "./components/MapControls";
 import { calculateModulePositions } from "./utils/moduleCalculations";
+import { Loader2 } from "lucide-react";
 
 interface RoofMapProps {
   coordinates: { lat: number; lng: number };
@@ -15,6 +16,7 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
   const [polygons, setPolygons] = useState<google.maps.Polygon[]>([]);
   const [modules, setModules] = useState<google.maps.Rectangle[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [roofDetails, setRoofDetails] = useState<{ roofId: string; moduleCount: number }[]>([]);
   const { toast } = useToast();
 
@@ -25,7 +27,88 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
 
   const onLoad = useCallback((map: google.maps.Map) => {
     setMap(map);
+    // Start automatic analysis when map loads
+    handleAutoDetect(map);
   }, []);
+
+  const handleAutoDetect = async (mapInstance: google.maps.Map) => {
+    setIsAnalyzing(true);
+    try {
+      // Get the current map bounds and zoom level
+      const bounds = mapInstance.getBounds();
+      const zoom = mapInstance.getZoom();
+      if (!bounds) return;
+
+      // Get the static map image URL
+      const imageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${coordinates.lat},${coordinates.lng}&zoom=${zoom}&size=640x640&maptype=satellite&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`;
+
+      // Call the Supabase Edge Function
+      const response = await fetch('/functions/v1/analyze-roof', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imageUrl,
+          location: {
+            lat: coordinates.lat,
+            lng: coordinates.lng,
+            zoom: zoom
+          }
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      // Create a polygon from the detected coordinates
+      if (data.coordinates && data.coordinates.length > 0) {
+        const path = data.coordinates.map((coord: number[]) => ({
+          lat: coord[0],
+          lng: coord[1]
+        }));
+
+        const polygon = new google.maps.Polygon({
+          paths: path,
+          strokeColor: "#2563eb",
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: "#2563eb",
+          fillOpacity: 0.35,
+          editable: true,
+          map: mapInstance
+        });
+
+        setPolygons(prev => [...prev, polygon]);
+        const { moduleCount, roofId } = calculateModulePositions(polygon, mapInstance, setModules);
+        
+        const newRoofDetails = [...roofDetails, { roofId, moduleCount }];
+        setRoofDetails(newRoofDetails);
+
+        const allPaths = [...polygons, polygon].map(poly =>
+          poly.getPath().getArray()
+        );
+        onRoofOutlineComplete(allPaths, newRoofDetails);
+
+        toast({
+          title: "Dach erfolgreich erkannt",
+          description: "Die Dachfläche wurde automatisch erkannt. Sie können die Form bei Bedarf anpassen.",
+          duration: 5000,
+        });
+      }
+    } catch (error) {
+      console.error('Error during roof detection:', error);
+      toast({
+        title: "Automatische Erkennung fehlgeschlagen",
+        description: "Bitte zeichnen Sie die Dachfläche manuell ein.",
+        variant: "destructive",
+        duration: 5000,
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   const clearModules = () => {
     modules.forEach((module) => module.setMap(null));
@@ -93,6 +176,16 @@ export const RoofMap = ({ coordinates, onRoofOutlineComplete }: RoofMapProps) =>
       <Instructions />
 
       <div className="w-full h-[calc(100vh-400px)] md:h-[600px] rounded-lg overflow-hidden relative">
+        {isAnalyzing && (
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
+            <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+              <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-4" />
+              <p className="text-lg font-semibold">Analysiere Dach...</p>
+              <p className="text-sm text-gray-600">Bitte warten Sie einen Moment</p>
+            </div>
+          </div>
+        )}
+
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
           zoom={19}
