@@ -22,22 +22,37 @@ export const calculateModulePositions = (
   const moduleHeightDeg = MODULE_HEIGHT / latMetersPerDegree;
   const marginDeg = FRAME_MARGIN / lngMetersPerDegree;
 
-  // Calculate grid dimensions with padding to ensure modules stay within bounds
+  // Calculate grid dimensions with padding
   const gridWidth = bounds.getNorthEast().lng() - bounds.getSouthWest().lng() - (2 * marginDeg);
   const gridHeight = bounds.getNorthEast().lat() - bounds.getSouthWest().lat() - (2 * marginDeg);
 
+  // Determine orientation based on roof dimensions
+  const isRoofWiderThanTall = gridWidth > gridHeight;
+  
+  // Align modules with the shorter side of the roof
+  let effectiveModuleWidth, effectiveModuleHeight;
+  if (isRoofWiderThanTall) {
+    // Roof is wider than tall - align module height with roof width
+    effectiveModuleWidth = moduleHeightDeg;
+    effectiveModuleHeight = moduleWidthDeg;
+  } else {
+    // Roof is taller than wide - align module height with roof height
+    effectiveModuleWidth = moduleWidthDeg;
+    effectiveModuleHeight = moduleHeightDeg;
+  }
+
   // Calculate number of modules that can fit
-  const modulesInRow = Math.floor(gridWidth / (moduleWidthDeg + marginDeg));
-  const modulesInColumn = Math.floor(gridHeight / (moduleHeightDeg + marginDeg));
+  const modulesInRow = Math.floor(gridWidth / (effectiveModuleWidth + marginDeg));
+  const modulesInColumn = Math.floor(gridHeight / (effectiveModuleHeight + marginDeg));
 
   // Create modules
   for (let row = 0; row < modulesInColumn; row++) {
     for (let col = 0; col < modulesInRow; col++) {
       // Calculate center position
       const baseLat = bounds.getSouthWest().lat() + marginDeg + 
-        (row * (moduleHeightDeg + marginDeg)) + (moduleHeightDeg / 2);
+        (row * (effectiveModuleHeight + marginDeg)) + (effectiveModuleHeight / 2);
       const baseLng = bounds.getSouthWest().lng() + marginDeg + 
-        (col * (moduleWidthDeg + marginDeg)) + (moduleWidthDeg / 2);
+        (col * (effectiveModuleWidth + marginDeg)) + (effectiveModuleWidth / 2);
       
       const moduleCenter = new google.maps.LatLng(baseLat, baseLng);
 
@@ -45,10 +60,10 @@ export const calculateModulePositions = (
       if (google.maps.geometry.poly.containsLocation(moduleCenter, polygon)) {
         // Create module bounds
         const moduleBounds = {
-          north: moduleCenter.lat() + (moduleHeightDeg / 2),
-          south: moduleCenter.lat() - (moduleHeightDeg / 2),
-          east: moduleCenter.lng() + (moduleWidthDeg / 2),
-          west: moduleCenter.lng() - (moduleWidthDeg / 2)
+          north: moduleCenter.lat() + (effectiveModuleHeight / 2),
+          south: moduleCenter.lat() - (effectiveModuleHeight / 2),
+          east: moduleCenter.lng() + (effectiveModuleWidth / 2),
+          west: moduleCenter.lng() - (effectiveModuleWidth / 2)
         };
 
         const moduleRect = new google.maps.Rectangle({
