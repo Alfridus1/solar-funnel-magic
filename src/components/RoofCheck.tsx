@@ -1,58 +1,49 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { useLoadScript } from "@react-google-maps/api";
+import { useLoadScript, Autocomplete } from "@react-google-maps/api";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RoofMap } from "@/components/roof/RoofMap";
 import { RoofMetrics } from "@/components/roof/RoofMetrics";
 import { calculateRoofArea, calculateSolarMetrics } from "@/utils/roofCalculations";
 import { Input } from "@/components/ui/input";
-import { Autocomplete } from "@react-google-maps/api";
 import { useToast } from "@/hooks/use-toast";
-
-const libraries = ["places", "drawing"] as ["places", "drawing"];
 
 interface RoofCheckProps {
   address: string;
   onLog?: (message: string) => void;
 }
 
+interface Metrics {
+  monthlyProduction: number;
+  annualSavings: number;
+  roofArea: number;
+  possiblePanels: number;
+  kWp: number;
+  roofDetails: { roofId: string; moduleCount: number }[];
+}
+
 export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
   const [selectedAddress, setSelectedAddress] = useState(address);
   const [paths, setPaths] = useState<google.maps.LatLng[][]>([]);
-  const [metrics, setMetrics] = useState({
+  const [metrics, setMetrics] = useState<Metrics>({
     monthlyProduction: 0,
     annualSavings: 0,
     roofArea: 0,
     possiblePanels: 0,
     kWp: 0,
-    roofDetails: [] as { roofId: string; moduleCount: number }[]
+    roofDetails: []
   });
+
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-    libraries,
+    libraries: ["places", "drawing"],
   });
 
-  const handleRoofOutlineComplete = useCallback(
-    (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number }[]) => {
-      setPaths(paths);
-      const totalArea = calculateRoofArea(paths);
-      const calculatedMetrics = calculateSolarMetrics(totalArea);
-      setMetrics({
-        ...calculatedMetrics,
-        roofArea: totalArea,
-        roofDetails
-      });
-    },
-    []
-  );
-
   const reverseGeocode = async (lat: number, lng: number) => {
-    if (!isLoaded) return;
-    
     const geocoder = new google.maps.Geocoder();
     try {
       const response = await geocoder.geocode({ location: { lat, lng } });
@@ -115,9 +106,22 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
     );
   };
 
+  const handleRoofOutlineComplete = useCallback(
+    (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number }[]) => {
+      setPaths(paths);
+      const totalArea = calculateRoofArea(paths);
+      const calculatedMetrics = calculateSolarMetrics(totalArea);
+      setMetrics({
+        ...calculatedMetrics,
+        roofArea: totalArea,
+        roofDetails
+      });
+    },
+    []
+  );
+
   const handleContinue = () => {
     if (paths.length === 0) return;
-
     navigate("/recommended-config", {
       state: {
         metrics,
@@ -127,6 +131,10 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
   };
 
   const handleInputFocus = () => {
+    toast({
+      title: "Standorterkennung",
+      description: "Standorterkennung wird automatisch gestartet...",
+    });
     handleGeolocation();
   };
 
