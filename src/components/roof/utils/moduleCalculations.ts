@@ -1,4 +1,8 @@
-import { MODULE_WIDTH, MODULE_HEIGHT, FRAME_MARGIN, METERS_PER_DEGREE } from './constants';
+import { v4 as uuidv4 } from 'uuid';
+
+const PANEL_WIDTH = 1.7; // meters
+const PANEL_HEIGHT = 1.0; // meters
+const PANEL_SPACING = 0.3; // meters
 
 export const calculateModulePositions = (
   polygon: google.maps.Polygon,
@@ -6,103 +10,82 @@ export const calculateModulePositions = (
   setModules: (modules: google.maps.Rectangle[]) => void
 ) => {
   if (!map) return { moduleCount: 0, roofId: '' };
-  
-  const modules: google.maps.Rectangle[] = [];
-  const path = polygon.getPath();
-  const bounds = new google.maps.LatLngBounds();
-  
-  // Get polygon vertices
-  const vertices = path.getArray();
-  path.forEach(point => bounds.extend(point));
-  
-  const center = bounds.getCenter();
-  const latMetersPerDegree = METERS_PER_DEGREE;
-  const lngMetersPerDegree = METERS_PER_DEGREE * Math.cos(center.lat() * Math.PI / 180);
 
-  // Calculate primary roof direction based on longest edge
-  let longestEdgeLength = 0;
-  let primaryAngle = 0;
-  
-  for (let i = 0; i < vertices.length; i++) {
-    const current = vertices[i];
-    const next = vertices[(i + 1) % vertices.length];
+  const bounds = new google.maps.LatLngBounds();
+  const path = polygon.getPath();
+  path.forEach((point) => bounds.extend(point));
+
+  // Calculate the main angle of the roof
+  const points = path.getArray();
+  let maxDistance = 0;
+  let mainVector = { x: 0, y: 0 };
+
+  for (let i = 0; i < points.length; i++) {
+    const p1 = points[i];
+    const p2 = points[(i + 1) % points.length];
     
-    const dx = (next.lng() - current.lng()) * lngMetersPerDegree;
-    const dy = (next.lat() - current.lat()) * latMetersPerDegree;
-    const edgeLength = Math.sqrt(dx * dx + dy * dy);
+    const dx = p2.lng() - p1.lng();
+    const dy = p2.lat() - p1.lat();
+    const distance = Math.sqrt(dx * dx + dy * dy);
     
-    if (edgeLength > longestEdgeLength) {
-      longestEdgeLength = edgeLength;
-      primaryAngle = Math.atan2(dy, dx);
+    if (distance > maxDistance) {
+      maxDistance = distance;
+      mainVector = { x: dx, y: dy };
     }
   }
 
-  // Convert module dimensions to degrees
-  const moduleWidthDeg = MODULE_WIDTH / lngMetersPerDegree;
-  const moduleHeightDeg = MODULE_HEIGHT / latMetersPerDegree;
-  const marginDeg = FRAME_MARGIN / lngMetersPerDegree;
+  const angle = Math.atan2(mainVector.y, mainVector.x) * (180 / Math.PI);
 
-  // Calculate rotated grid dimensions
-  const cos = Math.cos(primaryAngle);
-  const sin = Math.sin(primaryAngle);
-  
-  // Calculate grid bounds
-  const gridWidth = bounds.getNorthEast().lng() - bounds.getSouthWest().lng() - (2 * marginDeg);
-  const gridHeight = bounds.getNorthEast().lat() - bounds.getSouthWest().lat() - (2 * marginDeg);
+  // Convert panel dimensions to LatLng
+  const center = bounds.getCenter();
+  const scale = 1 / Math.cos(center.lat() * Math.PI / 180);
+  const panelWidthDeg = PANEL_WIDTH / 111320 * scale;
+  const panelHeightDeg = PANEL_HEIGHT / 111320;
+  const spacingDeg = PANEL_SPACING / 111320;
 
-  // Calculate number of modules that can fit
-  const modulesInRow = Math.floor(gridWidth / (moduleWidthDeg + marginDeg));
-  const modulesInColumn = Math.floor(gridHeight / (moduleHeightDeg + marginDeg));
+  const sw = bounds.getSouthWest();
+  const ne = bounds.getNorthEast();
+  const width = ne.lng() - sw.lng();
+  const height = ne.lat() - sw.lat();
 
-  // Create modules with rotation
-  for (let row = 0; row < modulesInColumn; row++) {
-    for (let col = 0; col < modulesInRow; col++) {
-      // Calculate base position
-      const x = bounds.getSouthWest().lng() + marginDeg + 
-        (col * (moduleWidthDeg + marginDeg)) + (moduleWidthDeg / 2);
-      const y = bounds.getSouthWest().lat() + marginDeg + 
-        (row * (moduleHeightDeg + marginDeg)) + (moduleHeightDeg / 2);
-      
-      // Apply rotation around center
-      const dx = x - center.lng();
-      const dy = y - center.lat();
-      const rotatedX = center.lng() + (dx * cos - dy * sin);
-      const rotatedY = center.lat() + (dx * sin + dy * cos);
-      
-      const moduleCenter = new google.maps.LatLng(rotatedY, rotatedX);
+  const modules: google.maps.Rectangle[] = [];
+  const projection = map.getProjection();
+  if (!projection) return { moduleCount: 0, roofId: '' };
 
-      // Check if the module center is within the polygon
-      if (google.maps.geometry.poly.containsLocation(moduleCenter, polygon)) {
-        // Create module bounds with rotation
-        const moduleBounds = {
-          north: moduleCenter.lat() + ((moduleHeightDeg / 2) * cos),
-          south: moduleCenter.lat() - ((moduleHeightDeg / 2) * cos),
-          east: moduleCenter.lng() + ((moduleWidthDeg / 2) * cos),
-          west: moduleCenter.lng() - ((moduleWidthDeg / 2) * cos)
-        };
+  // Calculate grid dimensions
+  const cols = Math.floor(width / (panelWidthDeg + spacingDeg));
+  const rows = Math.floor(height / (panelHeightDeg + spacingDeg));
 
-        const moduleRect = new google.maps.Rectangle({
-          bounds: moduleBounds,
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const position = new google.maps.LatLng(
+        sw.lat() + row * (panelHeightDeg + spacingDeg),
+        sw.lng() + col * (panelWidthDeg + spacingDeg)
+      );
+
+      if (google.maps.geometry.poly.containsLocation(position, polygon)) {
+        const module = new google.maps.Rectangle({
+          bounds: new google.maps.LatLngBounds(
+            position,
+            new google.maps.LatLng(
+              position.lat() + panelHeightDeg,
+              position.lng() + panelWidthDeg
+            )
+          ),
           map: map,
-          fillColor: "#2563eb",
-          fillOpacity: 0.4,
-          strokeColor: "#1e40af",
-          strokeWeight: 1
+          fillColor: "#FFD700",
+          fillOpacity: 0.5,
+          strokeColor: "#FFA500",
+          strokeWeight: 1,
+          clickable: false
         });
 
-        // Apply rotation to the rectangle
-        moduleRect.setOptions({
-          rotation: (primaryAngle * 180) / Math.PI
-        });
-
-        modules.push(moduleRect);
+        modules.push(module);
       }
     }
   }
 
-  const roofId = Math.random().toString(36).substr(2, 9);
-  polygon.set('roofId', roofId);
-
   setModules(modules);
+  const roofId = uuidv4();
   return { moduleCount: modules.length, roofId };
 };

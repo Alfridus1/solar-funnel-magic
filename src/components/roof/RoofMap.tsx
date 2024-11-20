@@ -19,6 +19,7 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [formattedAddress, setFormattedAddress] = useState(address);
 
   const {
     map,
@@ -82,6 +83,7 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
             lat: location.lat(),
             lng: location.lng()
           });
+          setFormattedAddress(result[0].formatted_address);
           onLog?.(`Koordinaten gefunden: ${location.lat()}, ${location.lng()}`);
         }
       } catch (err) {
@@ -113,6 +115,10 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
 
   return (
     <div className="space-y-4">
+      <div className="bg-white p-4 rounded-lg shadow-sm">
+        <h2 className="text-lg font-semibold mb-2">Ausgewählte Adresse</h2>
+        <p className="text-gray-700">{formattedAddress}</p>
+      </div>
       <Instructions />
       <RoofMapUI
         coordinates={coordinates}

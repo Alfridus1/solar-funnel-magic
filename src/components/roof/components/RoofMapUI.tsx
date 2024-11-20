@@ -3,9 +3,6 @@ import { GoogleMap, DrawingManager, Marker } from "@react-google-maps/api";
 import { MapControls } from "./MapControls";
 import { Loader2 } from "lucide-react";
 
-// Define libraries array outside of component to prevent reloading
-const libraries: ("drawing" | "geometry" | "places")[] = ["drawing", "geometry"];
-
 interface RoofMapUIProps {
   coordinates: { lat: number; lng: number };
   isDrawing: boolean;
@@ -101,7 +98,6 @@ export const RoofMapUI = ({
         center={markerPosition}
         onLoad={handleMapLoad}
         options={mapOptions}
-        libraries={libraries}
       >
         <Marker
           position={markerPosition}
