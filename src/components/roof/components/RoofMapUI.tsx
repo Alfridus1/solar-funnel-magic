@@ -14,6 +14,24 @@ interface RoofMapUIProps {
   polygonsExist: boolean;
 }
 
+const mapContainerStyle = {
+  width: "100%",
+  height: "500px",
+  position: "relative" as const,
+};
+
+const mapOptions = {
+  mapTypeId: "satellite",
+  tilt: 0,
+  mapTypeControl: false,
+  fullscreenControl: false,
+  streetViewControl: false,
+  zoomControl: true,
+  zoomControlOptions: {
+    position: google.maps.ControlPosition.RIGHT_TOP,
+  },
+};
+
 export const RoofMapUI = ({
   coordinates,
   isDrawing,
@@ -26,12 +44,6 @@ export const RoofMapUI = ({
 }: RoofMapUIProps) => {
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const [markerPosition, setMarkerPosition] = useState(coordinates);
-
-  const mapContainerStyle = {
-    width: "100%",
-    height: "500px",
-    position: "relative" as const,
-  };
 
   const handleMapLoad = useCallback((map: google.maps.Map) => {
     if (!mapInstance) {
@@ -51,18 +63,6 @@ export const RoofMapUI = ({
         mapInstance.panTo(newPosition);
       }
     }
-  };
-
-  const mapOptions = {
-    mapTypeId: "satellite",
-    tilt: 0,
-    mapTypeControl: false,
-    fullscreenControl: false,
-    streetViewControl: false,
-    zoomControl: true,
-    zoomControlOptions: {
-      position: google.maps.ControlPosition.RIGHT_TOP,
-    },
   };
 
   const drawingManagerOptions = {

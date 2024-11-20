@@ -67,6 +67,7 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
       }
       
       try {
+        onLog?.("Starte Geocoding für Adresse: " + address);
         const geocoder = new google.maps.Geocoder();
         const result = await new Promise<google.maps.GeocoderResult[]>((resolve, reject) => {
           geocoder.geocode({ address }, (results, status) => {
@@ -86,7 +87,6 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
           });
           setFormattedAddress(result[0].formatted_address);
           onLog?.(`Koordinaten gefunden: ${location.lat()}, ${location.lng()}`);
-          setIsLoading(false);
         }
       } catch (err: any) {
         const errorMessage = "Adresse konnte nicht gefunden werden";
@@ -97,6 +97,7 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
           description: errorMessage
         });
         onLog?.(`Geocoding Fehler: ${err.message}`);
+      } finally {
         setIsLoading(false);
       }
     };
@@ -138,8 +139,8 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
       <RoofMapUI
         coordinates={coordinates}
         onLoad={(map) => {
+          onLog?.("Karte wurde geladen");
           setMap(map);
-          setIsLoading(false);
         }}
         isDrawing={isDrawing}
         onPolygonComplete={onPolygonComplete}

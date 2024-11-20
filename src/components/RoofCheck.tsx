@@ -5,6 +5,9 @@ import { Card } from "@/components/ui/card";
 import { calculateRoofArea, calculateSolarMetrics } from "@/utils/roofCalculations";
 import { RoofCheckContent } from "./RoofCheck/RoofCheckContent";
 
+// Define libraries outside component to prevent reloading
+const libraries: ("places" | "drawing" | "geometry")[] = ["places", "drawing"];
+
 interface RoofCheckProps {
   address: string;
   onLog?: (message: string) => void;
@@ -34,7 +37,7 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-    libraries: ["places", "drawing"],
+    libraries,
   });
 
   const handleRoofOutlineComplete = useCallback(
