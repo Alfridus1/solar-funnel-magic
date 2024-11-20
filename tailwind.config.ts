@@ -25,8 +25,30 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         solar: {
-          blue: "#E5F3FF",
-          orange: "#FFA726",
+          orange: {
+            DEFAULT: "#F75C03",
+            light: "#FF8A3D",
+            dark: "#D14A00",
+            50: "#FFF3E8",
+            100: "#FFE0C7",
+            200: "#FFB485",
+            300: "#FF8A3D",
+            400: "#F75C03",
+            500: "#D14A00",
+            600: "#A63B00",
+            700: "#7A2C00"
+          },
+          blue: {
+            DEFAULT: "#E5F3FF",
+            50: "#F5FAFF",
+            100: "#E5F3FF",
+            200: "#B3DAFF",
+            300: "#80C2FF",
+            400: "#4DA9FF",
+            500: "#1A91FF",
+            600: "#0077E6",
+            700: "#005CB3"
+          }
         },
         primary: {
           DEFAULT: "hsl(var(--primary))",

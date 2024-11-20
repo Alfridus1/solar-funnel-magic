@@ -26,7 +26,7 @@ export const Benefits = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
         {benefits.map((benefit, index) => (
           <div key={index} className="flex flex-col items-center text-center p-6 bg-white/80 backdrop-blur rounded-xl">
-            <CheckCircle className="h-10 w-10 text-blue-600 mb-4" />
+            <CheckCircle className="h-10 w-10 text-solar-orange mb-4" />
             <h3 className="text-xl font-semibold mb-2">{benefit.title}</h3>
             <p className="text-gray-600">{benefit.description}</p>
           </div>
