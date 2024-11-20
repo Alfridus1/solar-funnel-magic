@@ -124,6 +124,7 @@ export function Index() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-solar-blue to-white">
       <div className="container mx-auto px-4 py-12">
+        {/* Hero Section */}
         <div className="max-w-4xl mx-auto text-center mb-12 space-y-6 animate-fade-up">
           <img 
             src="/lovable-uploads/230bf2e3-b64a-4f51-bb2f-f246df2597be.png" 
@@ -137,6 +138,7 @@ export function Index() {
             Zeichnen Sie Ihr Dach ein und erhalten Sie sofort Ihre optimale Konfiguration
           </p>
 
+          {/* Main CTA Card */}
           <Card className="max-w-xl mx-auto p-8 shadow-lg bg-white/90 backdrop-blur">
             <div className="space-y-6">
               <div className="space-y-2">
@@ -180,10 +182,51 @@ export function Index() {
           </Card>
         </div>
 
+        {/* Trust Indicators */}
+        <div className="py-8 text-center">
+          <div className="flex flex-wrap justify-center gap-8 text-gray-600">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-solar-orange" />
+              <span>TÜV-zertifiziert</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Award className="h-5 w-5 text-solar-orange" />
+              <span>10 Jahre Garantie</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Heart className="h-5 w-5 text-solar-orange" />
+              <span>100% Kundenzufriedenheit</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Statistics Section */}
         <Stats />
+
+        {/* Benefits Section */}
         <Benefits />
+
+        {/* Social Proof Section */}
         <Testimonials />
+
+        {/* FAQ Section */}
         <FAQ />
+
+        {/* Final CTA Section */}
+        <div className="max-w-4xl mx-auto text-center py-16">
+          <h2 className="text-3xl font-bold mb-6">
+            Bereit für Ihre eigene Solaranlage?
+          </h2>
+          <p className="text-xl text-gray-600 mb-8">
+            Starten Sie jetzt und erhalten Sie ein unverbindliches Angebot
+          </p>
+          <Button
+            onClick={handleAddressSubmit}
+            className="h-12 px-8 text-lg bg-solar-orange hover:bg-solar-orange-dark transition-colors"
+          >
+            Jetzt Dach vermessen
+          </Button>
+        </div>
       </div>
     </div>
   );
