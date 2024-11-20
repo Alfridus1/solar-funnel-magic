@@ -21,13 +21,13 @@ export const ProgressBar = ({ currentStep, totalSteps, steps = [] }: ProgressBar
                 key={index}
                 className={cn(
                   "flex flex-col items-center w-1/5",
-                  index < currentStep ? "text-blue-600" : "text-gray-400"
+                  index < currentStep ? "text-solar-orange" : "text-gray-400"
                 )}
               >
                 <div
                   className={cn(
                     "w-8 h-8 rounded-full flex items-center justify-center mb-2",
-                    index < currentStep ? "bg-blue-600 text-white" : "bg-gray-200"
+                    index < currentStep ? "bg-solar-orange text-white" : "bg-gray-200"
                   )}
                 >
                   {index + 1}
@@ -41,7 +41,7 @@ export const ProgressBar = ({ currentStep, totalSteps, steps = [] }: ProgressBar
           </div>
           <div className="h-2 bg-gray-200 rounded-full">
             <div
-              className="h-full bg-blue-600 rounded-full transition-all duration-500"
+              className="h-full bg-solar-orange rounded-full transition-all duration-500"
               style={{ width: `${(currentStep / totalSteps) * 100}%` }}
             />
           </div>
