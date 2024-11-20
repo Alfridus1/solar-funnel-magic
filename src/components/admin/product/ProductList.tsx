@@ -33,21 +33,18 @@ export const ProductList = ({
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random()}.${fileExt}`;
 
-      // Upload the file to Supabase storage
       const { error: uploadError } = await supabase.storage
         .from('product_images')
         .upload(fileName, file);
 
       if (uploadError) throw uploadError;
 
-      // Get the public URL
       const { data: { publicUrl } } = supabase.storage
         .from('product_images')
         .getPublicUrl(fileName);
 
       if (!publicUrl) throw new Error('Failed to get public URL');
 
-      // Update the product with the new image URL
       onEditingProductChange({
         ...editingProduct,
         image_url: publicUrl
