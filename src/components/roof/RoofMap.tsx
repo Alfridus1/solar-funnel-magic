@@ -52,6 +52,28 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
     onLog
   });
 
+  const updateModules = useCallback((polygon: google.maps.Polygon, roofId: string) => {
+    onLog?.("Aktualisiere Module nach Formänderung");
+    const { moduleCount } = calculateModulePositions(polygon, map, setModules);
+    
+    const updatedRoofDetails = roofDetails.map(detail => 
+      detail.roofId === roofId ? { ...detail, moduleCount } : detail
+    );
+    
+    setRoofDetails(updatedRoofDetails);
+    const allPaths = polygons.map(poly => poly.getPath().getArray());
+    onRoofOutlineComplete(allPaths, updatedRoofDetails);
+  }, [map, polygons, roofDetails, setRoofDetails, onRoofOutlineComplete, onLog, setModules]);
+
+  const addPolygonListeners = useCallback((polygon: google.maps.Polygon, roofId: string) => {
+    const paths = polygon.getPaths();
+    paths.forEach((path) => {
+      google.maps.event.addListener(path, 'insert_at', () => updateModules(polygon, roofId));
+      google.maps.event.addListener(path, 'remove_at', () => updateModules(polygon, roofId));
+      google.maps.event.addListener(path, 'set_at', () => updateModules(polygon, roofId));
+    });
+  }, [updateModules]);
+
   const createRectangle = () => {
     if (!map) return;
     
@@ -76,34 +98,19 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
       strokeOpacity: 0.8,
       strokeWeight: 2,
       editable: true,
+      clickable: true,
       map: map
     });
 
-    // Add listeners for polygon changes
-    const addPolygonListeners = (polygon: google.maps.Polygon) => {
-      const paths = polygon.getPaths();
-      paths.forEach((path) => {
-        google.maps.event.addListener(path, 'insert_at', () => updateModules(polygon));
-        google.maps.event.addListener(path, 'remove_at', () => updateModules(polygon));
-        google.maps.event.addListener(path, 'set_at', () => updateModules(polygon));
-      });
-    };
-
-    const updateModules = (polygon: google.maps.Polygon) => {
-      onLog?.("Aktualisiere Module nach Formänderung");
-      const { moduleCount, roofId } = calculateModulePositions(polygon, map, setModules);
-      
-      const updatedRoofDetails = roofDetails.map(detail => 
-        detail.roofId === roofId ? { ...detail, moduleCount } : detail
-      );
-      
-      setRoofDetails(updatedRoofDetails);
-      const allPaths = polygons.map(poly => poly.getPath().getArray());
-      onRoofOutlineComplete(allPaths, updatedRoofDetails);
-    };
-
-    addPolygonListeners(polygon);
-    onPolygonComplete(polygon);
+    const { moduleCount, roofId } = calculateModulePositions(polygon, map, setModules);
+    addPolygonListeners(polygon, roofId);
+    
+    const newRoofDetails = [...roofDetails, { roofId, moduleCount }];
+    setRoofDetails(newRoofDetails);
+    
+    setPolygons(prevPolygons => [...prevPolygons, polygon]);
+    const allPaths = [...polygons, polygon].map(poly => poly.getPath().getArray());
+    onRoofOutlineComplete(allPaths, newRoofDetails);
   };
 
   const geocodeAddress = useCallback(async () => {
