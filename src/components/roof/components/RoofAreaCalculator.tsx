@@ -161,28 +161,6 @@ export const RoofAreaCalculator = ({ polygons }: RoofAreaCalculatorProps) => {
           </ResponsiveContainer>
         </div>
       </Card>
-
-      <div className="space-y-4">
-        <h4 className="font-semibold">Details pro Dachfläche:</h4>
-        {polygons.map((polygon, index) => {
-          const area = google.maps.geometry.spherical.computeArea(polygon.getPath());
-          const moduleCount = Math.floor(area / 1.7); // 1.7m² pro Panel
-          return (
-            <Card key={index} className="p-4">
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="font-medium">Dachfläche {index + 1}</p>
-                  <p className="text-sm text-gray-600">{Math.round(area * 100) / 100} m²</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-medium">{moduleCount} Module</p>
-                  <p className="text-sm text-gray-600">{Math.round(moduleCount * 0.4)} kWp</p>
-                </div>
-              </div>
-            </Card>
-          );
-        })}
-      </div>
     </motion.div>
   );
 };
