@@ -2,7 +2,8 @@ import React, { useState, useCallback } from 'react';
 import { Square, Move, Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { GoogleMap, DrawingManager } from '@react-google-maps/api';
+import { GoogleMap, DrawingManager, useLoadScript } from '@react-google-maps/api';
+import { Loader2 } from "lucide-react";
 
 interface RoofDesignerProps {
   onComplete?: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number }[]) => void;
@@ -18,28 +19,17 @@ const defaultCenter = {
   lng: 13.404954,
 };
 
-const drawingManagerOptions = {
-  drawingControl: true,
-  drawingControlOptions: {
-    position: google.maps.ControlPosition.TOP_CENTER,
-    drawingModes: [google.maps.drawing.OverlayType.POLYGON],
-  },
-  polygonOptions: {
-    fillColor: '#2563eb',
-    fillOpacity: 0.3,
-    strokeColor: '#2563eb',
-    strokeWeight: 2,
-    clickable: true,
-    editable: true,
-    draggable: true,
-    zIndex: 1,
-  },
-};
+const libraries: ("places" | "drawing" | "geometry")[] = ["places", "drawing", "geometry"];
 
 export const RoofDesigner = ({ onComplete }: RoofDesignerProps) => {
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [polygons, setPolygons] = useState<google.maps.Polygon[]>([]);
   const { toast } = useToast();
+
+  const { isLoaded, loadError } = useLoadScript({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    libraries,
+  });
 
   const onLoad = useCallback((map: google.maps.Map) => {
     setMap(map);
@@ -87,6 +77,43 @@ export const RoofDesigner = ({ onComplete }: RoofDesignerProps) => {
       }
     }
   }, [polygons, onComplete, toast]);
+
+  if (loadError) {
+    return (
+      <div className="p-4 text-red-600">
+        Fehler beim Laden der Google Maps API. Bitte versuchen Sie es später erneut.
+      </div>
+    );
+  }
+
+  if (!isLoaded) {
+    return (
+      <div className="flex items-center justify-center h-[500px] bg-gray-50 rounded-lg">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+          <p className="text-gray-600">Lade Karte...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const drawingManagerOptions = {
+    drawingControl: true,
+    drawingControlOptions: {
+      position: google.maps.ControlPosition.TOP_CENTER,
+      drawingModes: [google.maps.drawing.OverlayType.POLYGON],
+    },
+    polygonOptions: {
+      fillColor: '#2563eb',
+      fillOpacity: 0.3,
+      strokeColor: '#2563eb',
+      strokeWeight: 2,
+      clickable: true,
+      editable: true,
+      draggable: true,
+      zIndex: 1,
+    },
+  };
 
   return (
     <div className="space-y-4">
