@@ -25,33 +25,46 @@ export const useModuleManagement = ({
   const clearModules = useCallback(() => {
     onLog?.("Lösche bestehende Module");
     // Entferne alle Module von der Karte
-    modules.forEach(module => module.setMap(null));
+    modules.forEach(module => {
+      if (module) {
+        module.setMap(null);
+      }
+    });
     // Leere das Modules-Array
     setModules([]);
   }, [modules, setModules, onLog]);
 
-  const updateModules = useCallback((polygon: google.maps.Polygon, roofId: string) => {
-    onLog?.("Aktualisiere Module nach Formänderung");
-    // Zuerst alle bestehenden Module löschen
+  const recalculateAllModules = useCallback(() => {
+    onLog?.("Berechne alle Module neu");
     clearModules();
     
-    // Sofortige Berechnung der Module
-    const { moduleCount } = calculateModulePositions(polygon, map, setModules);
+    const newModules: google.maps.Rectangle[] = [];
+    const newRoofDetails: { roofId: string; moduleCount: number }[] = [];
+
+    polygons.forEach(polygon => {
+      const { moduleCount, roofId } = calculateModulePositions(polygon, map, (calculatedModules) => {
+        newModules.push(...calculatedModules);
+      });
+      newRoofDetails.push({ roofId, moduleCount });
+    });
+
+    setModules(newModules);
+    setRoofDetails(newRoofDetails);
     
-    const updatedRoofDetails = roofDetails.map(detail => 
-      detail.roofId === roofId ? { ...detail, moduleCount } : detail
-    );
-    
-    setRoofDetails(updatedRoofDetails);
     const allPaths = polygons.map(poly => poly.getPath().getArray());
-    onRoofOutlineComplete(allPaths, updatedRoofDetails);
-  }, [map, polygons, roofDetails, setRoofDetails, onRoofOutlineComplete, clearModules, onLog, setModules]);
+    onRoofOutlineComplete(allPaths, newRoofDetails);
+  }, [map, polygons, clearModules, setModules, setRoofDetails, onRoofOutlineComplete, onLog]);
+
+  const updateModules = useCallback((polygon: google.maps.Polygon, roofId: string) => {
+    onLog?.("Aktualisiere Module nach Formänderung");
+    recalculateAllModules();
+  }, [recalculateAllModules, onLog]);
 
   const addPolygonListeners = useCallback((polygon: google.maps.Polygon, roofId: string) => {
     // Event-Listener für Vertex-Änderungen (wenn Eckpunkte verschoben werden)
     google.maps.event.addListener(polygon, 'mouseup', () => {
       onLog?.("Polygon-MouseUp-Event ausgelöst");
-      updateModules(polygon, roofId);
+      recalculateAllModules();
     });
 
     // Event-Listener für Pfadänderungen
@@ -60,7 +73,7 @@ export const useModuleManagement = ({
       ['insert_at', 'remove_at', 'set_at'].forEach(eventName => {
         path.addListener(eventName, () => {
           onLog?.(`Pfad-${eventName}-Event ausgelöst`);
-          updateModules(polygon, roofId);
+          recalculateAllModules();
         });
       });
     });
@@ -68,9 +81,9 @@ export const useModuleManagement = ({
     // Event-Listener für Polygon-Bewegungen
     google.maps.event.addListener(polygon, 'dragend', () => {
       onLog?.("Polygon-Drag-Event ausgelöst");
-      updateModules(polygon, roofId);
+      recalculateAllModules();
     });
-  }, [updateModules, onLog]);
+  }, [recalculateAllModules, onLog]);
 
   return {
     clearModules,
