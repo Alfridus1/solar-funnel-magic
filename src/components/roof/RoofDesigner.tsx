@@ -1,9 +1,9 @@
-import { useState, useCallback, useEffect } from 'react';
-import { Square, Move, Trash2, Plus } from 'lucide-react';
+import { useState, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { GoogleMap, DrawingManager, useLoadScript } from '@react-google-maps/api';
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
+import { RoofCalculations } from './components/RoofCalculations';
 
 interface RoofDesignerProps {
   onComplete?: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number }[]) => void;
@@ -15,19 +15,12 @@ const mapContainerStyle = {
   height: '500px',
 };
 
-// Fallback coordinates for Germany
-const defaultCenter = {
-  lat: 51.1657,
-  lng: 10.4515,
-};
-
 const libraries: ("places" | "drawing" | "geometry")[] = ["places", "drawing", "geometry"];
 
 export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
   const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [polygons, setPolygons] = useState<google.maps.Polygon[]>([]);
+  const [activePolygon, setActivePolygon] = useState<google.maps.Polygon | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [center, setCenter] = useState(defaultCenter);
   const { toast } = useToast();
 
   const { isLoaded, loadError } = useLoadScript({
@@ -35,75 +28,64 @@ export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
     libraries,
   });
 
-  useEffect(() => {
-    if (isLoaded && address) {
-      const geocoder = new google.maps.Geocoder();
-      geocoder.geocode({ address }, (results, status) => {
-        if (status === google.maps.GeocoderStatus.OK && results && results[0]) {
-          const location = results[0].geometry.location;
-          setCenter({
-            lat: location.lat(),
-            lng: location.lng(),
-          });
-          if (map) {
-            map.setCenter(location);
-            map.setZoom(19);
-          }
-        }
-      });
-    }
-  }, [isLoaded, address, map]);
-
   const onLoad = useCallback((map: google.maps.Map) => {
     setMap(map);
-  }, []);
+    
+    // Setze initiale Position und Zoom
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ address }, (results, status) => {
+      if (status === google.maps.GeocoderStatus.OK && results && results[0]) {
+        const location = results[0].geometry.location;
+        map.setCenter(location);
+        map.setZoom(21);
+        
+        // Füge Marker hinzu
+        new google.maps.Marker({
+          position: location,
+          map: map,
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 10,
+            fillColor: "#f75c03",
+            fillOpacity: 1,
+            strokeColor: "#ffffff",
+            strokeWeight: 2,
+          }
+        });
+      }
+    });
+  }, [address]);
 
   const onPolygonComplete = useCallback((polygon: google.maps.Polygon) => {
-    setPolygons(prev => [...prev, polygon]);
+    setActivePolygon(polygon);
     setIsDrawing(false);
-    
-    // Berechne die Anzahl der möglichen Module basierend auf der Fläche
-    const path = polygon.getPath();
-    const area = google.maps.geometry.spherical.computeArea(path);
-    const moduleCount = Math.floor(area / (1.7 * 1)); // Ungefähre Modulgröße in m²
 
-    const roofId = `roof-${Date.now()}`;
-    const roofDetails = [{ roofId, moduleCount }];
+    // Füge Listener für Änderungen hinzu
+    google.maps.event.addListener(polygon, 'mouseup', () => {
+      setActivePolygon(polygon); // Trigger Neuberechnung
+    });
+
+    google.maps.event.addListener(polygon.getPath(), 'set_at', () => {
+      setActivePolygon(polygon); // Trigger Neuberechnung
+    });
+
+    google.maps.event.addListener(polygon.getPath(), 'insert_at', () => {
+      setActivePolygon(polygon); // Trigger Neuberechnung
+    });
 
     toast({
       title: "Dachfläche erstellt",
-      description: `${moduleCount} Module können auf dieser Dachfläche installiert werden.`,
+      description: "Die Dachfläche wurde erfolgreich eingezeichnet.",
       duration: 3000,
     });
-
-    if (onComplete) {
-      const paths = polygons.map(p => p.getPath().getArray());
-      paths.push(path.getArray());
-      onComplete(paths, roofDetails);
-    }
-  }, [polygons, onComplete, toast]);
-
-  const deleteLastRoof = useCallback(() => {
-    if (polygons.length > 0) {
-      const lastPolygon = polygons[polygons.length - 1];
-      lastPolygon.setMap(null);
-      setPolygons(prev => prev.slice(0, -1));
-
-      toast({
-        title: "Dachfläche entfernt",
-        description: "Die letzte Dachfläche wurde entfernt.",
-        duration: 3000,
-      });
-
-      if (onComplete) {
-        const paths = polygons.slice(0, -1).map(p => p.getPath().getArray());
-        onComplete(paths, []);
-      }
-    }
-  }, [polygons, onComplete, toast]);
+  }, [toast]);
 
   const startDrawing = () => {
     setIsDrawing(true);
+    if (activePolygon) {
+      activePolygon.setMap(null);
+      setActivePolygon(null);
+    }
     toast({
       title: "Zeichenmodus aktiviert",
       description: "Klicken Sie nacheinander auf die Ecken Ihres Daches. Klicken Sie zum Abschluss auf den ersten Punkt zurück.",
@@ -111,10 +93,22 @@ export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
     });
   };
 
+  const deletePolygon = () => {
+    if (activePolygon) {
+      activePolygon.setMap(null);
+      setActivePolygon(null);
+      toast({
+        title: "Dachfläche entfernt",
+        description: "Die Dachfläche wurde entfernt.",
+        duration: 3000,
+      });
+    }
+  };
+
   if (loadError) {
     return (
       <div className="p-4 text-red-600">
-        Fehler beim Laden der Google Maps API. Bitte versuchen Sie es später erneut.
+        Fehler beim Laden der Google Maps API
       </div>
     );
   }
@@ -130,29 +124,12 @@ export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
     );
   }
 
-  const drawingManagerOptions = {
-    drawingControl: false,
-    drawingMode: isDrawing ? google.maps.drawing.OverlayType.POLYGON : null,
-    polygonOptions: {
-      fillColor: '#2563eb',
-      fillOpacity: 0.3,
-      strokeColor: '#2563eb',
-      strokeOpacity: 0.8,
-      strokeWeight: 2,
-      editable: true,
-      clickable: true,
-      draggable: true,
-      zIndex: 1,
-    },
-  };
-
   return (
     <div className="space-y-4">
       <div className="relative rounded-lg overflow-hidden border border-gray-200">
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
           zoom={21}
-          center={center}
           onLoad={onLoad}
           options={{
             mapTypeId: 'satellite',
@@ -165,11 +142,23 @@ export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
         >
           <DrawingManager
             onPolygonComplete={onPolygonComplete}
-            options={drawingManagerOptions}
+            options={{
+              drawingControl: false,
+              drawingMode: isDrawing ? google.maps.drawing.OverlayType.POLYGON : null,
+              polygonOptions: {
+                fillColor: '#2563eb',
+                fillOpacity: 0.3,
+                strokeColor: '#2563eb',
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                editable: true,
+                draggable: true,
+                zIndex: 1,
+              },
+            }}
           />
           
-          {/* Neuer Button zum Erstellen eines Polygons */}
-          <div className="absolute top-4 left-4 z-10">
+          <div className="absolute top-4 left-4 z-10 space-x-2">
             <Button
               size="sm"
               onClick={startDrawing}
@@ -179,33 +168,23 @@ export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
               <Plus className="mr-1 h-4 w-4" />
               Dach einzeichnen
             </Button>
+            
+            {activePolygon && (
+              <Button
+                size="sm"
+                variant="destructive"
+                onClick={deletePolygon}
+                className="rounded-full shadow-lg"
+              >
+                <Trash2 className="mr-1 h-4 w-4" />
+                Löschen
+              </Button>
+            )}
           </div>
         </GoogleMap>
       </div>
 
-      {polygons.length > 0 && (
-        <div className="flex gap-2">
-          <Button
-            variant="destructive"
-            onClick={deleteLastRoof}
-            disabled={polygons.length === 0}
-          >
-            <Trash2 className="w-4 h-4 mr-2" />
-            Letztes Dach entfernen
-          </Button>
-        </div>
-      )}
-
-      {polygons.length > 0 && (
-        <div className="bg-white p-4 rounded-lg shadow-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <Move className="w-4 h-4 text-blue-500" />
-            <span className="text-sm text-gray-600">
-              Sie können die Dachform durch Ziehen der Punkte anpassen
-            </span>
-          </div>
-        </div>
-      )}
+      <RoofCalculations polygon={activePolygon} />
     </div>
   );
 };
