@@ -73,12 +73,40 @@ export const calculateModulePositions = (
       );
 
       if (google.maps.geometry.poly.containsLocation(position, polygon)) {
+        // Create a polygon instead of a rectangle to handle rotation
+        const modulePoints = [
+          { lat: position.lat(), lng: position.lng() },
+          { lat: position.lat() + panelHeightDeg, lng: position.lng() },
+          { lat: position.lat() + panelHeightDeg, lng: position.lng() + panelWidthDeg },
+          { lat: position.lat(), lng: position.lng() + panelWidthDeg }
+        ];
+
+        // Apply rotation around the center point
+        const centerPoint = {
+          lat: position.lat() + panelHeightDeg / 2,
+          lng: position.lng() + panelWidthDeg / 2
+        };
+
+        const rotatedPoints = modulePoints.map(point => {
+          const dx = point.lng - centerPoint.lng;
+          const dy = point.lat - centerPoint.lat;
+          const rotatedX = dx * Math.cos(angleRad) - dy * Math.sin(angleRad);
+          const rotatedY = dx * Math.sin(angleRad) + dy * Math.cos(angleRad);
+          return {
+            lat: centerPoint.lat + rotatedY,
+            lng: centerPoint.lng + rotatedX
+          };
+        });
+
         const module = new google.maps.Rectangle({
           bounds: new google.maps.LatLngBounds(
-            position,
             new google.maps.LatLng(
-              position.lat() + panelHeightDeg,
-              position.lng() + panelWidthDeg
+              Math.min(...rotatedPoints.map(p => p.lat)),
+              Math.min(...rotatedPoints.map(p => p.lng))
+            ),
+            new google.maps.LatLng(
+              Math.max(...rotatedPoints.map(p => p.lat)),
+              Math.max(...rotatedPoints.map(p => p.lng))
             )
           ),
           map: map,
@@ -86,16 +114,9 @@ export const calculateModulePositions = (
           fillOpacity: 0.5,
           strokeColor: "#FFA500",
           strokeWeight: 1,
-          clickable: false
+          clickable: false,
+          zIndex: 1
         });
-
-        // Apply rotation to the rectangle
-        if (module.setOptions) {
-          module.setOptions({
-            zIndex: 1,
-            rotation: totalAngle
-          });
-        }
 
         modules.push(module);
       }

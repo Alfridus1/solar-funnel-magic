@@ -3,6 +3,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useRoofMapState } from "./hooks/useRoofMapState";
 import { useRoofMapHandlers } from "./hooks/useRoofMapHandlers";
 import { RoofMapUI } from "./components/RoofMapUI";
+import { calculateModulePositions } from "./utils/moduleCalculations";
 
 interface RoofMapProps {
   address: string;
