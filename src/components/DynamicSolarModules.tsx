@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { ModuleControls } from '@/components/roof/modules/ModuleControls';
 import { ModuleStats } from '@/components/roof/modules/ModuleStats';
 import { calculateModuleGrid, isPointInPolygon } from '@/components/roof/modules/ModuleCalculator';
+import { MODULE_WIDTH, MODULE_HEIGHT } from '@/components/roof/utils/constants';
 
 const DynamicSolarModules = () => {
   const [polygons, setPolygons] = useState([]);
