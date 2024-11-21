@@ -13,16 +13,31 @@ const DynamicSolarModules = () => {
   const [isManualPlacement, setIsManualPlacement] = useState(false);
   const { toast } = useToast();
 
+  // Berechne Module neu wenn sich Polygone oder Rotation ändern
   useEffect(() => {
     if (!isManualPlacement) {
-      const allModules = [];
-      polygons.forEach(polygon => {
-        const polygonModules = calculateModuleGrid(polygon, moduleRotation);
-        allModules.push(...polygonModules);
-      });
-      setModules(allModules);
+      recalculateAllModules();
     }
   }, [polygons, moduleRotation, isManualPlacement]);
+
+  // Zentrale Funktion zur Modulberechnung
+  const recalculateAllModules = useCallback(() => {
+    const newModules = [];
+    polygons.forEach(polygon => {
+      const polygonModules = calculateModuleGrid(polygon, moduleRotation);
+      newModules.push(...polygonModules);
+    });
+    setModules(newModules);
+
+    // Zeige Toast nur wenn Module hinzugefügt wurden
+    if (newModules.length > 0) {
+      toast({
+        title: "Module berechnet",
+        description: `${newModules.length} Module können optimal auf den Dachflächen installiert werden.`,
+        duration: 3000,
+      });
+    }
+  }, [polygons, moduleRotation, toast]);
 
   const handlePolygonMove = useCallback((polygonId, newPoints) => {
     setPolygons(current => 
@@ -46,8 +61,10 @@ const DynamicSolarModules = () => {
     setIsManualPlacement(prev => !prev);
     if (!isManualPlacement) {
       setModules([]);
+    } else {
+      recalculateAllModules();
     }
-  }, [isManualPlacement]);
+  }, [isManualPlacement, recalculateAllModules]);
 
   const handleManualPlacement = useCallback((e) => {
     if (!isManualPlacement || !activePolygon) return;
@@ -66,30 +83,37 @@ const DynamicSolarModules = () => {
       { x, y: y + effectiveModuleHeight }
     ];
 
+    // Prüfe ob das neue Modul innerhalb des Polygons liegt
     if (moduleCorners.every(corner => isPointInPolygon(corner, activePolygon.points))) {
-      setModules(prev => [...prev, {
+      const newModule = {
         id: `manual-module-${Date.now()}`,
         x,
         y,
         width: effectiveModuleWidth,
         height: effectiveModuleHeight,
         polygonId: activePolygon.id
-      }]);
+      };
 
-      toast({
-        title: "Sehr gut!",
-        description: `${modules.length + 1} Module können optimal auf dieser Dachfläche installiert werden.`,
-        duration: 3000,
+      setModules(prev => {
+        const updatedModules = [...prev, newModule];
+        // Aktualisiere Toast mit der korrekten Gesamtanzahl
+        toast({
+          title: "Modul platziert",
+          description: `${updatedModules.length} Module sind auf den Dachflächen installiert.`,
+          duration: 3000,
+        });
+        return updatedModules;
       });
     }
-  }, [isManualPlacement, activePolygon, moduleRotation, modules.length, toast]);
+  }, [isManualPlacement, activePolygon, moduleRotation, toast]);
 
+  // Berechne Statistiken pro Dach
   const roofStats = polygons.map(polygon => {
     const roofModules = modules.filter(m => m.polygonId === polygon.id);
     return {
       id: polygon.id,
       moduleCount: roofModules.length,
-      power: roofModules.length * 400
+      power: roofModules.length * 400 // 400Wp pro Modul
     };
   });
 
