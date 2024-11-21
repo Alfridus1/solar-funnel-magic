@@ -24,12 +24,15 @@ export const useModuleManagement = ({
 }: UseModuleManagementProps) => {
   const clearModules = useCallback(() => {
     onLog?.("Lösche bestehende Module");
+    // Entferne alle Module von der Karte
     modules.forEach(module => module.setMap(null));
+    // Leere das Modules-Array
     setModules([]);
   }, [modules, setModules, onLog]);
 
   const updateModules = useCallback((polygon: google.maps.Polygon, roofId: string) => {
     onLog?.("Aktualisiere Module nach Formänderung");
+    // Zuerst alle bestehenden Module löschen
     clearModules();
     
     // Sofortige Berechnung der Module
