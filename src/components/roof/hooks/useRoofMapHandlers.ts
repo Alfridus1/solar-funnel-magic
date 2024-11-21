@@ -1,4 +1,4 @@
-import { calculateModulePositions, findOptimalRotation } from "../utils/moduleCalculations";
+import { calculateModulePositions } from "../utils/moduleCalculations";
 
 interface UseRoofMapHandlersProps {
   map: google.maps.Map | null;
@@ -14,7 +14,6 @@ interface UseRoofMapHandlersProps {
   setIsAnalyzing: (isAnalyzing: boolean) => void;
   toast: any;
   onLog?: (message: string) => void;
-  currentRotation?: number;
 }
 
 export const useRoofMapHandlers = ({
@@ -31,7 +30,6 @@ export const useRoofMapHandlers = ({
   setIsAnalyzing,
   toast,
   onLog,
-  currentRotation = 0
 }: UseRoofMapHandlersProps) => {
   const clearModules = () => {
     onLog?.("Lösche bestehende Module");
@@ -57,7 +55,6 @@ export const useRoofMapHandlers = ({
       lastPolygon.setMap(null);
       setPolygons(prevPolygons => prevPolygons.slice(0, -1));
       
-      // Lösche alle Module wenn das letzte Dach entfernt wird
       if (polygons.length === 1) {
         clearModules();
       }
@@ -81,10 +78,8 @@ export const useRoofMapHandlers = ({
     setPolygons(prevPolygons => [...prevPolygons, polygon]);
     setIsDrawing(false);
 
-    // Finde die optimale Rotation für maximale Modulanzahl
-    const optimalRotation = findOptimalRotation(polygon, map);
-    const { moduleCount, roofId } = calculateModulePositions(polygon, map, setModules, optimalRotation);
-    onLog?.(`Module berechnet: ${moduleCount} bei ${optimalRotation}°`);
+    const { moduleCount, roofId } = calculateModulePositions(polygon, map, setModules);
+    onLog?.(`Module berechnet: ${moduleCount}`);
     
     const newRoofDetails = [...roofDetails, { roofId, moduleCount }];
     setRoofDetails(newRoofDetails);
@@ -96,7 +91,7 @@ export const useRoofMapHandlers = ({
 
     toast({
       title: "Sehr gut!",
-      description: `${moduleCount} Module können optimal bei ${optimalRotation}° auf dieser Dachfläche installiert werden. ${
+      description: `${moduleCount} Module können optimal auf dieser Dachfläche installiert werden. ${
         polygons.length === 0
           ? "Sie können weitere Dächer hinzufügen oder die Form durch Ziehen der Punkte anpassen."
           : "Sie können weitere Dachflächen einzeichnen oder die Formen anpassen."
