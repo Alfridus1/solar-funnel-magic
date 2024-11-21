@@ -35,18 +35,21 @@ export const calculateModulePositions = (
         sw.lng() + col * (panelWidthDeg + spacingDeg)
       );
 
+      // Überprüfen, ob der Mittelpunkt des Moduls innerhalb des Polygons liegt
       if (google.maps.geometry.poly.containsLocation(position, polygon)) {
-        const module = new google.maps.Rectangle({
-          bounds: new google.maps.LatLngBounds(
-            new google.maps.LatLng(
-              position.lat(),
-              position.lng()
-            ),
-            new google.maps.LatLng(
-              position.lat() + panelHeightDeg,
-              position.lng() + panelWidthDeg
-            )
+        const moduleBounds = new google.maps.LatLngBounds(
+          new google.maps.LatLng(
+            position.lat(),
+            position.lng()
           ),
+          new google.maps.LatLng(
+            position.lat() + panelHeightDeg,
+            position.lng() + panelWidthDeg
+          )
+        );
+
+        const module = new google.maps.Rectangle({
+          bounds: moduleBounds,
           map: map,
           fillColor: "#FFD700",
           fillOpacity: 0.5,
