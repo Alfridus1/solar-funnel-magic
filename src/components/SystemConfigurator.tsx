@@ -39,7 +39,6 @@ export const SystemConfigurator = () => {
       return;
     }
 
-    // Type assertion to ensure the data matches our Product interface
     const typedProducts = (productsData as any[]).map(product => ({
       ...product,
       category: product.category as 'module' | 'inverter' | 'battery',
@@ -50,14 +49,19 @@ export const SystemConfigurator = () => {
   };
 
   const calculateAutarky = () => {
-    const totalModulePower = systemConfig.modules.reduce((sum, module) => 
-      sum + (module.specs.watts || 0), 0);
-    const batteryCapacity = systemConfig.battery?.specs.capacity || 0;
+    // Calculate total kWp (500W = 0.5 kWp per module)
+    const totalKWp = systemConfig.modules.reduce((sum, module) => 
+      sum + ((module.specs.watts || 0) / 1000), 0);
     
-    const yearlyProduction = (totalModulePower / 1000) * 1000;
+    // Calculate yearly production (kWp * 950 kWh/kWp)
+    const yearlyProduction = totalKWp * 950;
+    
+    // Calculate daily values
     const dailyConsumption = yearlyConsumption / 365;
+    const batteryCapacity = systemConfig.battery?.specs.capacity || 0;
     const batteryContribution = Math.min(batteryCapacity * 0.8, dailyConsumption * 0.5);
     
+    // Calculate final autarky percentage
     const autarkyValue = Math.min(100, 
       ((yearlyProduction + (batteryContribution * 365)) / yearlyConsumption) * 100
     );
