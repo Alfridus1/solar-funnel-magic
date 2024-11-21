@@ -2,8 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useRoofMapState } from "./hooks/useRoofMapState";
 import { useRoofMapHandlers } from "./hooks/useRoofMapHandlers";
+import { useModuleManagement } from "./hooks/useModuleManagement";
+import { useRectangleCreation } from "./hooks/useRectangleCreation";
 import { RoofMapUI } from "./components/RoofMapUI";
-import { calculateModulePositions } from "./utils/moduleCalculations";
 
 interface RoofMapProps {
   address: string;
@@ -32,6 +33,28 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
     setRoofDetails
   } = useRoofMapState();
 
+  const { clearModules, updateModules, addPolygonListeners } = useModuleManagement({
+    map,
+    polygons,
+    modules,
+    setModules,
+    roofDetails,
+    setRoofDetails,
+    onRoofOutlineComplete,
+    onLog
+  });
+
+  const { createRectangle } = useRectangleCreation({
+    map,
+    polygons,
+    setPolygons,
+    setModules,
+    roofDetails,
+    setRoofDetails,
+    onRoofOutlineComplete,
+    addPolygonListeners
+  });
+
   const {
     startDrawing,
     deleteLastRoof,
@@ -51,77 +74,6 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
     toast,
     onLog
   });
-
-  const updateModules = useCallback((polygon: google.maps.Polygon, roofId: string) => {
-    onLog?.("Aktualisiere Module nach Formänderung");
-    clearModules();
-    const { moduleCount } = calculateModulePositions(polygon, map, setModules);
-    
-    const updatedRoofDetails = roofDetails.map(detail => 
-      detail.roofId === roofId ? { ...detail, moduleCount } : detail
-    );
-    
-    setRoofDetails(updatedRoofDetails);
-    const allPaths = polygons.map(poly => poly.getPath().getArray());
-    onRoofOutlineComplete(allPaths, updatedRoofDetails);
-  }, [map, polygons, roofDetails, setRoofDetails, onRoofOutlineComplete, onLog, setModules]);
-
-  const clearModules = useCallback(() => {
-    modules.forEach(module => module.setMap(null));
-    setModules([]);
-  }, [modules, setModules]);
-
-  const addPolygonListeners = useCallback((polygon: google.maps.Polygon, roofId: string) => {
-    const paths = polygon.getPaths();
-    paths.forEach((path) => {
-      google.maps.event.addListener(path, 'insert_at', () => updateModules(polygon, roofId));
-      google.maps.event.addListener(path, 'remove_at', () => updateModules(polygon, roofId));
-      google.maps.event.addListener(path, 'set_at', () => updateModules(polygon, roofId));
-    });
-
-    // Zusätzlicher Listener für Änderungen am Polygon selbst
-    google.maps.event.addListener(polygon, 'bounds_changed', () => updateModules(polygon, roofId));
-  }, [updateModules]);
-
-  const createRectangle = () => {
-    if (!map) return;
-    
-    const center = map.getCenter();
-    if (!center) return;
-    
-    const lat = center.lat();
-    const lng = center.lng();
-    
-    const rectanglePoints = [
-      { lat: lat + 0.0002, lng: lng - 0.0003 },
-      { lat: lat + 0.0002, lng: lng + 0.0003 },
-      { lat: lat - 0.0002, lng: lng + 0.0003 },
-      { lat: lat - 0.0002, lng: lng - 0.0003 }
-    ];
-    
-    const polygon = new google.maps.Polygon({
-      paths: rectanglePoints,
-      fillColor: "#2563eb",
-      fillOpacity: 0.3,
-      strokeColor: "#2563eb",
-      strokeOpacity: 0.8,
-      strokeWeight: 2,
-      editable: true,
-      clickable: true,
-      draggable: true,
-      map: map
-    });
-
-    const { moduleCount, roofId } = calculateModulePositions(polygon, map, setModules);
-    addPolygonListeners(polygon, roofId);
-    
-    const newRoofDetails = [...roofDetails, { roofId, moduleCount }];
-    setRoofDetails(newRoofDetails);
-    
-    setPolygons(prevPolygons => [...prevPolygons, polygon]);
-    const allPaths = [...polygons, polygon].map(poly => poly.getPath().getArray());
-    onRoofOutlineComplete(allPaths, newRoofDetails);
-  };
 
   const geocodeAddress = useCallback(async () => {
     if (!address) {
