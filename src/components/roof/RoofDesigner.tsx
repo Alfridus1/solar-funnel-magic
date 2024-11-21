@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { GoogleMap, DrawingManager, useLoadScript } from '@react-google-maps/api';
 import { Loader2 } from "lucide-react";
-import { calculateModulePositions } from './utils/moduleCalculations';
 
 interface RoofDesignerProps {
   onComplete?: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number }[]) => void;
@@ -27,7 +26,6 @@ const libraries: ("places" | "drawing" | "geometry")[] = ["places", "drawing", "
 export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [polygons, setPolygons] = useState<google.maps.Polygon[]>([]);
-  const [modules, setModules] = useState<google.maps.Rectangle[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
   const [center, setCenter] = useState(defaultCenter);
   const { toast } = useToast();
@@ -60,16 +58,17 @@ export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
     setMap(map);
   }, []);
 
-  const clearModules = useCallback(() => {
-    modules.forEach(module => module.setMap(null));
-    setModules([]);
-  }, [modules]);
-
   const onPolygonComplete = useCallback((polygon: google.maps.Polygon) => {
     setPolygons(prev => [...prev, polygon]);
     setIsDrawing(false);
     
-    const { moduleCount, roofId } = calculateModulePositions(polygon, map, setModules);
+    // Berechne die Anzahl der möglichen Module basierend auf der Fläche
+    const path = polygon.getPath();
+    const area = google.maps.geometry.spherical.computeArea(path);
+    const moduleCount = Math.floor(area / (1.7 * 1)); // Ungefähre Modulgröße in m²
+
+    const roofId = `roof-${Date.now()}`;
+    const roofDetails = [{ roofId, moduleCount }];
 
     toast({
       title: "Dachfläche erstellt",
@@ -79,17 +78,16 @@ export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
 
     if (onComplete) {
       const paths = polygons.map(p => p.getPath().getArray());
-      paths.push(polygon.getPath().getArray());
-      onComplete(paths, [{ roofId, moduleCount }]);
+      paths.push(path.getArray());
+      onComplete(paths, roofDetails);
     }
-  }, [polygons, onComplete, map, toast]);
+  }, [polygons, onComplete, toast]);
 
   const deleteLastRoof = useCallback(() => {
     if (polygons.length > 0) {
       const lastPolygon = polygons[polygons.length - 1];
       lastPolygon.setMap(null);
       setPolygons(prev => prev.slice(0, -1));
-      clearModules();
 
       toast({
         title: "Dachfläche entfernt",
@@ -102,7 +100,7 @@ export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
         onComplete(paths, []);
       }
     }
-  }, [polygons, onComplete, clearModules, toast]);
+  }, [polygons, onComplete, toast]);
 
   const startDrawing = () => {
     setIsDrawing(true);
@@ -170,6 +168,7 @@ export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
             options={drawingManagerOptions}
           />
           
+          {/* Neuer Button zum Erstellen eines Polygons */}
           <div className="absolute top-4 left-4 z-10">
             <Button
               size="sm"
