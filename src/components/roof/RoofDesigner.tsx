@@ -151,7 +151,7 @@ export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
       <div className="relative rounded-lg overflow-hidden border border-gray-200">
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
-          zoom={19}
+          zoom={21}
           center={center}
           onLoad={onLoad}
           options={{
