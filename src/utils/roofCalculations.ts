@@ -1,8 +1,8 @@
 const MODULE_WIDTH = 1.135; // meters
 const MODULE_HEIGHT = 1.962; // meters
 const MODULE_AREA = MODULE_WIDTH * MODULE_HEIGHT;
-const PANEL_WATTS = 400; // Typical watts per panel
-const ANNUAL_KWH_PER_KWP = 1000; // Annual kWh production per kWp in Germany
+const PANEL_WATTS = 500; // Updated to 500W per panel
+const ANNUAL_KWH_PER_KWP = 950; // Annual kWh production per kWp in Germany
 const ELECTRICITY_PRICE = 0.40; // Average electricity price in EUR/kWh
 const USABLE_AREA_FACTOR = 0.65; // Reduced from 0.75 to 0.65 for more safety margin
 
