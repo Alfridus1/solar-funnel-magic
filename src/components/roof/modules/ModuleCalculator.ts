@@ -49,17 +49,16 @@ export const calculateModuleGrid = (
       const moduleX = bounds.minX + FRAME_MARGIN + x * (effectiveModuleWidth + FRAME_MARGIN);
       const moduleY = bounds.minY + FRAME_MARGIN + y * (effectiveModuleHeight + FRAME_MARGIN);
 
-      // Überprüfe alle Ecken und zusätzliche Punkte entlang der Kanten
       const testPoints = [
-        { x: moduleX, y: moduleY }, // Obere linke Ecke
-        { x: moduleX + effectiveModuleWidth, y: moduleY }, // Obere rechte Ecke
-        { x: moduleX + effectiveModuleWidth, y: moduleY + effectiveModuleHeight }, // Untere rechte Ecke
-        { x: moduleX, y: moduleY + effectiveModuleHeight }, // Untere linke Ecke
-        { x: moduleX + effectiveModuleWidth/2, y: moduleY }, // Oben Mitte
-        { x: moduleX + effectiveModuleWidth, y: moduleY + effectiveModuleHeight/2 }, // Rechts Mitte
-        { x: moduleX + effectiveModuleWidth/2, y: moduleY + effectiveModuleHeight }, // Unten Mitte
-        { x: moduleX, y: moduleY + effectiveModuleHeight/2 }, // Links Mitte
-        { x: moduleX + effectiveModuleWidth/2, y: moduleY + effectiveModuleHeight/2 } // Zentrum
+        { x: moduleX, y: moduleY },
+        { x: moduleX + effectiveModuleWidth, y: moduleY },
+        { x: moduleX + effectiveModuleWidth, y: moduleY + effectiveModuleHeight },
+        { x: moduleX, y: moduleY + effectiveModuleHeight },
+        { x: moduleX + effectiveModuleWidth/2, y: moduleY },
+        { x: moduleX + effectiveModuleWidth, y: moduleY + effectiveModuleHeight/2 },
+        { x: moduleX + effectiveModuleWidth/2, y: moduleY + effectiveModuleHeight },
+        { x: moduleX, y: moduleY + effectiveModuleHeight/2 },
+        { x: moduleX + effectiveModuleWidth/2, y: moduleY + effectiveModuleHeight/2 }
       ];
 
       if (testPoints.every(point => isPointInPolygon(point, polygon.points))) {
