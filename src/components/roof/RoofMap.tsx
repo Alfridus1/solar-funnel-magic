@@ -61,7 +61,7 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
       onLog?.("Starte Geocoding für Adresse: " + address);
       const geocoder = new window.google.maps.Geocoder();
       const result = await new Promise<google.maps.GeocoderResult[]>((resolve, reject) => {
-        geocoder.geocode({ address }, (results, status) => {
+        geocoder.geocode({ address, region: 'DE' }, (results, status) => {
           if (status === window.google.maps.GeocoderStatus.OK && results) {
             resolve(results);
           } else {
@@ -108,9 +108,13 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
       
       if (!bounds.isEmpty()) {
         map.fitBounds(bounds);
+      } else {
+        // Wenn keine Polygone vorhanden sind, zentriere auf die Adresskoordinaten
+        map.setCenter(coordinates);
+        map.setZoom(20); // Setze einen angemessenen Zoom-Level für Gebäudeansicht
       }
     }
-  }, [map, polygons, formattedAddress]);
+  }, [map, polygons, formattedAddress, coordinates]);
 
   return (
     <RoofMapUI
