@@ -12,6 +12,9 @@ export const calculateModulePositions = (
 ) => {
   if (!map) return { moduleCount: 0, roofId: '' };
 
+  // Lösche bestehende Module
+  setModules([]);
+
   const bounds = new google.maps.LatLngBounds();
   const path = polygon.getPath();
   path.forEach((point) => bounds.extend(point));

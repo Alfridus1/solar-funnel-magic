@@ -148,47 +148,40 @@ export const RoofMapUI = ({
           onStartDrawing={onStartDrawing}
           onDeleteLastRoof={onDeleteLastRoof}
         />
-      </div>
 
-      {polygonsExist && (
-        <Card className="p-4">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-semibold">Modulausrichtung</h3>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => adjustRotation(-45)}
-                >
-                  <RotateCcw className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => adjustRotation(45)}
-                >
-                  <RotateCw className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-500">0°</span>
+        {polygonsExist && (
+          <div className="absolute bottom-4 right-4 bg-white p-3 rounded-lg shadow-lg">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => adjustRotation(-45)}
+                className="h-8 w-8"
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
               <Slider
                 value={[rotation]}
                 onValueChange={handleRotationChange}
                 max={360}
                 step={1}
-                className="flex-1"
+                className="w-32"
               />
-              <span className="text-sm text-gray-500">360°</span>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => adjustRotation(45)}
+                className="h-8 w-8"
+              >
+                <RotateCw className="h-4 w-4" />
+              </Button>
             </div>
-            <p className="text-sm text-gray-500 text-center">
-              Aktuelle Rotation: {rotation}°
+            <p className="text-xs text-gray-500 text-center mt-1">
+              {rotation}°
             </p>
           </div>
-        </Card>
-      )}
+        )}
+      </div>
     </div>
   );
 };
