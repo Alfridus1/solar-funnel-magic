@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { Ruler, Home, Sun, ArrowRight } from "lucide-react";
+import { Ruler, Home, Sun, ArrowRight, Calculator } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 
 interface RoofAreaCalculatorProps {
@@ -127,13 +127,23 @@ export const RoofAreaCalculator = ({ polygons }: RoofAreaCalculatorProps) => {
       <Card className="p-6">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold">Geschätzter Jahresverlauf</h3>
-          <Button 
-            onClick={handleContinue}
-            className="bg-solar-orange hover:bg-solar-orange-600"
-          >
-            Jetzt Ihre Einsparungen erfahren
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
+          <div className="flex gap-4">
+            <Button 
+              onClick={handleContinue}
+              className="bg-solar-orange hover:bg-solar-orange-600"
+            >
+              Jetzt Ihre Einsparungen erfahren
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+            <Button 
+              onClick={handleContinue}
+              variant="outline"
+              className="border-solar-orange text-solar-orange hover:bg-solar-orange/10"
+            >
+              Kostenlose Beratung
+              <Calculator className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
         </div>
         <div className="h-[200px]">
           <ResponsiveContainer width="100%" height="100%">
