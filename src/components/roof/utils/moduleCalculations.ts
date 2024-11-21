@@ -1,8 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-
-const PANEL_WIDTH = 1.7; // meters
-const PANEL_HEIGHT = 1.0; // meters
-const PANEL_SPACING = 0.3; // meters
+import { MODULE_WIDTH, MODULE_HEIGHT, FRAME_MARGIN } from './constants';
 
 // Hilfsfunktion zur Berechnung der Modulanzahl für eine bestimmte Rotation
 const calculateModulesForRotation = (
@@ -22,12 +19,12 @@ const calculateModulesForRotation = (
   
   // Adjust dimensions based on rotation
   const angleRad = rotation * (Math.PI / 180);
-  const rotatedWidth = Math.abs(PANEL_WIDTH * Math.cos(angleRad)) + Math.abs(PANEL_HEIGHT * Math.sin(angleRad));
-  const rotatedHeight = Math.abs(PANEL_WIDTH * Math.sin(angleRad)) + Math.abs(PANEL_HEIGHT * Math.cos(angleRad));
+  const rotatedWidth = Math.abs(MODULE_WIDTH * Math.cos(angleRad)) + Math.abs(MODULE_HEIGHT * Math.sin(angleRad));
+  const rotatedHeight = Math.abs(MODULE_WIDTH * Math.sin(angleRad)) + Math.abs(MODULE_HEIGHT * Math.cos(angleRad));
   
   const panelWidthDeg = rotatedWidth / 111320 * scale;
   const panelHeightDeg = rotatedHeight / 111320;
-  const spacingDeg = PANEL_SPACING / 111320;
+  const spacingDeg = FRAME_MARGIN / 111320;
 
   const sw = bounds.getSouthWest();
   const ne = bounds.getNorthEast();
@@ -55,7 +52,7 @@ const calculateModulesForRotation = (
   return moduleCount;
 };
 
-// Funktion zur Findung der optimalen Rotation
+// Optimierte Funktion zur Findung der optimalen Rotation
 export const findOptimalRotation = (
   polygon: google.maps.Polygon,
   map: google.maps.Map | null
@@ -63,8 +60,20 @@ export const findOptimalRotation = (
   let maxModules = 0;
   let optimalRotation = 0;
 
-  // Überprüfe Rotationen in 5-Grad-Schritten
+  // Überprüfe Rotationen in kleineren Schritten für bessere Präzision
   for (let rotation = 0; rotation < 180; rotation += 5) {
+    const moduleCount = calculateModulesForRotation(polygon, map, rotation);
+    if (moduleCount > maxModules) {
+      maxModules = moduleCount;
+      optimalRotation = rotation;
+    }
+  }
+
+  // Feinere Suche um den gefundenen optimalen Wert
+  const fineStart = Math.max(0, optimalRotation - 5);
+  const fineEnd = Math.min(180, optimalRotation + 5);
+  
+  for (let rotation = fineStart; rotation < fineEnd; rotation += 1) {
     const moduleCount = calculateModulesForRotation(polygon, map, rotation);
     if (moduleCount > maxModules) {
       maxModules = moduleCount;
@@ -83,9 +92,6 @@ export const calculateModulePositions = (
 ) => {
   if (!map) return { moduleCount: 0, roofId: '' };
 
-  // Lösche bestehende Module
-  setModules([]);
-
   const bounds = new google.maps.LatLngBounds();
   const path = polygon.getPath();
   path.forEach((point) => bounds.extend(point));
@@ -94,22 +100,19 @@ export const calculateModulePositions = (
   const scale = 1 / Math.cos(center.lat() * Math.PI / 180);
   
   const angleRad = rotation * (Math.PI / 180);
-  const rotatedWidth = Math.abs(PANEL_WIDTH * Math.cos(angleRad)) + Math.abs(PANEL_HEIGHT * Math.sin(angleRad));
-  const rotatedHeight = Math.abs(PANEL_WIDTH * Math.sin(angleRad)) + Math.abs(PANEL_HEIGHT * Math.cos(angleRad));
+  const rotatedWidth = Math.abs(MODULE_WIDTH * Math.cos(angleRad)) + Math.abs(MODULE_HEIGHT * Math.sin(angleRad));
+  const rotatedHeight = Math.abs(MODULE_WIDTH * Math.sin(angleRad)) + Math.abs(MODULE_HEIGHT * Math.cos(angleRad));
   
   const panelWidthDeg = rotatedWidth / 111320 * scale;
   const panelHeightDeg = rotatedHeight / 111320;
-  const spacingDeg = PANEL_SPACING / 111320;
+  const spacingDeg = FRAME_MARGIN / 111320;
 
   const sw = bounds.getSouthWest();
   const ne = bounds.getNorthEast();
   const width = ne.lng() - sw.lng();
   const height = ne.lat() - sw.lat();
 
-  const modules: google.maps.Rectangle[] = [];
-  const projection = map.getProjection();
-  if (!projection) return { moduleCount: 0, roofId: '' };
-
+  const newModules: google.maps.Rectangle[] = [];
   const cols = Math.floor(width / (panelWidthDeg + spacingDeg));
   const rows = Math.floor(height / (panelHeightDeg + spacingDeg));
 
@@ -164,12 +167,13 @@ export const calculateModulePositions = (
           zIndex: 1
         });
 
-        modules.push(module);
+        newModules.push(module);
       }
     }
   }
 
-  setModules(modules);
+  // Lösche alte Module und setze neue
+  setModules(newModules);
   const roofId = uuidv4();
-  return { moduleCount: modules.length, roofId };
+  return { moduleCount: newModules.length, roofId };
 };

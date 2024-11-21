@@ -16,6 +16,7 @@ interface RoofMapUIProps {
   onDeleteLastRoof: () => void;
   polygonsExist: boolean;
   onRotationChange?: (rotation: number) => void;
+  currentRotation: number;
 }
 
 const mapContainerStyle = {
@@ -43,10 +44,10 @@ export const RoofMapUI = ({
   onDeleteLastRoof,
   polygonsExist,
   onRotationChange = () => {},
+  currentRotation,
 }: RoofMapUIProps) => {
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const [markerPosition, setMarkerPosition] = useState(coordinates);
-  const [rotation, setRotation] = useState(0);
 
   const handleMapLoad = useCallback((map: google.maps.Map) => {
     if (!mapInstance) {
@@ -69,14 +70,11 @@ export const RoofMapUI = ({
   };
 
   const handleRotationChange = (value: number[]) => {
-    const newRotation = value[0];
-    setRotation(newRotation);
-    onRotationChange(newRotation);
+    onRotationChange(value[0]);
   };
 
   const adjustRotation = (amount: number) => {
-    const newRotation = (rotation + amount + 360) % 360;
-    setRotation(newRotation);
+    const newRotation = (currentRotation + amount + 360) % 360;
     onRotationChange(newRotation);
   };
 
@@ -161,7 +159,7 @@ export const RoofMapUI = ({
                 <RotateCcw className="h-4 w-4" />
               </Button>
               <Slider
-                value={[rotation]}
+                value={[currentRotation]}
                 onValueChange={handleRotationChange}
                 max={360}
                 step={1}
@@ -177,7 +175,7 @@ export const RoofMapUI = ({
               </Button>
             </div>
             <p className="text-xs text-gray-500 text-center mt-1">
-              {rotation}°
+              {currentRotation}°
             </p>
           </div>
         )}

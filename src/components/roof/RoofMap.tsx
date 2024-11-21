@@ -120,7 +120,11 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
 
   const handleRotationChange = (rotation: number) => {
     setCurrentRotation(rotation);
-    // Neuberechnung der Module mit der neuen Rotation
+    // Lösche zuerst alle bestehenden Module
+    modules.forEach(module => module.setMap(null));
+    setModules([]);
+    
+    // Berechne Module neu für jedes Polygon mit der neuen Rotation
     polygons.forEach((polygon, index) => {
       const { moduleCount, roofId } = calculateModulePositions(polygon, map, setModules, rotation);
       const updatedRoofDetails = [...roofDetails];
@@ -147,6 +151,7 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
       polygonsExist={polygons.length > 0}
       isLoading={isLoading}
       onRotationChange={handleRotationChange}
+      currentRotation={currentRotation}
     />
   );
 };
