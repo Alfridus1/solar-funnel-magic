@@ -1,8 +1,9 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { GoogleMap, DrawingManager, useLoadScript } from '@react-google-maps/api';
 import { Loader2, Plus, Trash2 } from "lucide-react";
+import { RoofAreaCalculator } from './components/RoofAreaCalculator';
 
 interface RoofDesignerProps {
   onComplete?: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number }[]) => void;
@@ -10,8 +11,9 @@ interface RoofDesignerProps {
 }
 
 const mapContainerStyle = {
-  width: '100%',
-  height: '500px',
+  width: "100%",
+  height: "500px",
+  position: "relative" as const,
 };
 
 const libraries: ("places" | "drawing" | "geometry")[] = ["places", "drawing", "geometry"];
@@ -179,6 +181,8 @@ export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
           </div>
         </GoogleMap>
       </div>
+
+      <RoofAreaCalculator polygon={activePolygon} />
     </div>
   );
 };
