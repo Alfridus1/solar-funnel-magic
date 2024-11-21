@@ -28,6 +28,9 @@ export const HeroSection = ({
         alt="COPPEN Logo" 
         className="h-24 mx-auto mb-8" 
       />
+      <h2 className="text-2xl text-solar-orange font-semibold mb-4">
+        Ihre unverbindliche Potentialanalyse
+      </h2>
       <h1 className="text-4xl md:text-6xl font-bold text-gray-900 tracking-tight">
         Ihre <span className="text-solar-orange">Solaranlage</span> in wenigen Minuten planen
       </h1>
