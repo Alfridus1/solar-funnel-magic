@@ -14,6 +14,7 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
   const [coordinates, setCoordinates] = useState({ lat: 52.520008, lng: 13.404954 });
   const [isLoading, setIsLoading] = useState(true);
   const [formattedAddress, setFormattedAddress] = useState("");
+  const [currentRotation, setCurrentRotation] = useState(0);
   const { toast } = useToast();
 
   const {
@@ -48,7 +49,8 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
     onRoofOutlineComplete,
     setIsAnalyzing,
     toast,
-    onLog
+    onLog,
+    currentRotation
   });
 
   const geocodeAddress = useCallback(async () => {
@@ -109,12 +111,26 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
       if (!bounds.isEmpty()) {
         map.fitBounds(bounds);
       } else {
-        // Wenn keine Polygone vorhanden sind, zentriere auf die Adresskoordinaten
         map.setCenter(coordinates);
-        map.setZoom(20); // Setze einen angemessenen Zoom-Level für Gebäudeansicht
+        map.setZoom(20);
       }
     }
   }, [map, polygons, formattedAddress, coordinates]);
+
+  const handleRotationChange = (rotation: number) => {
+    setCurrentRotation(rotation);
+    // Neuberechnung der Module mit der neuen Rotation
+    polygons.forEach((polygon, index) => {
+      const { moduleCount, roofId } = calculateModulePositions(polygon, map, setModules, rotation);
+      const updatedRoofDetails = [...roofDetails];
+      updatedRoofDetails[index] = { roofId, moduleCount };
+      setRoofDetails(updatedRoofDetails);
+      onRoofOutlineComplete(
+        polygons.map(p => p.getPath().getArray()),
+        updatedRoofDetails
+      );
+    });
+  };
 
   return (
     <RoofMapUI
@@ -129,6 +145,7 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
       onDeleteLastRoof={deleteLastRoof}
       polygonsExist={polygons.length > 0}
       isLoading={isLoading}
+      onRotationChange={handleRotationChange}
     />
   );
 };

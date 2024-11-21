@@ -7,7 +7,8 @@ const PANEL_SPACING = 0.3; // meters
 export const calculateModulePositions = (
   polygon: google.maps.Polygon,
   map: google.maps.Map | null,
-  setModules: (modules: google.maps.Rectangle[]) => void
+  setModules: (modules: google.maps.Rectangle[]) => void,
+  rotation: number = 0
 ) => {
   if (!map) return { moduleCount: 0, roofId: '' };
 
@@ -34,13 +35,21 @@ export const calculateModulePositions = (
     }
   }
 
-  const angle = Math.atan2(mainVector.y, mainVector.x) * (180 / Math.PI);
+  // Combine roof angle with user rotation
+  const baseAngle = Math.atan2(mainVector.y, mainVector.x) * (180 / Math.PI);
+  const totalAngle = baseAngle + rotation;
 
   // Convert panel dimensions to LatLng
   const center = bounds.getCenter();
   const scale = 1 / Math.cos(center.lat() * Math.PI / 180);
-  const panelWidthDeg = PANEL_WIDTH / 111320 * scale;
-  const panelHeightDeg = PANEL_HEIGHT / 111320;
+  
+  // Adjust dimensions based on rotation
+  const angleRad = totalAngle * (Math.PI / 180);
+  const rotatedWidth = Math.abs(PANEL_WIDTH * Math.cos(angleRad)) + Math.abs(PANEL_HEIGHT * Math.sin(angleRad));
+  const rotatedHeight = Math.abs(PANEL_WIDTH * Math.sin(angleRad)) + Math.abs(PANEL_HEIGHT * Math.cos(angleRad));
+  
+  const panelWidthDeg = rotatedWidth / 111320 * scale;
+  const panelHeightDeg = rotatedHeight / 111320;
   const spacingDeg = PANEL_SPACING / 111320;
 
   const sw = bounds.getSouthWest();
@@ -79,6 +88,14 @@ export const calculateModulePositions = (
           strokeWeight: 1,
           clickable: false
         });
+
+        // Apply rotation to the rectangle
+        if (module.setOptions) {
+          module.setOptions({
+            zIndex: 1,
+            rotation: totalAngle
+          });
+        }
 
         modules.push(module);
       }

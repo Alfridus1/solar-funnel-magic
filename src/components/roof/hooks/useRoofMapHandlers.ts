@@ -14,6 +14,7 @@ interface UseRoofMapHandlersProps {
   setIsAnalyzing: (isAnalyzing: boolean) => void;
   toast: any;
   onLog?: (message: string) => void;
+  currentRotation?: number;
 }
 
 export const useRoofMapHandlers = ({
@@ -29,7 +30,8 @@ export const useRoofMapHandlers = ({
   onRoofOutlineComplete,
   setIsAnalyzing,
   toast,
-  onLog
+  onLog,
+  currentRotation = 0
 }: UseRoofMapHandlersProps) => {
   const clearModules = () => {
     onLog?.("Lösche bestehende Module");
@@ -75,7 +77,7 @@ export const useRoofMapHandlers = ({
     setPolygons(prevPolygons => [...prevPolygons, polygon]);
     setIsDrawing(false);
 
-    const { moduleCount, roofId } = calculateModulePositions(polygon, map, setModules);
+    const { moduleCount, roofId } = calculateModulePositions(polygon, map, setModules, currentRotation);
     onLog?.(`Module berechnet: ${moduleCount}`);
     
     const newRoofDetails = [...roofDetails, { roofId, moduleCount }];
