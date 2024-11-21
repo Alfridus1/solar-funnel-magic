@@ -1,6 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { RoofMap } from "@/components/roof/RoofMap";
+import { RoofDesigner } from "@/components/roof/RoofDesigner";
 import { RoofMetrics } from "@/components/roof/RoofMetrics";
 import { ProgressBar } from "@/components/ProgressBar";
 
@@ -43,24 +42,10 @@ export const RoofCheckContent = ({
               </p>
             </div>
 
-            <RoofMap
-              address={address}
-              onRoofOutlineComplete={handleRoofOutlineComplete}
-              onLog={onLog}
-            />
+            <RoofDesigner onComplete={handleRoofOutlineComplete} />
 
             {paths.length > 0 && (
-              <>
-                <RoofMetrics {...metrics} />
-                <div className="flex justify-end">
-                  <Button
-                    onClick={handleContinue}
-                    className="bg-solar-orange hover:bg-solar-orange-dark"
-                  >
-                    Weiter zur Konfiguration
-                  </Button>
-                </div>
-              </>
+              <RoofMetrics {...metrics} />
             )}
           </div>
         </Card>
