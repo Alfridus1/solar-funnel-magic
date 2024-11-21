@@ -7,7 +7,7 @@ import { RoofCheckContent } from "./RoofCheck/RoofCheckContent";
 import { RoofCheckLoading } from "./RoofCheck/RoofCheckLoading";
 
 // Define libraries outside component to prevent reloading
-const libraries: ("places" | "drawing" | "geometry")[] = ["places", "drawing"];
+const libraries: ("places" | "drawing" | "geometry")[] = ["places", "drawing", "geometry"];
 
 interface RoofCheckProps {
   address: string;

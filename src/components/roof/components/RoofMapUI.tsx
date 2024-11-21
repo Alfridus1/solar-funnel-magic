@@ -2,8 +2,6 @@ import { useState, useCallback } from "react";
 import { GoogleMap, DrawingManager, Marker } from "@react-google-maps/api";
 import { MapControls } from "./MapControls";
 import { Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 
 interface RoofMapUIProps {
   coordinates: { lat: number; lng: number };
