@@ -122,30 +122,27 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
   }, [geocodeAddress]);
 
   useEffect(() => {
-    if (map && formattedAddress) {
-      const bounds = new window.google.maps.LatLngBounds();
-      polygons.forEach(polygon => {
-        polygon.getPath().forEach(latLng => {
-          bounds.extend(latLng);
-        });
+    if (!map || !formattedAddress) return;
+
+    const bounds = new window.google.maps.LatLngBounds();
+    polygons.forEach(polygon => {
+      polygon.getPath().forEach(latLng => {
+        bounds.extend(latLng);
       });
-      
-      if (!bounds.isEmpty()) {
-        map.fitBounds(bounds);
-      } else {
-        map.setCenter(coordinates);
-        map.setZoom(20);
-      }
+    });
+    
+    if (!bounds.isEmpty()) {
+      map.fitBounds(bounds);
+    } else {
+      map.setCenter(coordinates);
+      map.setZoom(20);
     }
   }, [map, polygons, formattedAddress, coordinates]);
 
   return (
     <RoofMapUI
       coordinates={coordinates}
-      onLoad={(map) => {
-        onLog?.("Karte wurde geladen");
-        setMap(map);
-      }}
+      onLoad={setMap}
       isDrawing={isDrawing}
       onPolygonComplete={onPolygonComplete}
       onStartDrawing={startDrawing}
