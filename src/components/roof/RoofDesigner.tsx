@@ -20,7 +20,7 @@ const libraries: ("places" | "drawing" | "geometry")[] = ["places", "drawing", "
 
 export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
   const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [activePolygon, setActivePolygon] = useState<google.maps.Polygon | null>(null);
+  const [polygons, setPolygons] = useState<google.maps.Polygon[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
   const { toast } = useToast();
 
@@ -56,34 +56,30 @@ export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
   }, [address]);
 
   const onPolygonComplete = useCallback((polygon: google.maps.Polygon) => {
-    setActivePolygon(polygon);
+    setPolygons(prev => [...prev, polygon]);
     setIsDrawing(false);
 
     google.maps.event.addListener(polygon, 'mouseup', () => {
-      setActivePolygon(polygon);
-    });
-
-    google.maps.event.addListener(polygon.getPath(), 'set_at', () => {
-      setActivePolygon(polygon);
-    });
-
-    google.maps.event.addListener(polygon.getPath(), 'insert_at', () => {
-      setActivePolygon(polygon);
+      const allPaths = polygons.map(p => p.getPath().getArray());
+      allPaths.push(polygon.getPath().getArray());
+      
+      const roofDetails = allPaths.map((_, index) => ({
+        roofId: `roof-${index + 1}`,
+        moduleCount: 0 // Dies wird später in RoofAreaCalculator berechnet
+      }));
+      
+      onComplete?.(allPaths, roofDetails);
     });
 
     toast({
       title: "Dachfläche erstellt",
-      description: "Die Dachfläche wurde erfolgreich eingezeichnet.",
+      description: "Die Dachfläche wurde erfolgreich eingezeichnet. Sie können weitere Dachflächen hinzufügen.",
       duration: 3000,
     });
-  }, [toast]);
+  }, [polygons, onComplete, toast]);
 
   const startDrawing = () => {
     setIsDrawing(true);
-    if (activePolygon) {
-      activePolygon.setMap(null);
-      setActivePolygon(null);
-    }
     toast({
       title: "Zeichenmodus aktiviert",
       description: "Klicken Sie nacheinander auf die Ecken Ihres Daches. Klicken Sie zum Abschluss auf den ersten Punkt zurück.",
@@ -91,13 +87,23 @@ export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
     });
   };
 
-  const deletePolygon = () => {
-    if (activePolygon) {
-      activePolygon.setMap(null);
-      setActivePolygon(null);
+  const deleteLastRoof = () => {
+    if (polygons.length > 0) {
+      const lastPolygon = polygons[polygons.length - 1];
+      lastPolygon.setMap(null);
+      setPolygons(prev => prev.slice(0, -1));
+      
+      const remainingPaths = polygons.slice(0, -1).map(p => p.getPath().getArray());
+      const roofDetails = remainingPaths.map((_, index) => ({
+        roofId: `roof-${index + 1}`,
+        moduleCount: 0
+      }));
+      
+      onComplete?.(remainingPaths, roofDetails);
+      
       toast({
         title: "Dachfläche entfernt",
-        description: "Die Dachfläche wurde entfernt.",
+        description: "Die letzte Dachfläche wurde entfernt.",
         duration: 3000,
       });
     }
@@ -167,22 +173,22 @@ export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
               Dach einzeichnen
             </Button>
             
-            {activePolygon && (
+            {polygons.length > 0 && (
               <Button
                 size="sm"
                 variant="destructive"
-                onClick={deletePolygon}
+                onClick={deleteLastRoof}
                 className="rounded-full shadow-lg"
               >
                 <Trash2 className="mr-1 h-4 w-4" />
-                Löschen
+                Letztes Dach entfernen
               </Button>
             )}
           </div>
         </GoogleMap>
       </div>
 
-      <RoofAreaCalculator polygon={activePolygon} />
+      <RoofAreaCalculator polygons={polygons} />
     </div>
   );
 };
