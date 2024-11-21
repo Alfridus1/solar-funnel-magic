@@ -61,7 +61,6 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
     const lat = center.lat();
     const lng = center.lng();
     
-    // Erstelle ein rechteckiges Polygon
     const rectanglePoints = [
       { lat: lat + 0.0002, lng: lng - 0.0003 },
       { lat: lat + 0.0002, lng: lng + 0.0003 },
@@ -79,7 +78,31 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
       editable: true,
       map: map
     });
-    
+
+    // Add listeners for polygon changes
+    const addPolygonListeners = (polygon: google.maps.Polygon) => {
+      const paths = polygon.getPaths();
+      paths.forEach((path) => {
+        google.maps.event.addListener(path, 'insert_at', () => updateModules(polygon));
+        google.maps.event.addListener(path, 'remove_at', () => updateModules(polygon));
+        google.maps.event.addListener(path, 'set_at', () => updateModules(polygon));
+      });
+    };
+
+    const updateModules = (polygon: google.maps.Polygon) => {
+      onLog?.("Aktualisiere Module nach Formänderung");
+      const { moduleCount, roofId } = calculateModulePositions(polygon, map, setModules);
+      
+      const updatedRoofDetails = roofDetails.map(detail => 
+        detail.roofId === roofId ? { ...detail, moduleCount } : detail
+      );
+      
+      setRoofDetails(updatedRoofDetails);
+      const allPaths = polygons.map(poly => poly.getPath().getArray());
+      onRoofOutlineComplete(allPaths, updatedRoofDetails);
+    };
+
+    addPolygonListeners(polygon);
     onPolygonComplete(polygon);
   };
 
