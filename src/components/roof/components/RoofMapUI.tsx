@@ -1,10 +1,9 @@
 import { useState, useCallback } from "react";
 import { GoogleMap, DrawingManager, Marker } from "@react-google-maps/api";
 import { MapControls } from "./MapControls";
-import { Loader2, RotateCcw, RotateCw } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Slider } from "@/components/ui/slider";
 
 interface RoofMapUIProps {
   coordinates: { lat: number; lng: number };
@@ -15,8 +14,7 @@ interface RoofMapUIProps {
   onStartDrawing: () => void;
   onDeleteLastRoof: () => void;
   polygonsExist: boolean;
-  onRotationChange?: (rotation: number) => void;
-  currentRotation: number;
+  onStartRectangle: () => void;
 }
 
 const mapContainerStyle = {
@@ -43,8 +41,7 @@ export const RoofMapUI = ({
   onStartDrawing,
   onDeleteLastRoof,
   polygonsExist,
-  onRotationChange = () => {},
-  currentRotation,
+  onStartRectangle,
 }: RoofMapUIProps) => {
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const [markerPosition, setMarkerPosition] = useState(coordinates);
@@ -67,15 +64,6 @@ export const RoofMapUI = ({
         mapInstance.panTo(newPosition);
       }
     }
-  };
-
-  const handleRotationChange = (value: number[]) => {
-    onRotationChange(value[0]);
-  };
-
-  const adjustRotation = (amount: number) => {
-    const newRotation = (currentRotation + amount + 360) % 360;
-    onRotationChange(newRotation);
   };
 
   if (isLoading) {
@@ -145,40 +133,8 @@ export const RoofMapUI = ({
           polygonsExist={polygonsExist}
           onStartDrawing={onStartDrawing}
           onDeleteLastRoof={onDeleteLastRoof}
+          onStartRectangle={onStartRectangle}
         />
-
-        {polygonsExist && (
-          <div className="absolute bottom-4 right-4 bg-white p-3 rounded-lg shadow-lg">
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => adjustRotation(-45)}
-                className="h-8 w-8"
-              >
-                <RotateCcw className="h-4 w-4" />
-              </Button>
-              <Slider
-                value={[currentRotation]}
-                onValueChange={handleRotationChange}
-                max={360}
-                step={1}
-                className="w-32"
-              />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => adjustRotation(45)}
-                className="h-8 w-8"
-              >
-                <RotateCw className="h-4 w-4" />
-              </Button>
-            </div>
-            <p className="text-xs text-gray-500 text-center mt-1">
-              {currentRotation}°
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );

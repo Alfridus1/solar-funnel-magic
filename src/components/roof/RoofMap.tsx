@@ -15,7 +15,6 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
   const [coordinates, setCoordinates] = useState({ lat: 52.520008, lng: 13.404954 });
   const [isLoading, setIsLoading] = useState(true);
   const [formattedAddress, setFormattedAddress] = useState("");
-  const [currentRotation, setCurrentRotation] = useState(0);
   const { toast } = useToast();
 
   const {
@@ -50,9 +49,39 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
     onRoofOutlineComplete,
     setIsAnalyzing,
     toast,
-    onLog,
-    currentRotation
+    onLog
   });
+
+  const createRectangle = () => {
+    if (!map) return;
+    
+    const center = map.getCenter();
+    if (!center) return;
+    
+    const lat = center.lat();
+    const lng = center.lng();
+    
+    // Erstelle ein rechteckiges Polygon
+    const rectanglePoints = [
+      { lat: lat + 0.0002, lng: lng - 0.0003 },
+      { lat: lat + 0.0002, lng: lng + 0.0003 },
+      { lat: lat - 0.0002, lng: lng + 0.0003 },
+      { lat: lat - 0.0002, lng: lng - 0.0003 }
+    ];
+    
+    const polygon = new google.maps.Polygon({
+      paths: rectanglePoints,
+      fillColor: "#2563eb",
+      fillOpacity: 0.3,
+      strokeColor: "#2563eb",
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      editable: true,
+      map: map
+    });
+    
+    onPolygonComplete(polygon);
+  };
 
   const geocodeAddress = useCallback(async () => {
     if (!address) {
@@ -118,25 +147,6 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
     }
   }, [map, polygons, formattedAddress, coordinates]);
 
-  const handleRotationChange = (rotation: number) => {
-    setCurrentRotation(rotation);
-    // Lösche zuerst alle bestehenden Module
-    modules.forEach(module => module.setMap(null));
-    setModules([]);
-    
-    // Berechne Module neu für jedes Polygon mit der neuen Rotation
-    polygons.forEach((polygon, index) => {
-      const { moduleCount, roofId } = calculateModulePositions(polygon, map, setModules, rotation);
-      const updatedRoofDetails = [...roofDetails];
-      updatedRoofDetails[index] = { roofId, moduleCount };
-      setRoofDetails(updatedRoofDetails);
-      onRoofOutlineComplete(
-        polygons.map(p => p.getPath().getArray()),
-        updatedRoofDetails
-      );
-    });
-  };
-
   return (
     <RoofMapUI
       coordinates={coordinates}
@@ -150,8 +160,7 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
       onDeleteLastRoof={deleteLastRoof}
       polygonsExist={polygons.length > 0}
       isLoading={isLoading}
-      onRotationChange={handleRotationChange}
-      currentRotation={currentRotation}
+      onStartRectangle={createRectangle}
     />
   );
 };
