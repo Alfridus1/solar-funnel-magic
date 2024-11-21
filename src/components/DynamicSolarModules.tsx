@@ -7,9 +7,6 @@ const DynamicSolarModules = () => {
   const [modules, setModules] = useState([]);
   const [activePolygon, setActivePolygon] = useState(null);
   
-  // Module dimensions from our constants (in meters)
-  const MODULE_SPACING = FRAME_MARGIN;
-
   const calculateModuleGrid = useCallback((polygon) => {
     if (!polygon || polygon.points.length < 3) return [];
     
@@ -30,16 +27,16 @@ const DynamicSolarModules = () => {
     const height = bounds.maxY - bounds.minY;
 
     // Calculate maximum number of modules
-    const maxModulesX = Math.floor(width / (MODULE_WIDTH + MODULE_SPACING));
-    const maxModulesY = Math.floor(height / (MODULE_HEIGHT + MODULE_SPACING));
+    const maxModulesX = Math.floor(width / (MODULE_WIDTH + FRAME_MARGIN));
+    const maxModulesY = Math.floor(height / (MODULE_HEIGHT + FRAME_MARGIN));
 
     const newModules = [];
     
     // Create modules and check if they are inside the polygon
     for (let y = 0; y < maxModulesY; y++) {
       for (let x = 0; x < maxModulesX; x++) {
-        const moduleX = bounds.minX + x * (MODULE_WIDTH + MODULE_SPACING);
-        const moduleY = bounds.minY + y * (MODULE_HEIGHT + MODULE_SPACING);
+        const moduleX = bounds.minX + x * (MODULE_WIDTH + FRAME_MARGIN);
+        const moduleY = bounds.minY + y * (MODULE_HEIGHT + FRAME_MARGIN);
 
         // Check all 4 corners of the module
         const corners = [
@@ -80,6 +77,14 @@ const DynamicSolarModules = () => {
     return inside;
   };
 
+  // Add effect to update modules when polygons change
+  useEffect(() => {
+    if (activePolygon) {
+      const updatedModules = calculateModuleGrid(activePolygon);
+      setModules(updatedModules);
+    }
+  }, [activePolygon, calculateModuleGrid]);
+
   const handlePolygonMove = useCallback((polygonId, newPoints) => {
     setPolygons(current => 
       current.map(poly => 
@@ -94,6 +99,10 @@ const DynamicSolarModules = () => {
       setModules(updatedModules);
     }
   }, [activePolygon, calculateModuleGrid]);
+
+  const handlePolygonSelect = useCallback((polygon) => {
+    setActivePolygon(polygon);
+  }, []);
 
   // UI Components rendering
   return (
@@ -128,7 +137,11 @@ const DynamicSolarModules = () => {
       {/* Map area with polygons and modules */}
       <div className="w-full h-full">
         {polygons.map(polygon => (
-          <div key={polygon.id} className="absolute">
+          <div 
+            key={polygon.id} 
+            className="absolute"
+            onClick={() => handlePolygonSelect(polygon)}
+          >
             {/* Polygon visualization */}
             <svg className="absolute top-0 left-0">
               <path
