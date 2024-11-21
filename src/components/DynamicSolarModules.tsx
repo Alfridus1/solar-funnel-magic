@@ -3,6 +3,7 @@ import { ModuleControls } from '@/components/roof/modules/ModuleControls';
 import { ModuleStats } from '@/components/roof/modules/ModuleStats';
 import { calculateModuleGrid, isPointInPolygon } from '@/components/roof/modules/ModuleCalculator';
 import { MODULE_WIDTH, MODULE_HEIGHT } from '@/components/roof/utils/constants';
+import { useToast } from "@/components/ui/use-toast";
 
 const DynamicSolarModules = () => {
   const [polygons, setPolygons] = useState([]);
@@ -10,6 +11,7 @@ const DynamicSolarModules = () => {
   const [activePolygon, setActivePolygon] = useState(null);
   const [moduleRotation, setModuleRotation] = useState(0);
   const [isManualPlacement, setIsManualPlacement] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!isManualPlacement) {
@@ -73,8 +75,14 @@ const DynamicSolarModules = () => {
         height: effectiveModuleHeight,
         polygonId: activePolygon.id
       }]);
+
+      toast({
+        title: "Sehr gut!",
+        description: `${modules.length + 1} Module können optimal auf dieser Dachfläche installiert werden.`,
+        duration: 3000,
+      });
     }
-  }, [isManualPlacement, activePolygon, moduleRotation]);
+  }, [isManualPlacement, activePolygon, moduleRotation, modules.length, toast]);
 
   const roofStats = polygons.map(polygon => {
     const roofModules = modules.filter(m => m.polygonId === polygon.id);
