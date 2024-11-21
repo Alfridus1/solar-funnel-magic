@@ -1,4 +1,4 @@
-import { calculateModulePositions } from "../utils/moduleCalculations";
+import { calculateModulePositions, findOptimalRotation } from "../utils/moduleCalculations";
 
 interface UseRoofMapHandlersProps {
   map: google.maps.Map | null;
@@ -57,9 +57,13 @@ export const useRoofMapHandlers = ({
       lastPolygon.setMap(null);
       setPolygons(prevPolygons => prevPolygons.slice(0, -1));
       
+      // Lösche alle Module wenn das letzte Dach entfernt wird
+      if (polygons.length === 1) {
+        clearModules();
+      }
+      
       const updatedRoofDetails = roofDetails.slice(0, -1);
       setRoofDetails(updatedRoofDetails);
-      clearModules();
 
       const allPaths = polygons.slice(0, -1).map((poly) => poly.getPath().getArray());
       onRoofOutlineComplete(allPaths, updatedRoofDetails);
@@ -77,8 +81,10 @@ export const useRoofMapHandlers = ({
     setPolygons(prevPolygons => [...prevPolygons, polygon]);
     setIsDrawing(false);
 
-    const { moduleCount, roofId } = calculateModulePositions(polygon, map, setModules, currentRotation);
-    onLog?.(`Module berechnet: ${moduleCount}`);
+    // Finde die optimale Rotation für maximale Modulanzahl
+    const optimalRotation = findOptimalRotation(polygon, map);
+    const { moduleCount, roofId } = calculateModulePositions(polygon, map, setModules, optimalRotation);
+    onLog?.(`Module berechnet: ${moduleCount} bei ${optimalRotation}°`);
     
     const newRoofDetails = [...roofDetails, { roofId, moduleCount }];
     setRoofDetails(newRoofDetails);
@@ -90,7 +96,7 @@ export const useRoofMapHandlers = ({
 
     toast({
       title: "Sehr gut!",
-      description: `${moduleCount} Module können auf dieser Dachfläche installiert werden. ${
+      description: `${moduleCount} Module können optimal bei ${optimalRotation}° auf dieser Dachfläche installiert werden. ${
         polygons.length === 0
           ? "Sie können weitere Dächer hinzufügen oder die Form durch Ziehen der Punkte anpassen."
           : "Sie können weitere Dachflächen einzeichnen oder die Formen anpassen."

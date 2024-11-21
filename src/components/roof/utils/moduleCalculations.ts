@@ -4,6 +4,77 @@ const PANEL_WIDTH = 1.7; // meters
 const PANEL_HEIGHT = 1.0; // meters
 const PANEL_SPACING = 0.3; // meters
 
+// Hilfsfunktion zur Berechnung der Modulanzahl für eine bestimmte Rotation
+const calculateModulesForRotation = (
+  polygon: google.maps.Polygon,
+  map: google.maps.Map | null,
+  rotation: number
+): number => {
+  if (!map) return 0;
+
+  const bounds = new google.maps.LatLngBounds();
+  const path = polygon.getPath();
+  path.forEach((point) => bounds.extend(point));
+
+  // Convert panel dimensions to LatLng
+  const center = bounds.getCenter();
+  const scale = 1 / Math.cos(center.lat() * Math.PI / 180);
+  
+  // Adjust dimensions based on rotation
+  const angleRad = rotation * (Math.PI / 180);
+  const rotatedWidth = Math.abs(PANEL_WIDTH * Math.cos(angleRad)) + Math.abs(PANEL_HEIGHT * Math.sin(angleRad));
+  const rotatedHeight = Math.abs(PANEL_WIDTH * Math.sin(angleRad)) + Math.abs(PANEL_HEIGHT * Math.cos(angleRad));
+  
+  const panelWidthDeg = rotatedWidth / 111320 * scale;
+  const panelHeightDeg = rotatedHeight / 111320;
+  const spacingDeg = PANEL_SPACING / 111320;
+
+  const sw = bounds.getSouthWest();
+  const ne = bounds.getNorthEast();
+  const width = ne.lng() - sw.lng();
+  const height = ne.lat() - sw.lat();
+
+  // Calculate grid dimensions
+  const cols = Math.floor(width / (panelWidthDeg + spacingDeg));
+  const rows = Math.floor(height / (panelHeightDeg + spacingDeg));
+
+  let moduleCount = 0;
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const position = new google.maps.LatLng(
+        sw.lat() + row * (panelHeightDeg + spacingDeg),
+        sw.lng() + col * (panelWidthDeg + spacingDeg)
+      );
+
+      if (google.maps.geometry.poly.containsLocation(position, polygon)) {
+        moduleCount++;
+      }
+    }
+  }
+
+  return moduleCount;
+};
+
+// Funktion zur Findung der optimalen Rotation
+export const findOptimalRotation = (
+  polygon: google.maps.Polygon,
+  map: google.maps.Map | null
+): number => {
+  let maxModules = 0;
+  let optimalRotation = 0;
+
+  // Überprüfe Rotationen in 5-Grad-Schritten
+  for (let rotation = 0; rotation < 180; rotation += 5) {
+    const moduleCount = calculateModulesForRotation(polygon, map, rotation);
+    if (moduleCount > maxModules) {
+      maxModules = moduleCount;
+      optimalRotation = rotation;
+    }
+  }
+
+  return optimalRotation;
+};
+
 export const calculateModulePositions = (
   polygon: google.maps.Polygon,
   map: google.maps.Map | null,
@@ -19,35 +90,10 @@ export const calculateModulePositions = (
   const path = polygon.getPath();
   path.forEach((point) => bounds.extend(point));
 
-  // Calculate the main angle of the roof
-  const points = path.getArray();
-  let maxDistance = 0;
-  let mainVector = { x: 0, y: 0 };
-
-  for (let i = 0; i < points.length; i++) {
-    const p1 = points[i];
-    const p2 = points[(i + 1) % points.length];
-    
-    const dx = p2.lng() - p1.lng();
-    const dy = p2.lat() - p1.lat();
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    
-    if (distance > maxDistance) {
-      maxDistance = distance;
-      mainVector = { x: dx, y: dy };
-    }
-  }
-
-  // Combine roof angle with user rotation
-  const baseAngle = Math.atan2(mainVector.y, mainVector.x) * (180 / Math.PI);
-  const totalAngle = baseAngle + rotation;
-
-  // Convert panel dimensions to LatLng
   const center = bounds.getCenter();
   const scale = 1 / Math.cos(center.lat() * Math.PI / 180);
   
-  // Adjust dimensions based on rotation
-  const angleRad = totalAngle * (Math.PI / 180);
+  const angleRad = rotation * (Math.PI / 180);
   const rotatedWidth = Math.abs(PANEL_WIDTH * Math.cos(angleRad)) + Math.abs(PANEL_HEIGHT * Math.sin(angleRad));
   const rotatedHeight = Math.abs(PANEL_WIDTH * Math.sin(angleRad)) + Math.abs(PANEL_HEIGHT * Math.cos(angleRad));
   
@@ -64,7 +110,6 @@ export const calculateModulePositions = (
   const projection = map.getProjection();
   if (!projection) return { moduleCount: 0, roofId: '' };
 
-  // Calculate grid dimensions
   const cols = Math.floor(width / (panelWidthDeg + spacingDeg));
   const rows = Math.floor(height / (panelHeightDeg + spacingDeg));
 
@@ -76,7 +121,6 @@ export const calculateModulePositions = (
       );
 
       if (google.maps.geometry.poly.containsLocation(position, polygon)) {
-        // Create a polygon instead of a rectangle to handle rotation
         const modulePoints = [
           { lat: position.lat(), lng: position.lng() },
           { lat: position.lat() + panelHeightDeg, lng: position.lng() },
@@ -84,7 +128,6 @@ export const calculateModulePositions = (
           { lat: position.lat(), lng: position.lng() + panelWidthDeg }
         ];
 
-        // Apply rotation around the center point
         const centerPoint = {
           lat: position.lat() + panelHeightDeg / 2,
           lng: position.lng() + panelWidthDeg / 2
