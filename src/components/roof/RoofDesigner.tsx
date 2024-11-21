@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Square, Move, Trash2, Plus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 
 interface RoofDesignerProps {
   onComplete?: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number }[]) => void;
+  address: string;
 }
 
 const mapContainerStyle = {
@@ -14,7 +15,7 @@ const mapContainerStyle = {
   height: '500px',
 };
 
-// Updated coordinates for Germany
+// Fallback coordinates for Germany
 const defaultCenter = {
   lat: 51.1657,
   lng: 10.4515,
@@ -22,16 +23,36 @@ const defaultCenter = {
 
 const libraries: ("places" | "drawing" | "geometry")[] = ["places", "drawing", "geometry"];
 
-export const RoofDesigner = ({ onComplete }: RoofDesignerProps) => {
+export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [polygons, setPolygons] = useState<google.maps.Polygon[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [center, setCenter] = useState(defaultCenter);
   const { toast } = useToast();
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
     libraries,
   });
+
+  useEffect(() => {
+    if (isLoaded && address) {
+      const geocoder = new google.maps.Geocoder();
+      geocoder.geocode({ address }, (results, status) => {
+        if (status === google.maps.GeocoderStatus.OK && results && results[0]) {
+          const location = results[0].geometry.location;
+          setCenter({
+            lat: location.lat(),
+            lng: location.lng(),
+          });
+          if (map) {
+            map.setCenter(location);
+            map.setZoom(19);
+          }
+        }
+      });
+    }
+  }, [isLoaded, address, map]);
 
   const onLoad = useCallback((map: google.maps.Map) => {
     setMap(map);
@@ -116,9 +137,10 @@ export const RoofDesigner = ({ onComplete }: RoofDesignerProps) => {
       fillColor: '#2563eb',
       fillOpacity: 0.3,
       strokeColor: '#2563eb',
+      strokeOpacity: 0.8,
       strokeWeight: 2,
-      clickable: true,
       editable: true,
+      clickable: true,
       draggable: true,
       zIndex: 1,
     },
@@ -129,8 +151,8 @@ export const RoofDesigner = ({ onComplete }: RoofDesignerProps) => {
       <div className="relative rounded-lg overflow-hidden border border-gray-200">
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
-          zoom={6}
-          center={defaultCenter}
+          zoom={19}
+          center={center}
           onLoad={onLoad}
           options={{
             mapTypeId: 'satellite',

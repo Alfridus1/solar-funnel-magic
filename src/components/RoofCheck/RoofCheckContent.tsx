@@ -42,7 +42,10 @@ export const RoofCheckContent = ({
               </p>
             </div>
 
-            <RoofDesigner onComplete={handleRoofOutlineComplete} />
+            <RoofDesigner 
+              onComplete={handleRoofOutlineComplete} 
+              address={address}
+            />
 
             {paths.length > 0 && (
               <RoofMetrics {...metrics} />
