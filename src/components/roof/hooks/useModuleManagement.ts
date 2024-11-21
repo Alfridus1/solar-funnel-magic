@@ -24,13 +24,11 @@ export const useModuleManagement = ({
 }: UseModuleManagementProps) => {
   const clearModules = useCallback(() => {
     onLog?.("Lösche bestehende Module");
-    // Entferne alle Module von der Karte
     modules.forEach(module => {
       if (module) {
         module.setMap(null);
       }
     });
-    // Leere das Modules-Array
     setModules([]);
   }, [modules, setModules, onLog]);
 
@@ -55,16 +53,16 @@ export const useModuleManagement = ({
     onRoofOutlineComplete(allPaths, newRoofDetails);
   }, [map, polygons, clearModules, setModules, setRoofDetails, onRoofOutlineComplete, onLog]);
 
-  const updateModules = useCallback((polygon: google.maps.Polygon, roofId: string) => {
+  const updateModules = useCallback(() => {
     onLog?.("Aktualisiere Module nach Formänderung");
     recalculateAllModules();
   }, [recalculateAllModules, onLog]);
 
   const addPolygonListeners = useCallback((polygon: google.maps.Polygon, roofId: string) => {
-    // Event-Listener für Vertex-Änderungen (wenn Eckpunkte verschoben werden)
+    // Event-Listener für Vertex-Änderungen
     google.maps.event.addListener(polygon, 'mouseup', () => {
       onLog?.("Polygon-MouseUp-Event ausgelöst");
-      recalculateAllModules();
+      updateModules();
     });
 
     // Event-Listener für Pfadänderungen
@@ -73,7 +71,7 @@ export const useModuleManagement = ({
       ['insert_at', 'remove_at', 'set_at'].forEach(eventName => {
         path.addListener(eventName, () => {
           onLog?.(`Pfad-${eventName}-Event ausgelöst`);
-          recalculateAllModules();
+          updateModules();
         });
       });
     });
@@ -81,9 +79,15 @@ export const useModuleManagement = ({
     // Event-Listener für Polygon-Bewegungen
     google.maps.event.addListener(polygon, 'dragend', () => {
       onLog?.("Polygon-Drag-Event ausgelöst");
-      recalculateAllModules();
+      updateModules();
     });
-  }, [recalculateAllModules, onLog]);
+
+    // Neuer Event-Listener für Drag-Bewegungen
+    google.maps.event.addListener(polygon, 'drag', () => {
+      onLog?.("Polygon wird gezogen");
+      updateModules();
+    });
+  }, [updateModules, onLog]);
 
   return {
     clearModules,
