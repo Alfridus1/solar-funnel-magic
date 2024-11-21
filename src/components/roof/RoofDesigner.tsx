@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import { Square, Move, Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { calculateModulePositions } from './utils/moduleCalculations';
 
-const RoofDesigner = ({ onComplete }: { onComplete?: (roofDetails: { roofId: string; moduleCount: number }[]) => void }) => {
+interface RoofDesignerProps {
+  onComplete?: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number }[]) => void;
+}
+
+export const RoofDesigner = ({ onComplete }: RoofDesignerProps) => {
   const [polygons, setPolygons] = useState<Array<{
     id: string;
     type: 'rectangle';
@@ -83,7 +86,7 @@ const RoofDesigner = ({ onComplete }: { onComplete?: (roofDetails: { roofId: str
 
     const { roofDetails } = calculateTotalModules();
     if (onComplete) {
-      onComplete(roofDetails);
+      onComplete([], roofDetails);
     }
   };
 
@@ -187,14 +190,6 @@ const RoofDesigner = ({ onComplete }: { onComplete?: (roofDetails: { roofId: str
                       });
                       
                       setPolygons(newPolygons);
-                      
-                      // Aktualisiere die Modulanzahl während des Ziehens
-                      const { totalModules } = calculateTotalModules();
-                      toast({
-                        title: "Module aktualisiert",
-                        description: `${totalModules} Module können auf den Dachflächen installiert werden.`,
-                        duration: 1000,
-                      });
                     };
                     
                     const handleMouseUp = () => {
@@ -241,5 +236,3 @@ const RoofDesigner = ({ onComplete }: { onComplete?: (roofDetails: { roofId: str
     </div>
   );
 };
-
-export default RoofDesigner;
