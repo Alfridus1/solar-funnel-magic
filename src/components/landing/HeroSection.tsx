@@ -51,12 +51,14 @@ export const HeroSection = ({
               <Home className="absolute left-3 top-3 h-5 w-5 text-gray-400 pointer-events-none z-10" />
               <Autocomplete
                 onLoad={(autocomplete) => {
-                  autocompleteRef.current = autocomplete;
-                  autocomplete.setComponentRestrictions({ country: 'de' });
-                  autocomplete.setOptions({
-                    types: ['address'],
-                    fields: ['formatted_address', 'geometry']
-                  });
+                  if (autocomplete) {
+                    autocompleteRef.current = autocomplete;
+                    autocomplete.setComponentRestrictions({ country: 'de' });
+                    autocomplete.setOptions({
+                      types: ['address'],
+                      fields: ['formatted_address', 'geometry', 'address_components']
+                    });
+                  }
                 }}
                 onPlaceChanged={() => {
                   const place = autocompleteRef.current?.getPlace();
@@ -87,6 +89,7 @@ export const HeroSection = ({
             <Button
               onClick={handleAddressSubmit}
               className="w-full h-12 text-lg bg-solar-orange hover:bg-solar-orange-dark transition-colors"
+              disabled={!address}
             >
               Dach vermessen
             </Button>

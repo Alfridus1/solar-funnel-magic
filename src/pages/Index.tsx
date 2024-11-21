@@ -10,6 +10,7 @@ import { Stats } from "@/components/Stats";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { FinalCTA } from "@/components/landing/FinalCTA";
 import { TrustIndicators } from "@/components/landing/TrustIndicators";
+import { useGeolocation } from "@/components/RoofCheck/hooks/useGeolocation";
 
 const libraries = ["drawing", "places"];
 
@@ -24,58 +25,27 @@ export function Index() {
     libraries: libraries as ["drawing", "places"],
   });
 
-  const handleGeolocation = () => {
-    if (!navigator.geolocation) {
-      toast({
-        title: "Nicht unterstützt",
-        description: "Ihr Browser unterstützt keine Standorterkennung.",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  const onGeolocationSuccess = (formattedAddress: string) => {
+    setAddress(formattedAddress);
     toast({
-      title: "Standorterkennung",
-      description: "Ihr Standort wird ermittelt...",
+      title: "Erfolg",
+      description: "Ihr Standort wurde erfolgreich erkannt.",
     });
-
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-        const geocoder = new google.maps.Geocoder();
-        try {
-          const response = await geocoder.geocode({ location: { lat: latitude, lng: longitude } });
-          if (response.results[0]) {
-            const newAddress = response.results[0].formatted_address;
-            setAddress(newAddress);
-            toast({
-              title: "Erfolg",
-              description: "Ihr Standort wurde erfolgreich erkannt.",
-            });
-          }
-        } catch (error) {
-          console.error('Geocoding error:', error);
-          toast({
-            title: "Fehler",
-            description: "Die Adresse konnte nicht ermittelt werden.",
-            variant: "destructive",
-          });
-        }
-      },
-      (error) => {
-        console.error('Geolocation error:', error);
-        let errorMessage = "Ihr Standort konnte nicht ermittelt werden.";
-        if (error.code === error.PERMISSION_DENIED) {
-          errorMessage = "Bitte erlauben Sie den Zugriff auf Ihren Standort.";
-        }
-        toast({
-          title: "Fehler",
-          description: errorMessage,
-          variant: "destructive",
-        });
-      }
-    );
   };
+
+  const onGeolocationError = (errorMessage: string) => {
+    toast({
+      title: "Fehler",
+      description: errorMessage,
+      variant: "destructive",
+    });
+  };
+
+  const { handleGeolocation } = useGeolocation({
+    onSuccess: onGeolocationSuccess,
+    onError: onGeolocationError,
+    toast
+  });
 
   const onPlaceSelected = () => {
     const place = autocompleteRef.current?.getPlace();
