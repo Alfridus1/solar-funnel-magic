@@ -54,6 +54,7 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
 
   const updateModules = useCallback((polygon: google.maps.Polygon, roofId: string) => {
     onLog?.("Aktualisiere Module nach Formänderung");
+    clearModules();
     const { moduleCount } = calculateModulePositions(polygon, map, setModules);
     
     const updatedRoofDetails = roofDetails.map(detail => 
@@ -65,6 +66,11 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
     onRoofOutlineComplete(allPaths, updatedRoofDetails);
   }, [map, polygons, roofDetails, setRoofDetails, onRoofOutlineComplete, onLog, setModules]);
 
+  const clearModules = useCallback(() => {
+    modules.forEach(module => module.setMap(null));
+    setModules([]);
+  }, [modules, setModules]);
+
   const addPolygonListeners = useCallback((polygon: google.maps.Polygon, roofId: string) => {
     const paths = polygon.getPaths();
     paths.forEach((path) => {
@@ -72,6 +78,9 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
       google.maps.event.addListener(path, 'remove_at', () => updateModules(polygon, roofId));
       google.maps.event.addListener(path, 'set_at', () => updateModules(polygon, roofId));
     });
+
+    // Zusätzlicher Listener für Änderungen am Polygon selbst
+    google.maps.event.addListener(polygon, 'bounds_changed', () => updateModules(polygon, roofId));
   }, [updateModules]);
 
   const createRectangle = () => {
@@ -99,6 +108,7 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
       strokeWeight: 2,
       editable: true,
       clickable: true,
+      draggable: true,
       map: map
     });
 
