@@ -24,11 +24,7 @@ export const useModuleManagement = ({
 }: UseModuleManagementProps) => {
   const clearModules = useCallback(() => {
     onLog?.("Lösche bestehende Module");
-    modules.forEach(module => {
-      if (module) {
-        module.setMap(null);
-      }
-    });
+    modules.forEach(module => module?.setMap(null));
     setModules([]);
   }, [modules, setModules, onLog]);
 
@@ -53,16 +49,22 @@ export const useModuleManagement = ({
     onRoofOutlineComplete(allPaths, newRoofDetails);
   }, [map, polygons, clearModules, setModules, setRoofDetails, onRoofOutlineComplete, onLog]);
 
-  const updateModules = useCallback(() => {
-    onLog?.("Aktualisiere Module nach Formänderung");
-    recalculateAllModules();
-  }, [recalculateAllModules, onLog]);
-
   const addPolygonListeners = useCallback((polygon: google.maps.Polygon, roofId: string) => {
+    let dragTimeout: NodeJS.Timeout;
+
+    const handleUpdate = () => {
+      if (dragTimeout) {
+        clearTimeout(dragTimeout);
+      }
+      dragTimeout = setTimeout(() => {
+        recalculateAllModules();
+      }, 100);
+    };
+
     // Event-Listener für Vertex-Änderungen
     google.maps.event.addListener(polygon, 'mouseup', () => {
       onLog?.("Polygon-MouseUp-Event ausgelöst");
-      updateModules();
+      recalculateAllModules();
     });
 
     // Event-Listener für Pfadänderungen
@@ -71,27 +73,30 @@ export const useModuleManagement = ({
       ['insert_at', 'remove_at', 'set_at'].forEach(eventName => {
         path.addListener(eventName, () => {
           onLog?.(`Pfad-${eventName}-Event ausgelöst`);
-          updateModules();
+          recalculateAllModules();
         });
       });
     });
 
     // Event-Listener für Polygon-Bewegungen
-    google.maps.event.addListener(polygon, 'dragend', () => {
-      onLog?.("Polygon-Drag-Event ausgelöst");
-      updateModules();
-    });
-
-    // Neuer Event-Listener für Drag-Bewegungen
     google.maps.event.addListener(polygon, 'drag', () => {
       onLog?.("Polygon wird gezogen");
-      updateModules();
+      handleUpdate();
     });
-  }, [updateModules, onLog]);
+
+    google.maps.event.addListener(polygon, 'dragend', () => {
+      onLog?.("Polygon-Drag-Event beendet");
+      if (dragTimeout) {
+        clearTimeout(dragTimeout);
+      }
+      recalculateAllModules();
+    });
+
+  }, [recalculateAllModules, onLog]);
 
   return {
     clearModules,
-    updateModules,
+    updateModules: recalculateAllModules,
     addPolygonListeners
   };
 };
