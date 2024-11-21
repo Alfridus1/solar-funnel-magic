@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { GoogleMap, DrawingManager, useLoadScript } from '@react-google-maps/api';
 import { Loader2, Plus, Trash2 } from "lucide-react";
-import { RoofCalculations } from './components/RoofCalculations';
 
 interface RoofDesignerProps {
   onComplete?: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number }[]) => void;
@@ -31,7 +30,6 @@ export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
   const onLoad = useCallback((map: google.maps.Map) => {
     setMap(map);
     
-    // Setze initiale Position und Zoom
     const geocoder = new google.maps.Geocoder();
     geocoder.geocode({ address }, (results, status) => {
       if (status === google.maps.GeocoderStatus.OK && results && results[0]) {
@@ -39,7 +37,6 @@ export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
         map.setCenter(location);
         map.setZoom(21);
         
-        // Füge Marker hinzu
         new google.maps.Marker({
           position: location,
           map: map,
@@ -60,17 +57,16 @@ export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
     setActivePolygon(polygon);
     setIsDrawing(false);
 
-    // Füge Listener für Änderungen hinzu
     google.maps.event.addListener(polygon, 'mouseup', () => {
-      setActivePolygon(polygon); // Trigger Neuberechnung
+      setActivePolygon(polygon);
     });
 
     google.maps.event.addListener(polygon.getPath(), 'set_at', () => {
-      setActivePolygon(polygon); // Trigger Neuberechnung
+      setActivePolygon(polygon);
     });
 
     google.maps.event.addListener(polygon.getPath(), 'insert_at', () => {
-      setActivePolygon(polygon); // Trigger Neuberechnung
+      setActivePolygon(polygon);
     });
 
     toast({
@@ -183,8 +179,6 @@ export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
           </div>
         </GoogleMap>
       </div>
-
-      <RoofCalculations polygon={activePolygon} />
     </div>
   );
 };
