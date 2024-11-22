@@ -5,15 +5,24 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 
+interface LeadMetrics {
+  kWp: number;
+  roofArea: number;
+  monthlyProduction: number;
+  annualSavings: number;
+}
+
 interface Lead {
   id: string;
   address: string;
-  metrics: {
-    kWp: number;
-    roofArea: number;
-    monthlyProduction: number;
-    annualSavings: number;
-  };
+  metrics: LeadMetrics;
+  created_at: string;
+}
+
+interface SupabaseLead {
+  id: string;
+  address: string;
+  metrics: unknown;
   created_at: string;
 }
 
@@ -36,7 +45,25 @@ export const SolarSystemOverview = () => {
         .single();
 
       if (error) throw error;
-      return data as Lead;
+      
+      // Type assertion and validation
+      const supabaseLead = data as SupabaseLead;
+      const metrics = supabaseLead.metrics as LeadMetrics;
+      
+      // Validate metrics structure
+      if (!metrics || typeof metrics.kWp !== 'number' || 
+          typeof metrics.roofArea !== 'number' || 
+          typeof metrics.monthlyProduction !== 'number' || 
+          typeof metrics.annualSavings !== 'number') {
+        throw new Error("Invalid metrics format");
+      }
+
+      return {
+        id: supabaseLead.id,
+        address: supabaseLead.address,
+        metrics: metrics,
+        created_at: supabaseLead.created_at
+      } as Lead;
     }
   });
 
