@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/index";
-import AffiliateLanding from "./pages/affiliate";
-import AdminDashboard from "./components/admin/AdminDashboard";
+import { Index } from "./pages/Index";
+import { AffiliateLanding } from "./pages/AffiliateLanding";
+import { AdminDashboard } from "./pages/admin/Dashboard";
 import { CustomerDashboard } from "./components/dashboard/CustomerDashboard";
 
 function App() {
