@@ -13,7 +13,6 @@ import { TrustIndicators } from "@/components/landing/TrustIndicators";
 import { useGeolocation } from "@/components/RoofCheck/hooks/useGeolocation";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { UserPlus } from "lucide-react";
 
 const libraries = ["drawing", "places"];
 
@@ -98,15 +97,7 @@ export function Index() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-solar-blue to-white">
       <div className="container mx-auto px-4">
-        <div className="flex justify-end gap-4 py-4">
-          <Button 
-            variant="outline"
-            onClick={() => navigate("/register-affiliate")}
-            className="bg-white hover:bg-solar-orange hover:text-white transition-colors"
-          >
-            <UserPlus className="w-4 h-4 mr-2" />
-            Als Affiliate registrieren
-          </Button>
+        <div className="flex justify-end py-4">
           <Button 
             variant="outline"
             onClick={() => navigate("/login")}
