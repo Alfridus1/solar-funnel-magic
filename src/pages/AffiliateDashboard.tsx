@@ -3,12 +3,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 type Lead = Tables<"leads">;
 type Affiliate = Tables<"affiliates">;
 
-export default function AffiliateDashboard() {
+export function AffiliateDashboard() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [affiliate, setAffiliate] = useState<Affiliate | null>(null);
   const { toast } = useToast();
