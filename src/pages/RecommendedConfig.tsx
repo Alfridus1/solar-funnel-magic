@@ -40,6 +40,15 @@ export const RecommendedConfig = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <SystemMetrics
+            moduleCount={moduleCount}
+            kWp={metrics.kWp}
+            annualProduction={annualProduction}
+            roofArea={metrics.roofArea}
+          />
+        </div>
+
         <Card className="max-w-5xl mx-auto mb-8 p-8 bg-white/90 backdrop-blur shadow-lg">
           <div className="space-y-8">
             <div className="text-center">
@@ -52,12 +61,6 @@ export const RecommendedConfig = () => {
                 {/* Left Column - Potential Analysis */}
                 <div className="space-y-6">
                   <h3 className="text-2xl font-bold">Potentialanalyse</h3>
-                  <SystemMetrics
-                    moduleCount={moduleCount}
-                    kWp={metrics.kWp}
-                    annualProduction={annualProduction}
-                    roofArea={metrics.roofArea}
-                  />
                   <SavingsCalculator yearlyProduction={annualProduction} />
                 </div>
 
