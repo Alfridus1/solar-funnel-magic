@@ -62,6 +62,8 @@ export type Database = {
           id: string
           last_name: string
           referral_code: string | null
+          referral_count: number | null
+          total_leads: number | null
           updated_at: string | null
           user_id: string | null
         }
@@ -72,6 +74,8 @@ export type Database = {
           id?: string
           last_name: string
           referral_code?: string | null
+          referral_count?: number | null
+          total_leads?: number | null
           updated_at?: string | null
           user_id?: string | null
         }
@@ -82,6 +86,8 @@ export type Database = {
           id?: string
           last_name?: string
           referral_code?: string | null
+          referral_count?: number | null
+          total_leads?: number | null
           updated_at?: string | null
           user_id?: string | null
         }
