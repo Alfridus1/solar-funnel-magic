@@ -1,45 +1,46 @@
-import { Container } from "@/components/ui/container";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { AdminLayout } from "@/components/admin/layout/AdminLayout";
+import { Overview } from "@/components/admin/Overview";
 import { LeadManagement } from "@/components/admin/LeadManagement";
-import { ProductManagement } from "@/components/admin/ProductManagement";
-import { SystemSettings } from "@/components/admin/SystemSettings";
-import { PremiumProductsManagement } from "@/components/admin/PremiumProductsManagement";
 import { UserManagement } from "@/components/admin/UserManagement";
+import { ProductManagement } from "@/components/admin/ProductManagement";
+import { PremiumProductsManagement } from "@/components/admin/PremiumProductsManagement";
+import { SystemSettings } from "@/components/admin/SystemSettings";
 
 export const AdminDashboard = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const currentTab = location.hash.replace("#", "") || "overview";
+
+  useEffect(() => {
+    if (!location.hash) {
+      navigate("#overview", { replace: true });
+    }
+  }, [location, navigate]);
+
+  const renderContent = () => {
+    switch (currentTab) {
+      case "overview":
+        return <Overview />;
+      case "leads":
+        return <LeadManagement />;
+      case "users":
+        return <UserManagement />;
+      case "products":
+        return <ProductManagement />;
+      case "premium":
+        return <PremiumProductsManagement />;
+      case "settings":
+        return <SystemSettings />;
+      default:
+        return <Overview />;
+    }
+  };
+
   return (
-    <Container className="py-8">
-      <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
-      
-      <Tabs defaultValue="leads" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="leads">Anfragen</TabsTrigger>
-          <TabsTrigger value="users">Benutzer</TabsTrigger>
-          <TabsTrigger value="products">Produkte</TabsTrigger>
-          <TabsTrigger value="premium">Premium Produkte</TabsTrigger>
-          <TabsTrigger value="settings">Einstellungen</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="leads">
-          <LeadManagement />
-        </TabsContent>
-
-        <TabsContent value="users">
-          <UserManagement />
-        </TabsContent>
-
-        <TabsContent value="products">
-          <ProductManagement />
-        </TabsContent>
-
-        <TabsContent value="premium">
-          <PremiumProductsManagement />
-        </TabsContent>
-
-        <TabsContent value="settings">
-          <SystemSettings />
-        </TabsContent>
-      </Tabs>
-    </Container>
+    <AdminLayout>
+      {renderContent()}
+    </AdminLayout>
   );
 };
