@@ -10,28 +10,26 @@ interface PDFDownloadButtonProps {
 }
 
 export const PDFDownloadButton = ({ metrics, address }: PDFDownloadButtonProps) => {
-  const renderButton = ({ loading }: { loading: boolean }): ReactElement => (
-    <Button
-      className="bg-solar-orange hover:bg-solar-orange-dark"
-      disabled={loading}
-    >
-      {loading ? (
-        "Wird geladen..."
-      ) : (
-        <>
-          <Download className="w-4 h-4 mr-2" />
-          Angebot als PDF
-        </>
-      )}
-    </Button>
-  );
-
   return (
     <PDFDownloadLink
       document={<SolarOfferPDF metrics={metrics} address={address} />}
       fileName="solar-angebot.pdf"
     >
-      {renderButton}
+      {({ loading }) => (
+        <Button
+          className="bg-solar-orange hover:bg-solar-orange-dark"
+          disabled={loading}
+        >
+          {loading ? (
+            "Wird geladen..."
+          ) : (
+            <>
+              <Download className="w-4 h-4 mr-2" />
+              Angebot als PDF
+            </>
+          )}
+        </Button>
+      )}
     </PDFDownloadLink>
   );
 };
