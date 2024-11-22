@@ -9,6 +9,9 @@ interface SystemMetricsProps {
 }
 
 export const SystemMetrics = ({ moduleCount, kWp, annualProduction, roofArea }: SystemMetricsProps) => {
+  // Berechne kWp direkt aus der Modulanzahl (jedes Modul = 0,5 kWp)
+  const calculatedKWp = moduleCount * 0.5;
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       <Card className="bg-gradient-to-br from-amber-50 to-white p-4 rounded-xl">
@@ -34,7 +37,7 @@ export const SystemMetrics = ({ moduleCount, kWp, annualProduction, roofArea }: 
           <Zap className="h-5 w-5" />
           <span className="text-sm font-medium">Anlagengröße</span>
         </div>
-        <p className="text-2xl font-bold">{kWp.toFixed(1)} kWp</p>
+        <p className="text-2xl font-bold">{calculatedKWp.toFixed(1)} kWp</p>
         <p className="text-sm text-gray-600">Gesamtleistung</p>
       </Card>
 
