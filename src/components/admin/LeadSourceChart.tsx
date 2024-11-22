@@ -1,55 +1,25 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { format, subDays } from "date-fns";
+import { format } from "date-fns";
 import { de } from "date-fns/locale";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ChartSkeleton } from "./charts/ChartSkeleton";
+import { useLeadsData } from "./charts/useLeadsData";
+
+const CHART_COLORS = [
+  "#2563eb", // Blau
+  "#f59e0b", // Orange
+  "#10b981", // Grün
+  "#6366f1", // Indigo
+  "#ec4899", // Pink
+];
 
 export const LeadSourceChart = () => {
-  const { data: leadsData, isLoading } = useQuery({
-    queryKey: ['leads-by-source'],
-    queryFn: async () => {
-      const thirtyDaysAgo = subDays(new Date(), 30).toISOString();
-      const { data, error } = await supabase
-        .from('leads')
-        .select('created_at, source')
-        .gte('created_at', thirtyDaysAgo)
-        .order('created_at');
-
-      if (error) throw error;
-
-      // Gruppiere Leads nach Datum und Quelle
-      const groupedData = data.reduce((acc: any, lead) => {
-        const date = format(new Date(lead.created_at), 'yyyy-MM-dd');
-        const source = lead.source || 'Direkt';
-        
-        if (!acc[date]) {
-          acc[date] = {};
-        }
-        acc[date][source] = (acc[date][source] || 0) + 1;
-        return acc;
-      }, {});
-
-      // Konvertiere die gruppierten Daten in das Format für das Chart
-      const chartData = Object.entries(groupedData).map(([date, sources]: [string, any]) => ({
-        date,
-        ...sources
-      }));
-
-      return chartData;
-    }
-  });
+  const { data: leadsData, isLoading } = useLeadsData();
 
   if (isLoading) {
-    return (
-      <Card className="p-6">
-        <Skeleton className="h-[400px] w-full" />
-      </Card>
-    );
+    return <ChartSkeleton />;
   }
 
-  // Ermittle alle einzigartigen Quellen
   const sources = leadsData ? Array.from(
     new Set(
       leadsData.flatMap(data => 
@@ -57,15 +27,6 @@ export const LeadSourceChart = () => {
       )
     )
   ) : [];
-
-  // Farben für verschiedene Quellen
-  const colors = [
-    "#2563eb", // Blau
-    "#f59e0b", // Orange
-    "#10b981", // Grün
-    "#6366f1", // Indigo
-    "#ec4899", // Pink
-  ];
 
   return (
     <Card className="p-6">
@@ -97,7 +58,7 @@ export const LeadSourceChart = () => {
                 key={source}
                 type="monotone"
                 dataKey={source}
-                stroke={colors[index % colors.length]}
+                stroke={CHART_COLORS[index % CHART_COLORS.length]}
                 strokeWidth={2}
                 dot={false}
                 name={source}
