@@ -289,7 +289,10 @@ export type Database = {
           lon: number | null
           modified_date: string
           opensolar_id: string
+          project_sold: boolean | null
           stage: number
+          system_details: Json | null
+          system_id: string | null
           title: string
           updated_at: string | null
         }
@@ -303,7 +306,10 @@ export type Database = {
           lon?: number | null
           modified_date: string
           opensolar_id: string
+          project_sold?: boolean | null
           stage: number
+          system_details?: Json | null
+          system_id?: string | null
           title: string
           updated_at?: string | null
         }
@@ -317,7 +323,10 @@ export type Database = {
           lon?: number | null
           modified_date?: string
           opensolar_id?: string
+          project_sold?: boolean | null
           stage?: number
+          system_details?: Json | null
+          system_id?: string | null
           title?: string
           updated_at?: string | null
         }
@@ -429,8 +438,10 @@ export type Database = {
           address: string
           completion_date: string | null
           created_at: string | null
+          customer_email: string | null
           customer_id: string | null
           customer_name: string
+          customer_phone: string | null
           estimated_completion_date: string | null
           id: string
           project_type: string
@@ -438,6 +449,7 @@ export type Database = {
           special_requirements: string | null
           start_date: string | null
           status: string
+          subtype: string | null
           system_size: number | null
           team_id: string | null
           title: string
@@ -447,8 +459,10 @@ export type Database = {
           address: string
           completion_date?: string | null
           created_at?: string | null
+          customer_email?: string | null
           customer_id?: string | null
           customer_name: string
+          customer_phone?: string | null
           estimated_completion_date?: string | null
           id?: string
           project_type: string
@@ -456,6 +470,7 @@ export type Database = {
           special_requirements?: string | null
           start_date?: string | null
           status: string
+          subtype?: string | null
           system_size?: number | null
           team_id?: string | null
           title: string
@@ -465,8 +480,10 @@ export type Database = {
           address?: string
           completion_date?: string | null
           created_at?: string | null
+          customer_email?: string | null
           customer_id?: string | null
           customer_name?: string
+          customer_phone?: string | null
           estimated_completion_date?: string | null
           id?: string
           project_type?: string
@@ -474,6 +491,7 @@ export type Database = {
           special_requirements?: string | null
           start_date?: string | null
           status?: string
+          subtype?: string | null
           system_size?: number | null
           team_id?: string | null
           title?: string

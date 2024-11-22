@@ -34,7 +34,7 @@ export const SystemMetrics = ({ moduleCount, kWp, annualProduction, roofArea }: 
           <Zap className="h-5 w-5" />
           <span className="text-sm font-medium">Anlagengröße</span>
         </div>
-        <p className="text-2xl font-bold">{kWp} kWp</p>
+        <p className="text-2xl font-bold">{Math.floor(kWp)} kWp</p>
         <p className="text-sm text-gray-600">Gesamtleistung</p>
       </Card>
 
