@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import { Sun, Battery, Leaf, Euro, Home } from "lucide-react";
 
 interface SavingsCalculatorProps {
@@ -29,16 +29,19 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
         </div>
         
         <div className="space-y-6">
-          <div>
-            <Label htmlFor="electricity-price">Strompreis (€/kWh)</Label>
-            <Input
+          <div className="space-y-4">
+            <div className="flex justify-between">
+              <Label htmlFor="electricity-price">Strompreis</Label>
+              <span className="font-medium text-solar-orange">{electricityPrice.toFixed(2)}€/kWh</span>
+            </div>
+            <Slider
               id="electricity-price"
-              type="number"
-              step="0.01"
-              min="0"
-              value={electricityPrice}
-              onChange={(e) => setElectricityPrice(Number(e.target.value))}
-              className="bg-white/50 backdrop-blur-sm"
+              min={0.20}
+              max={0.60}
+              step={0.01}
+              value={[electricityPrice]}
+              onValueChange={(value) => setElectricityPrice(value[0])}
+              className="w-full"
             />
           </div>
 
