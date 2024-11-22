@@ -59,12 +59,14 @@ export const RecommendedConfig = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
               <div className="space-y-6">
                 <h3 className="text-2xl font-bold">Potentialanalyse</h3>
-                <div className="bg-gradient-to-br from-white via-solar-blue-50/50 to-solar-blue-100/30 rounded-xl p-6 shadow-lg backdrop-blur-sm border border-white/50">
-                  <SavingsCalculator yearlyProduction={annualProduction} />
+                <div className="bg-gradient-to-br from-white via-solar-blue-50/50 to-solar-blue-100/30 rounded-xl p-6 shadow-lg backdrop-blur-sm border border-white/50 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-tr from-solar-orange/5 via-solar-blue-50/10 to-white/20 pointer-events-none" />
+                  <div className="relative z-10">
+                    <SavingsCalculator yearlyProduction={annualProduction} />
+                  </div>
                 </div>
               </div>
 
-              {/* Right Column - Price Estimation */}
               <div className="space-y-6">
                 <h3 className="text-2xl font-bold">Unverbindliche Preisschätzung</h3>
                 <Card className="p-6 bg-gradient-to-br from-solar-orange/10 to-white">
