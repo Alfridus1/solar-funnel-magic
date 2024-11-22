@@ -365,6 +365,42 @@ export type Database = {
         }
         Relationships: []
       }
+      premium_products: {
+        Row: {
+          climate_impact: string
+          created_at: string | null
+          description: string
+          features: string[]
+          id: string
+          image_url: string
+          name: string
+          order_number: number
+          updated_at: string | null
+        }
+        Insert: {
+          climate_impact: string
+          created_at?: string | null
+          description: string
+          features?: string[]
+          id?: string
+          image_url: string
+          name: string
+          order_number: number
+          updated_at?: string | null
+        }
+        Update: {
+          climate_impact?: string
+          created_at?: string | null
+          description?: string
+          features?: string[]
+          id?: string
+          image_url?: string
+          name?: string
+          order_number?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       product_categories: {
         Row: {
           created_at: string | null

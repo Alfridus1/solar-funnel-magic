@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LeadManagement } from "@/components/admin/LeadManagement";
 import { ProductManagement } from "@/components/admin/ProductManagement";
 import { SystemSettings } from "@/components/admin/SystemSettings";
+import { PremiumProductsManagement } from "@/components/admin/PremiumProductsManagement";
 
 export const AdminDashboard = () => {
   return (
@@ -13,6 +14,7 @@ export const AdminDashboard = () => {
         <TabsList>
           <TabsTrigger value="leads">Anfragen</TabsTrigger>
           <TabsTrigger value="products">Produkte</TabsTrigger>
+          <TabsTrigger value="premium">Premium Produkte</TabsTrigger>
           <TabsTrigger value="settings">Einstellungen</TabsTrigger>
         </TabsList>
 
@@ -22,6 +24,10 @@ export const AdminDashboard = () => {
 
         <TabsContent value="products">
           <ProductManagement />
+        </TabsContent>
+
+        <TabsContent value="premium">
+          <PremiumProductsManagement />
         </TabsContent>
 
         <TabsContent value="settings">
