@@ -6,7 +6,7 @@ export const useRoofMapState = () => {
   const [modules, setModules] = useState<google.maps.Rectangle[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [roofDetails, setRoofDetails] = useState<{ roofId: string; moduleCount: number }[]>([]);
+  const [roofDetails, setRoofDetails] = useState<{ roofId: string; moduleCount: number; kWp: number }[]>([]);
 
   return {
     map,

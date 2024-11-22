@@ -8,7 +8,7 @@ import { RoofMapUI } from "./components/RoofMapUI";
 
 interface RoofMapProps {
   address: string;
-  onRoofOutlineComplete: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number }[]) => void;
+  onRoofOutlineComplete: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number; kWp: number }[]) => void;
   onLog?: (message: string) => void;
 }
 
