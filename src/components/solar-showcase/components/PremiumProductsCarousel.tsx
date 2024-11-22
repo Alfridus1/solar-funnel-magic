@@ -97,7 +97,15 @@ export const PremiumProductsCarousel = () => {
   return (
     <section className="py-12">
       <div className="w-full max-w-7xl mx-auto px-4">
-        <div className="relative" ref={emblaRef}>
+        <Carousel
+          ref={emblaRef}
+          opts={{
+            loop: true,
+            align: 'center',
+            skipSnaps: false,
+          }}
+          className="relative"
+        >
           <CarouselContent>
             {products.map((product, index) => (
               <CarouselItem 
@@ -153,7 +161,7 @@ export const PremiumProductsCarousel = () => {
           </CarouselContent>
           <CarouselPrevious className="absolute -left-12 top-1/2 transform -translate-y-1/2" />
           <CarouselNext className="absolute -right-12 top-1/2 transform -translate-y-1/2" />
-        </div>
+        </Carousel>
       </div>
     </section>
   );
