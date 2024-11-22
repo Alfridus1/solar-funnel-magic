@@ -10,7 +10,7 @@ export const TrustIndicators = () => {
         </div>
         <div className="flex items-center gap-2">
           <Award className="h-5 w-5 text-solar-orange" />
-          <span>10 Jahre Garantie</span>
+          <span>15 Jahre Grundgarantie</span>
         </div>
         <div className="flex items-center gap-2">
           <Heart className="h-5 w-5 text-solar-orange" />
