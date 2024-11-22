@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { Index } from "@/pages/Index";
 import { Login } from "@/pages/Login";
@@ -12,6 +12,7 @@ import { ImpersonationBanner } from "@/components/admin/ImpersonationBanner";
 function App() {
   const [session, setSession] = useState(null);
   const [impersonatedUser, setImpersonatedUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -48,7 +49,7 @@ function App() {
   };
 
   return (
-    <Router>
+    <>
       {impersonatedUser && (
         <ImpersonationBanner
           userEmail={impersonatedUser.email}
@@ -62,7 +63,7 @@ function App() {
         <Route path="/debug" element={<Debug />} />
       </Routes>
       <Toaster />
-    </Router>
+    </>
   );
 }
 

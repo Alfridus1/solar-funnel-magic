@@ -48,10 +48,15 @@ export const UserManagement = () => {
       return;
     }
 
-    setProfiles(data.map(profile => ({
-      ...profile,
-      referral_count: profile.referral_count || 0
-    })));
+    if (data) {
+      const formattedProfiles = data.map(profile => ({
+        ...profile,
+        referral_count: Array.isArray(profile.referral_count) 
+          ? profile.referral_count[0]?.count || 0 
+          : profile.referral_count || 0
+      }));
+      setProfiles(formattedProfiles);
+    }
   };
 
   const handleImpersonation = async (email: string) => {
