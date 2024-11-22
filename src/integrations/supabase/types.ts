@@ -1034,6 +1034,36 @@ export type Database = {
           },
         ]
       }
+      tracking_pixels: {
+        Row: {
+          conversion_label: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          pixel_id: string
+          platform: string
+          updated_at: string | null
+        }
+        Insert: {
+          conversion_label?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          pixel_id: string
+          platform: string
+          updated_at?: string | null
+        }
+        Update: {
+          conversion_label?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          pixel_id?: string
+          platform?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       warehouses: {
         Row: {
           created_at: string | null

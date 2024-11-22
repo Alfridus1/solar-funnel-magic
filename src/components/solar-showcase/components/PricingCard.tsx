@@ -57,7 +57,7 @@ export const PricingCard = ({ estimatedPrice, onShowLeadForm, systemSizeKWp }: P
             className="w-full bg-solar-orange hover:bg-solar-orange-dark text-xl py-6"
             onClick={onShowLeadForm}
           >
-            Vor-Ort Termin vereinbaren
+            Telefonische Erstberatung vereinbaren
           </Button>
         </div>
       </div>
