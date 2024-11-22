@@ -61,11 +61,6 @@ export const SavingsCalculator = ({ yearlyProduction }: { yearlyProduction: numb
             {Math.round(twentyFiveYearSavings).toLocaleString()} €
           </span>
         </div>
-
-        <div className="flex justify-between items-center p-2 sm:p-3 bg-solar-orange-50 rounded-lg text-sm sm:text-base">
-          <span>Unverbindliche Preisschätzung:</span>
-          <span className="font-semibold text-solar-orange">{estimatedPrice.toLocaleString()} €</span>
-        </div>
       </div>
     </Card>
   );
