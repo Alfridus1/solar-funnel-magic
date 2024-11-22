@@ -24,16 +24,29 @@ export const RegistrationOverlay = ({ onComplete }: RegistrationOverlayProps) =>
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase
+      // First, create an anonymous session
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: Math.random().toString(36).slice(-8), // Generate a random password
+      });
+
+      if (authError) throw authError;
+
+      // Then insert the profile data
+      const { error: profileError } = await supabase
         .from('profiles')
         .insert([{
+          id: authData.user?.id, // Link the profile to the auth user
           first_name: formData.firstName,
           last_name: formData.lastName,
           email: formData.email,
           phone: formData.phone,
         }]);
 
-      if (error) throw error;
+      if (profileError) throw profileError;
+
+      // Sign out the temporary user since we don't need them to be logged in
+      await supabase.auth.signOut();
 
       onComplete();
       
