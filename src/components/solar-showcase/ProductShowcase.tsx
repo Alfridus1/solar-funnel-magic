@@ -93,17 +93,20 @@ export const ProductShowcase = () => {
                 }
                 fileName="solar-angebot.pdf"
               >
-                {({ loading }) => (
-                  loading ? (
-                    <Button disabled>Wird geladen...</Button>
-                  ) : (
-                    <Button
-                      className="bg-solar-orange hover:bg-solar-orange-dark"
-                    >
-                      <Download className="w-4 h-4 mr-2" />
-                      Angebot als PDF
-                    </Button>
-                  )
+                {({ loading }: { loading: boolean }) => (
+                  <Button
+                    className="bg-solar-orange hover:bg-solar-orange-dark"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      "Wird geladen..."
+                    ) : (
+                      <>
+                        <Download className="w-4 h-4 mr-2" />
+                        Angebot als PDF
+                      </>
+                    )}
+                  </Button>
                 )}
               </PDFDownloadLink>
             </div>
