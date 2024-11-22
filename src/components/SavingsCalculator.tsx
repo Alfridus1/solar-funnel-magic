@@ -5,6 +5,7 @@ import { Slider } from "@/components/ui/slider";
 
 export const SavingsCalculator = ({ yearlyProduction }: { yearlyProduction: number }) => {
   const [electricityPrice, setElectricityPrice] = useState(0.40); // €/kWh
+  const [consumption, setConsumption] = useState(4000); // kWh/Jahr
   const yearlySavings = yearlyProduction * electricityPrice;
   
   // Calculate 25 year savings with 4.5% annual price increase
@@ -12,6 +13,8 @@ export const SavingsCalculator = ({ yearlyProduction }: { yearlyProduction: numb
     const priceWithIncrease = electricityPrice * Math.pow(1.045, index);
     return total + (yearlyProduction * priceWithIncrease);
   }, 0);
+
+  const selfConsumptionRate = Math.min(consumption / yearlyProduction, 1) * 100;
 
   return (
     <Card className="p-4 sm:p-6 bg-gradient-to-br from-solar-orange-50 to-white/80 backdrop-blur">
@@ -24,6 +27,21 @@ export const SavingsCalculator = ({ yearlyProduction }: { yearlyProduction: numb
         <div className="flex justify-between items-center p-2 sm:p-3 bg-white/50 rounded-lg text-sm sm:text-base">
           <span>Jährliche Produktion:</span>
           <span className="font-semibold">{yearlyProduction.toLocaleString()} kWh</span>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex justify-between items-center text-sm sm:text-base">
+            <span>Ihr Stromverbrauch:</span>
+            <span className="font-semibold">{consumption.toLocaleString()} kWh/Jahr</span>
+          </div>
+          <Slider
+            value={[consumption]}
+            onValueChange={(values) => setConsumption(values[0])}
+            min={1000}
+            max={15000}
+            step={100}
+            className="my-4"
+          />
         </div>
         
         <div className="space-y-2">
@@ -39,6 +57,11 @@ export const SavingsCalculator = ({ yearlyProduction }: { yearlyProduction: numb
             step={0.01}
             className="my-4"
           />
+        </div>
+
+        <div className="flex justify-between items-center p-2 sm:p-3 bg-solar-orange-50 rounded-lg text-sm sm:text-base">
+          <span>Eigenverbrauchsquote:</span>
+          <span className="font-semibold text-solar-orange">{Math.round(selfConsumptionRate)}%</span>
         </div>
         
         <div className="flex justify-between items-center p-2 sm:p-3 bg-solar-orange-50 rounded-lg text-sm sm:text-base">
