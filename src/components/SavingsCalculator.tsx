@@ -71,27 +71,6 @@ export const SavingsCalculator = ({ yearlyProduction }: { yearlyProduction: numb
           </div>
         </div>
       </div>
-
-        <div className="space-y-2 text-sm">
-          <div className="flex items-start gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-solar-blue mt-1.5" />
-            <span>Premium Komponenten von führenden Herstellern</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-solar-blue mt-1.5" />
-            <span>Professionelle Installation durch zertifizierte Partner</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-solar-blue mt-1.5" />
-            <span>25 Jahre Leistungsgarantie auf Module</span>
-          </div>
-        </div>
-
-        <div className="pt-4">
-          <Button className="w-full bg-solar-blue hover:bg-solar-blue-600">
-            Vor-Ort Termin vereinbaren
-          </Button>
-        </div>
     </div>
   );
 };
