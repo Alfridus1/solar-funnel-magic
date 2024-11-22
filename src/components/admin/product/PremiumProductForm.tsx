@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Plus, Pencil } from "lucide-react";
 import { ImageUpload } from "./ImageUpload";
 import { PremiumProduct, PremiumProductFormFields } from "./types";
+import { useEffect } from "react";
 
 interface PremiumProductFormProps {
   editingProduct: PremiumProduct | null;
@@ -20,19 +21,35 @@ export const PremiumProductForm = ({
   onSubmit,
   onCancel
 }: PremiumProductFormProps) => {
-  const { register, handleSubmit, setValue, watch } = useForm<PremiumProductFormFields>({
-    defaultValues: editingProduct ? {
-      name: editingProduct.name,
-      description: editingProduct.description,
-      image_url: editingProduct.image_url,
-      climate_impact: editingProduct.climate_impact,
-      features: editingProduct.features.join('\n'),
-      price: editingProduct.purchase_options.price,
-      financing_available: editingProduct.purchase_options.financing.available,
-      financing_min_rate: editingProduct.purchase_options.financing.min_rate,
-      financing_max_term: editingProduct.purchase_options.financing.max_term
-    } : undefined
-  });
+  const { register, handleSubmit, setValue, watch, reset } = useForm<PremiumProductFormFields>();
+  
+  useEffect(() => {
+    if (editingProduct) {
+      reset({
+        name: editingProduct.name,
+        description: editingProduct.description,
+        image_url: editingProduct.image_url,
+        climate_impact: editingProduct.climate_impact,
+        features: editingProduct.features.join('\n'),
+        price: editingProduct.purchase_options.price,
+        financing_available: editingProduct.purchase_options.financing.available,
+        financing_min_rate: editingProduct.purchase_options.financing.min_rate,
+        financing_max_term: editingProduct.purchase_options.financing.max_term
+      });
+    } else {
+      reset({
+        name: '',
+        description: '',
+        image_url: '',
+        climate_impact: '',
+        features: '',
+        price: 0,
+        financing_available: false,
+        financing_min_rate: 0,
+        financing_max_term: 0
+      });
+    }
+  }, [editingProduct, reset]);
 
   const currentImageUrl = watch('image_url');
 
