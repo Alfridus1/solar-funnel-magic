@@ -6,7 +6,7 @@ export const calculateModulePositions = (
   map: google.maps.Map | null,
   setModules: (modules: google.maps.Rectangle[]) => void
 ) => {
-  if (!map) return { moduleCount: 0, roofId: '' };
+  if (!map) return { moduleCount: 0, roofId: '', kWp: 0 };
 
   const bounds = new google.maps.LatLngBounds();
   const path = polygon.getPath();
@@ -67,6 +67,7 @@ export const calculateModulePositions = (
   setModules(newModules);
   const roofId = uuidv4();
   // Calculate kWp based on module count (500Wp per module = 0.5 kWp per module)
-  const kWp = Math.round(newModules.length * 0.5 * 2) / 2; // Round to nearest 0.5
-  return { moduleCount: newModules.length, roofId, kWp };
+  const moduleCount = newModules.length;
+  const kWp = moduleCount * 0.5; // Each module contributes exactly 0.5 kWp
+  return { moduleCount, roofId, kWp };
 };
