@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Euro, Users, ArrowRight, CheckCircle } from "lucide-react";
+import { FAQ } from "@/components/FAQ";
+import { Testimonials } from "@/components/Testimonials";
 
 export function AffiliateLanding() {
   const [email, setEmail] = useState("");
@@ -36,6 +38,15 @@ export function AffiliateLanding() {
         return;
       }
 
+      // Create auth user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password: Math.random().toString(36).slice(-8), // Generate random password
+      });
+
+      if (authError) throw authError;
+
+      // Create affiliate record
       const { data, error } = await supabase
         .from('affiliates')
         .insert([
@@ -43,6 +54,7 @@ export function AffiliateLanding() {
             email,
             first_name: '',
             last_name: '',
+            user_id: authData.user?.id
           }
         ])
         .select()
@@ -154,6 +166,12 @@ export function AffiliateLanding() {
               </div>
             </div>
           </div>
+
+          {/* Testimonials Section */}
+          <Testimonials />
+
+          {/* FAQ Section */}
+          <FAQ />
         </div>
       </div>
     </div>

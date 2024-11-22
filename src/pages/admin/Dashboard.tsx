@@ -7,6 +7,7 @@ import { UserManagement } from "@/components/admin/UserManagement";
 import { ProductManagement } from "@/components/admin/ProductManagement";
 import { PremiumProductsManagement } from "@/components/admin/PremiumProductsManagement";
 import { SystemSettings } from "@/components/admin/SystemSettings";
+import { AffiliateManagement } from "@/components/admin/AffiliateManagement";
 
 export const AdminDashboard = () => {
   const location = useLocation();
@@ -27,6 +28,8 @@ export const AdminDashboard = () => {
         return <LeadManagement />;
       case "users":
         return <UserManagement />;
+      case "affiliates":
+        return <AffiliateManagement />;
       case "products":
         return <ProductManagement />;
       case "premium":

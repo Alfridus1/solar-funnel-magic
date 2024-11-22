@@ -8,7 +8,8 @@ import {
   Settings,
   MessageSquare,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  UserPlus
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,11 @@ const menuItems = [
     label: "Benutzer", 
     icon: Users, 
     value: "users" 
+  },
+  { 
+    label: "Affiliates", 
+    icon: UserPlus, 
+    value: "affiliates" 
   },
   { 
     label: "Produkte", 
