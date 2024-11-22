@@ -72,39 +72,32 @@ export const SavingsCalculator = ({ yearlyProduction }: { yearlyProduction: numb
         </div>
       </div>
 
-        <div className="flex items-center gap-2 sm:gap-3 mb-4">
-          <Calculator className="h-5 w-5 sm:h-6 sm:w-6 text-solar-blue" />
-          <h3 className="text-lg sm:text-xl font-semibold">Unverbindliches Angebot</h3>
+        <div className="p-4 bg-white/50 rounded-lg">
+          <div className="text-2xl font-bold text-solar-blue mb-2">
+            {estimatedPrice.toLocaleString()} €
+          </div>
+          <div className="text-sm text-gray-600">Geschätzter Anlagenpreis inkl. MwSt.</div>
         </div>
-        
-        <div className="space-y-4">
-          <div className="p-4 bg-white/50 rounded-lg">
-            <div className="text-2xl font-bold text-solar-blue mb-2">
-              {estimatedPrice.toLocaleString()} €
-            </div>
-            <div className="text-sm text-gray-600">Geschätzter Anlagenpreis inkl. MwSt.</div>
-          </div>
 
-          <div className="space-y-2 text-sm">
-            <div className="flex items-start gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-solar-blue mt-1.5" />
-              <span>Premium Komponenten von führenden Herstellern</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-solar-blue mt-1.5" />
-              <span>Professionelle Installation durch zertifizierte Partner</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-solar-blue mt-1.5" />
-              <span>25 Jahre Leistungsgarantie auf Module</span>
-            </div>
+        <div className="space-y-2 text-sm">
+          <div className="flex items-start gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-solar-blue mt-1.5" />
+            <span>Premium Komponenten von führenden Herstellern</span>
           </div>
+          <div className="flex items-start gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-solar-blue mt-1.5" />
+            <span>Professionelle Installation durch zertifizierte Partner</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-solar-blue mt-1.5" />
+            <span>25 Jahre Leistungsgarantie auf Module</span>
+          </div>
+        </div>
 
-          <div className="pt-4">
-            <Button className="w-full bg-solar-blue hover:bg-solar-blue-600">
-              Vor-Ort Termin vereinbaren
-            </Button>
-          </div>
+        <div className="pt-4">
+          <Button className="w-full bg-solar-blue hover:bg-solar-blue-600">
+            Vor-Ort Termin vereinbaren
+          </Button>
         </div>
     </div>
   );
