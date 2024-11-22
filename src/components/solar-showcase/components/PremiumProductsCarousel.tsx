@@ -28,6 +28,24 @@ interface PremiumProduct {
   };
 }
 
+interface SupabaseProduct {
+  id: string;
+  name: string;
+  description: string;
+  image_url: string;
+  features: string[];
+  climate_impact: string;
+  order_number: number;
+  purchase_options?: {
+    price: number;
+    financing: {
+      available: boolean;
+      min_rate: number;
+      max_term: number;
+    };
+  };
+}
+
 export const PremiumProductsCarousel = () => {
   const [products, setProducts] = useState<PremiumProduct[]>([]);
   const [showLeadForm, setShowLeadForm] = useState(false);
@@ -45,7 +63,7 @@ export const PremiumProductsCarousel = () => {
       }
 
       // Transform the data to ensure it matches our PremiumProduct interface
-      const transformedData: PremiumProduct[] = data.map(item => ({
+      const transformedData: PremiumProduct[] = (data as SupabaseProduct[]).map(item => ({
         ...item,
         purchase_options: item.purchase_options || {
           price: 0,

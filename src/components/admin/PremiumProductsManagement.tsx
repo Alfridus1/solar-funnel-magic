@@ -25,6 +25,24 @@ interface PremiumProduct {
   };
 }
 
+interface SupabaseProduct {
+  id: string;
+  name: string;
+  description: string;
+  image_url: string;
+  features: string[];
+  climate_impact: string;
+  order_number: number;
+  purchase_options?: {
+    price: number;
+    financing: {
+      available: boolean;
+      min_rate: number;
+      max_term: number;
+    };
+  };
+}
+
 export const PremiumProductsManagement = () => {
   const [products, setProducts] = useState<PremiumProduct[]>([]);
   const [loading, setLoading] = useState(false);
@@ -47,7 +65,7 @@ export const PremiumProductsManagement = () => {
     }
 
     // Transform the data to ensure it matches our PremiumProduct interface
-    const transformedData: PremiumProduct[] = data.map(item => ({
+    const transformedData: PremiumProduct[] = (data as SupabaseProduct[]).map(item => ({
       ...item,
       purchase_options: item.purchase_options || {
         price: 0,
@@ -145,6 +163,10 @@ export const PremiumProductsManagement = () => {
     }
   };
 
+  const handleEditProduct = (product: PremiumProduct) => {
+    setEditingProduct(product);
+  };
+
   return (
     <div className="space-y-8">
       <PremiumProductForm
@@ -155,7 +177,7 @@ export const PremiumProductsManagement = () => {
       />
       <PremiumProductList
         products={products}
-        onEdit={setEditingProduct}
+        onEdit={handleEditProduct}
         onDelete={deleteProduct}
       />
     </div>
