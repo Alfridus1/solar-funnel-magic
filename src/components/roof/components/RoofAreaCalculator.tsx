@@ -60,14 +60,15 @@ export const RoofAreaCalculator = ({ polygons }: RoofAreaCalculatorProps) => {
   }, [polygons]);
 
   const handleContinue = () => {
+    if (polygons.length === 0) return;
     navigate("/recommended-config", {
       state: {
         metrics: {
           roofArea: totalArea,
           kWp: solarPotential,
           monthlyProduction: Math.round((solarPotential * 1000) / 12),
-          annualSavings: Math.round(solarPotential * 1000 * 0.40), // 0.40€ pro kWh
-          possiblePanels: Math.floor(totalArea / 1.7), // 1.7m² pro Panel
+          annualSavings: Math.round(solarPotential * 1000 * 0.40),
+          possiblePanels: Math.floor(totalArea / 1.7),
           roofDetails: polygons.map((polygon, index) => ({
             roofId: `roof-${index + 1}`,
             moduleCount: Math.floor(google.maps.geometry.spherical.computeArea(polygon.getPath()) / 1.7)
@@ -86,6 +87,17 @@ export const RoofAreaCalculator = ({ polygons }: RoofAreaCalculatorProps) => {
       transition={{ duration: 0.5 }}
       className="mt-6 space-y-6"
     >
+      {/* Oberer Button */}
+      <div className="flex justify-center">
+        <Button 
+          onClick={handleContinue}
+          className="bg-solar-orange hover:bg-solar-orange-600 text-lg py-6 px-8 shadow-lg hover:shadow-xl transition-all duration-300 animate-pulse"
+        >
+          Jetzt Ihre Einsparungen erfahren
+          <ArrowRight className="ml-2 h-5 w-5" />
+        </Button>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="p-6 bg-gradient-to-br from-solar-blue-50 to-white">
           <div className="flex items-center space-x-4">
