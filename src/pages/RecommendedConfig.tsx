@@ -8,6 +8,7 @@ import { SystemMetrics } from "@/components/solar-showcase/components/SystemMetr
 import { SavingsCalculator } from "@/components/SavingsCalculator";
 import { Testimonials } from "@/components/Testimonials";
 import { FAQ } from "@/components/FAQ";
+import { Shield, Wrench, Clock, Package } from "lucide-react";
 
 export const RecommendedConfig = () => {
   const location = useLocation();
@@ -25,6 +26,7 @@ export const RecommendedConfig = () => {
   // Calculate values based on 500W modules
   const moduleCount = Math.round(metrics.kWp * 2); // Since each module is 0.5 kWp
   const annualProduction = Math.round(metrics.kWp * 950); // 950 kWh per kWp annually
+  const estimatedPrice = Math.round(metrics.kWp * 1950);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F75c03]/5 to-white">
@@ -65,6 +67,47 @@ export const RecommendedConfig = () => {
                 </div>
               </Card>
             </div>
+
+            <Card className="p-6 bg-gradient-to-br from-solar-orange/10 to-white">
+              <h3 className="text-2xl font-bold mb-6">Ihr All-Inclusive Angebot</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <Shield className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
+                    <div>
+                      <h4 className="font-semibold">Premium Komponenten</h4>
+                      <p className="text-gray-600">Hochwertige Module, Wechselrichter und ein 10 kWh Speicher für maximale Unabhängigkeit</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Wrench className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
+                    <div>
+                      <h4 className="font-semibold">Komplette Installation</h4>
+                      <p className="text-gray-600">Professionelle DC und AC Installation inklusive neuem Zählerschrank nach aktuellen Standards</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Clock className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
+                    <div>
+                      <h4 className="font-semibold">Schnelle Umsetzung</h4>
+                      <p className="text-gray-600">Von der Planung bis zur Inbetriebnahme - alles aus einer Hand</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Package className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
+                    <div>
+                      <h4 className="font-semibold">Rundum-Sorglos-Paket</h4>
+                      <p className="text-gray-600">Inklusive aller Genehmigungen, Anmeldungen und Dokumentation</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col justify-center p-6 bg-white rounded-lg shadow-lg">
+                  <p className="text-gray-600 mb-2">Unverbindliche Preisschätzung</p>
+                  <p className="text-3xl font-bold text-solar-orange mb-4">{estimatedPrice.toLocaleString()}€</p>
+                  <p className="text-sm text-gray-500">Komplett-Installation inkl. MwSt.</p>
+                </div>
+              </div>
+            </Card>
           </div>
         </Card>
 
