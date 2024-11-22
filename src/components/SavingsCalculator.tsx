@@ -82,7 +82,6 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
                 <span className="text-gray-600">20 Jahre Ersparnis</span>
               </div>
               <span className="text-2xl font-bold text-blue-600">{twentyYearSavings.toLocaleString()}€</span>
-              <p className="text-sm text-gray-500 mt-1">Bei gleichem Strompreis</p>
             </div>
           </div>
         </div>
