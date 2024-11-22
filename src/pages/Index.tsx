@@ -11,6 +11,8 @@ import { HeroSection } from "@/components/landing/HeroSection";
 import { FinalCTA } from "@/components/landing/FinalCTA";
 import { TrustIndicators } from "@/components/landing/TrustIndicators";
 import { useGeolocation } from "@/components/RoofCheck/hooks/useGeolocation";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const libraries = ["drawing", "places"];
 
@@ -19,6 +21,7 @@ export function Index() {
   const [showRoofCheck, setShowRoofCheck] = useState(false);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
@@ -93,21 +96,32 @@ export function Index() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-solar-blue to-white">
-      <div className="container mx-auto px-4 py-12">
-        <HeroSection
-          address={address}
-          setAddress={setAddress}
-          autocompleteRef={autocompleteRef}
-          onPlaceSelected={onPlaceSelected}
-          handleAddressSubmit={handleAddressSubmit}
-          handleGeolocation={handleGeolocation}
-        />
-        <TrustIndicators />
-        <Stats />
-        <Benefits />
-        <Testimonials />
-        <FAQ />
-        <FinalCTA handleAddressSubmit={handleAddressSubmit} />
+      <div className="container mx-auto px-4">
+        <div className="flex justify-end py-4">
+          <Button 
+            variant="outline"
+            onClick={() => navigate("/login")}
+            className="bg-white hover:bg-solar-orange hover:text-white transition-colors"
+          >
+            Login
+          </Button>
+        </div>
+        <div className="py-12">
+          <HeroSection
+            address={address}
+            setAddress={setAddress}
+            autocompleteRef={autocompleteRef}
+            onPlaceSelected={onPlaceSelected}
+            handleAddressSubmit={handleAddressSubmit}
+            handleGeolocation={handleGeolocation}
+          />
+          <TrustIndicators />
+          <Stats />
+          <Benefits />
+          <Testimonials />
+          <FAQ />
+          <FinalCTA handleAddressSubmit={handleAddressSubmit} />
+        </div>
       </div>
     </div>
   );

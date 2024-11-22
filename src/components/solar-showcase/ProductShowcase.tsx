@@ -7,14 +7,18 @@ import { SystemMetrics } from "@/components/solar-showcase/components/SystemMetr
 import { SavingsCalculator } from "@/components/SavingsCalculator";
 import { Testimonials } from "@/components/Testimonials";
 import { FAQ } from "@/components/FAQ";
-import { Shield, Wrench, Clock, Package } from "lucide-react";
+import { Shield, Wrench, Clock, Package, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { SolarOfferPDF } from "../pdf/SolarOfferPDF";
+import { useToast } from "@/components/ui/use-toast";
 
 export const ProductShowcase = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [showLeadForm, setShowLeadForm] = useState(false);
   const [formType, setFormType] = useState<"quote" | "consultation" | null>(null);
+  const { toast } = useToast();
   
   const { metrics, address } = location.state || {};
 
@@ -78,6 +82,35 @@ export const ProductShowcase = () => {
       <div className="container mx-auto px-4 py-8">
         <Card className="max-w-4xl mx-auto mb-8 p-8 bg-white/90 backdrop-blur shadow-lg">
           <div className="space-y-8">
+            <div className="flex justify-between items-center">
+              <h1 className="text-2xl font-bold">Ihre Solar-Analyse</h1>
+              <PDFDownloadLink
+                document={
+                  <SolarOfferPDF
+                    metrics={metrics}
+                    address={address}
+                  />
+                }
+                fileName="solar-angebot.pdf"
+              >
+                {({ loading }) => (
+                  <Button
+                    className="bg-solar-orange hover:bg-solar-orange-dark"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      "Wird geladen..."
+                    ) : (
+                      <>
+                        <Download className="w-4 h-4 mr-2" />
+                        Angebot als PDF
+                      </>
+                    )}
+                  </Button>
+                )}
+              </PDFDownloadLink>
+            </div>
+
             <SystemMetrics
               moduleCount={moduleCount}
               kWp={metrics.kWp}
