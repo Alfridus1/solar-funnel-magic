@@ -10,14 +10,28 @@ interface SavingsCalculatorProps {
 
 export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) => {
   const [electricityPrice, setElectricityPrice] = useState(0.40);
-  const YEARLY_CONSUMPTION = 4000; // 4000 kWh Jahresverbrauch
+  const [yearlyConsumption, setYearlyConsumption] = useState(4000);
   const SELF_CONSUMPTION_RATE = 0.90; // 90% Eigenverbrauch
   const FEED_IN_RATE = 0.09; // 9 Cent Einspeisevergütung
   const SYSTEM_COST_PER_KWP = 1950; // Durchschnittlicher Anlagenpreis pro kWp
   
-  // Berechne Eigenverbrauch (maximal 90% des Jahresverbrauchs)
-  const selfConsumedEnergy = Math.min(yearlyProduction * SELF_CONSUMPTION_RATE, YEARLY_CONSUMPTION * 0.90);
-  // Rest wird eingespeist
+  // Calculate system size in kWp (assuming 950kWh/kWp yearly production)
+  const systemKWp = yearlyProduction / 950;
+  
+  // Determine battery size based on system size
+  const getBatterySize = () => {
+    if (systemKWp >= 18) return 20;
+    if (systemKWp >= 12.5) return 15;
+    return 10;
+  };
+  
+  const batterySize = getBatterySize();
+  const batteryContribution = Math.min(batterySize * 0.8, (yearlyConsumption / 365) * 0.5) * 365;
+  
+  // Calculate self-consumption and feed-in
+  const maxSelfConsumption = yearlyConsumption * SELF_CONSUMPTION_RATE;
+  const potentialSelfConsumption = yearlyProduction * 0.3 + batteryContribution; // 30% direct use + battery
+  const selfConsumedEnergy = Math.min(maxSelfConsumption, potentialSelfConsumption);
   const feedInEnergy = yearlyProduction - selfConsumedEnergy;
   
   const yearlySavingsSelfConsumption = Math.round(selfConsumedEnergy * electricityPrice);
@@ -25,8 +39,7 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
   const totalYearlySavings = yearlySavingsSelfConsumption + yearlySavingsFeedIn;
   const monthlySavings = Math.round(totalYearlySavings / 12);
   
-  // Berechne System Kosten (basierend auf kWp)
-  const systemKWp = yearlyProduction / 950; // Typischer Ertrag pro kWp in Deutschland
+  // Calculate system costs (based on kWp)
   const estimatedSystemCost = Math.round(systemKWp * SYSTEM_COST_PER_KWP);
   
   // ROI in Jahren
@@ -47,6 +60,22 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
         </div>
         
         <div className="space-y-6">
+          <div className="space-y-4">
+            <div className="flex justify-between">
+              <Label htmlFor="consumption">Jahresverbrauch</Label>
+              <span className="font-medium text-solar-orange">{yearlyConsumption.toLocaleString()} kWh</span>
+            </div>
+            <Slider
+              id="consumption"
+              min={2000}
+              max={15000}
+              step={100}
+              value={[yearlyConsumption]}
+              onValueChange={(value) => setYearlyConsumption(value[0])}
+              className="w-full"
+            />
+          </div>
+
           <div className="space-y-4">
             <div className="flex justify-between">
               <Label htmlFor="electricity-price">Strompreis</Label>
@@ -75,6 +104,7 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
               <div className="mt-2 text-sm text-gray-500">
                 <div>Eigenverbrauch: {Math.round(selfConsumedEnergy)} kWh</div>
                 <div>Einspeisung: {Math.round(feedInEnergy)} kWh</div>
+                <div>Speichergröße: {batterySize} kWh</div>
               </div>
             </div>
 
