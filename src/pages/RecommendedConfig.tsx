@@ -28,7 +28,6 @@ export const RecommendedConfig = () => {
   const moduleCount = Math.round(metrics.kWp * 2);
   const annualProduction = Math.round(metrics.kWp * 950);
   const estimatedPrice = Math.round(metrics.kWp * 1950);
-  const co2Savings = Math.round(annualProduction * 0.366); // kg CO2 per kWh
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-solar-blue-50 to-white">
@@ -53,7 +52,7 @@ export const RecommendedConfig = () => {
           <div className="space-y-12">
             <div className="text-center max-w-3xl mx-auto">
               <h2 className="text-3xl font-bold mb-6">Ihr Beitrag zum Klimaschutz</h2>
-              <ClimateEffects co2Savings={co2Savings} annualProduction={annualProduction} />
+              <ClimateEffects annualProduction={annualProduction} />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
