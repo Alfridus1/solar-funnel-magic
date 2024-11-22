@@ -70,7 +70,8 @@ export const UserManagement = () => {
     await supabase.auth.signOut();
     
     // Admin Access Token verwenden (muss in der Supabase-Konfiguration eingerichtet sein)
-    const { data: { session }, error } = await supabase.auth.admin.signInWithEmail({
+    const { data, error } = await supabase.auth.admin.generateLink({
+      type: 'magiclink',
       email: profile.email,
     });
 
@@ -83,7 +84,7 @@ export const UserManagement = () => {
       return;
     }
 
-    if (session) {
+    if (data) {
       toast({
         title: "Erfolgreich eingeloggt",
         description: `Sie sind jetzt als ${profile.first_name} ${profile.last_name} eingeloggt.`,
