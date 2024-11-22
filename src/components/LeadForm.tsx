@@ -6,9 +6,12 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface LeadFormProps {
   formType?: "quote" | "consultation";
+  onSuccess?: () => void;
+  metrics?: any;
+  address?: string;
 }
 
-export const LeadForm = ({ formType = "quote" }: LeadFormProps) => {
+export const LeadForm = ({ formType = "quote", onSuccess, metrics, address }: LeadFormProps) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -28,7 +31,9 @@ export const LeadForm = ({ formType = "quote" }: LeadFormProps) => {
           ...formData,
           type: formType,
           source: window.location.href,
-          status: 'new'
+          status: 'new',
+          metrics: metrics || null,
+          address: address || null
         }]);
 
       if (error) throw error;
@@ -47,7 +52,12 @@ export const LeadForm = ({ formType = "quote" }: LeadFormProps) => {
         email: "",
         phone: "",
       });
+
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (error: any) {
+      console.error('Error submitting lead:', error);
       toast({
         title: "Ein Fehler ist aufgetreten",
         description: "Bitte versuchen Sie es später erneut.",

@@ -72,11 +72,23 @@ export const ProductShowcase = () => {
     setShowLeadForm(true);
   };
 
+  const handleCloseForm = () => {
+    setShowLeadForm(false);
+    setFormType(null);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F75c03]/5 to-white">
       <div className="relative">
         <HeroImage />
-        {showLeadForm && <LeadFormOverlay formType={formType} />}
+        {showLeadForm && (
+          <LeadFormOverlay 
+            formType={formType} 
+            metrics={metrics} 
+            address={address}
+            onClose={handleCloseForm}
+          />
+        )}
       </div>
 
       <div className="container mx-auto px-4 py-8">
