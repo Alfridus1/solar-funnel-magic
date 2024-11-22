@@ -58,11 +58,14 @@ export const RecommendedConfig = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
               <div className="space-y-6">
                 <h3 className="text-2xl font-bold">Potentialanalyse</h3>
-                <div className="bg-gradient-to-br from-white via-solar-blue-50/50 to-solar-blue-100/30 rounded-xl p-6 shadow-lg backdrop-blur-sm border border-white/50 relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-solar-orange/5 via-solar-blue-50/10 to-white/20 pointer-events-none" />
-                  <div className="relative z-10">
+                <div className="group bg-gradient-to-br from-white via-solar-blue-50/50 to-solar-blue-100/30 rounded-xl p-8 shadow-xl backdrop-blur-sm border border-white/50 relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
+                  <div className="absolute inset-0 bg-gradient-to-tr from-solar-orange/10 via-solar-blue-100/20 to-white/30 opacity-75 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10 group-hover:opacity-20 transition-opacity duration-300" />
+                  <div className="relative z-10 backdrop-blur-[2px]">
                     <SavingsCalculator yearlyProduction={annualProduction} />
                   </div>
+                  <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-solar-orange/10 rounded-full blur-3xl group-hover:blur-2xl transition-all duration-300" />
+                  <div className="absolute -top-20 -left-20 w-40 h-40 bg-solar-blue/20 rounded-full blur-3xl group-hover:blur-2xl transition-all duration-300" />
                 </div>
               </div>
 
