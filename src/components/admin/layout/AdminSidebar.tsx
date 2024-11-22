@@ -6,8 +6,12 @@ import {
   Package, 
   Crown, 
   Settings,
-  MessageSquare
+  MessageSquare,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 const menuItems = [
   { 
@@ -45,14 +49,35 @@ const menuItems = [
 export const AdminSidebar = () => {
   const location = useLocation();
   const currentTab = location.hash.replace("#", "") || "overview";
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <div className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+    <div className={cn(
+      "relative bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300",
+      isCollapsed ? "w-20" : "w-64"
+    )}>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute -right-3 top-6 h-6 w-6 rounded-full border shadow-md"
+        onClick={() => setIsCollapsed(!isCollapsed)}
+      >
+        {isCollapsed ? (
+          <ChevronRight className="h-4 w-4" />
+        ) : (
+          <ChevronLeft className="h-4 w-4" />
+        )}
+      </Button>
+
       <div className="p-6">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-          Admin
+        <h2 className={cn(
+          "text-2xl font-bold text-gray-800 dark:text-white transition-all duration-300",
+          isCollapsed && "text-center text-xl"
+        )}>
+          {isCollapsed ? "A" : "Admin"}
         </h2>
       </div>
+
       <nav className="space-y-1 px-3">
         {menuItems.map((item) => {
           const Icon = item.icon;
@@ -68,7 +93,12 @@ export const AdminSidebar = () => {
               )}
             >
               <Icon className="h-5 w-5 mr-3" />
-              {item.label}
+              <span className={cn(
+                "transition-all duration-300",
+                isCollapsed && "hidden"
+              )}>
+                {item.label}
+              </span>
             </Link>
           );
         })}
