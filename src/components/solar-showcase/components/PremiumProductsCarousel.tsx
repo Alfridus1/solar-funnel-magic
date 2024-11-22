@@ -82,9 +82,6 @@ export const PremiumProductsCarousel = () => {
 
   return (
     <section className="py-12">
-      <h2 className="text-3xl font-bold text-center mb-8">
-        Unsere Premium Produkte für Sie
-      </h2>
       <Carousel className="w-full max-w-5xl mx-auto">
         <CarouselContent>
           {products.map((product) => (
