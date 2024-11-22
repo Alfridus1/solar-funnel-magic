@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Plus, X } from "lucide-react";
+import { Loader2, Plus, X, Pencil } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 interface PremiumProduct {
@@ -29,8 +29,9 @@ interface ProductFormData {
 export const PremiumProductsManagement = () => {
   const [products, setProducts] = useState<PremiumProduct[]>([]);
   const [loading, setLoading] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<PremiumProduct | null>(null);
   const { toast } = useToast();
-  const { register, handleSubmit, reset } = useForm<ProductFormData>();
+  const { register, handleSubmit, reset, setValue } = useForm<ProductFormData>();
 
   const loadProducts = async () => {
     const { data, error } = await supabase
@@ -54,17 +55,34 @@ export const PremiumProductsManagement = () => {
     loadProducts();
   }, []);
 
+  useEffect(() => {
+    if (editingProduct) {
+      setValue("name", editingProduct.name);
+      setValue("description", editingProduct.description);
+      setValue("image_url", editingProduct.image_url);
+      setValue("climate_impact", editingProduct.climate_impact);
+      setValue("features", editingProduct.features.join('\n'));
+    }
+  }, [editingProduct, setValue]);
+
   const onSubmit = async (data: ProductFormData) => {
     setLoading(true);
     const features = data.features.split('\n').filter(f => f.trim());
     
-    const { error } = await supabase
-      .from('premium_products')
-      .insert([{
-        ...data,
-        features,
-        order_number: products.length + 1,
-      }]);
+    const operation = editingProduct 
+      ? supabase
+          .from('premium_products')
+          .update({ ...data, features })
+          .eq('id', editingProduct.id)
+      : supabase
+          .from('premium_products')
+          .insert([{
+            ...data,
+            features,
+            order_number: products.length + 1,
+          }]);
+
+    const { error } = await operation;
 
     if (error) {
       toast({
@@ -75,9 +93,12 @@ export const PremiumProductsManagement = () => {
     } else {
       toast({
         title: "Produkt gespeichert",
-        description: "Das Premium-Produkt wurde erfolgreich hinzugefügt.",
+        description: editingProduct 
+          ? "Das Premium-Produkt wurde erfolgreich aktualisiert."
+          : "Das Premium-Produkt wurde erfolgreich hinzugefügt.",
       });
       reset();
+      setEditingProduct(null);
       loadProducts();
     }
     setLoading(false);
@@ -104,10 +125,17 @@ export const PremiumProductsManagement = () => {
     }
   };
 
+  const cancelEdit = () => {
+    setEditingProduct(null);
+    reset();
+  };
+
   return (
     <div className="space-y-8">
       <Card className="p-6">
-        <h2 className="text-2xl font-bold mb-6">Premium-Produkte verwalten</h2>
+        <h2 className="text-2xl font-bold mb-6">
+          {editingProduct ? "Premium-Produkt bearbeiten" : "Premium-Produkte verwalten"}
+        </h2>
         
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
@@ -129,11 +157,27 @@ export const PremiumProductsManagement = () => {
               rows={4}
             />
           </div>
-          <Button type="submit" disabled={loading}>
-            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            <Plus className="mr-2 h-4 w-4" />
-            Produkt hinzufügen
-          </Button>
+          <div className="flex gap-2">
+            <Button type="submit" disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {editingProduct ? (
+                <>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Produkt aktualisieren
+                </>
+              ) : (
+                <>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Produkt hinzufügen
+                </>
+              )}
+            </Button>
+            {editingProduct && (
+              <Button type="button" variant="outline" onClick={cancelEdit}>
+                Abbrechen
+              </Button>
+            )}
+          </div>
         </form>
       </Card>
 
@@ -142,13 +186,22 @@ export const PremiumProductsManagement = () => {
           <Card key={product.id} className="p-4">
             <div className="flex justify-between items-start mb-4">
               <h3 className="font-semibold">{product.name}</h3>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => deleteProduct(product.id)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setEditingProduct(product)}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => deleteProduct(product.id)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
             <img 
               src={product.image_url} 
