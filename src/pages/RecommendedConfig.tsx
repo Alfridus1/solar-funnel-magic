@@ -95,6 +95,19 @@ export const RecommendedConfig = () => {
                         <p className="text-gray-600">Inklusive aller Genehmigungen, Anmeldungen und Dokumentation</p>
                       </div>
                     </div>
+                    <div className="mt-8 p-6 bg-white rounded-xl shadow-lg">
+                      <p className="text-4xl font-bold text-solar-orange mb-2">{estimatedPrice.toLocaleString()}€</p>
+                      <p className="text-sm text-gray-500 mb-4">Komplett-Installation inkl. MwSt.</p>
+                      <Button 
+                        className="w-full bg-solar-orange hover:bg-solar-orange-dark text-lg py-6"
+                        onClick={() => {
+                          setFormType("quote");
+                          setShowLeadForm(true);
+                        }}
+                      >
+                        Vor-Ort Termin vereinbaren
+                      </Button>
+                    </div>
                   </div>
                 </Card>
               </div>
@@ -121,23 +134,6 @@ export const RecommendedConfig = () => {
         <div className="max-w-4xl mx-auto space-y-16">
           <Testimonials />
           <FAQ />
-        </div>
-      </div>
-
-      {/* Price and CTA section moved outside the container */}
-      <div className="w-full max-w-xl mx-auto px-4 -mt-8 mb-16">
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <p className="text-4xl font-bold text-solar-orange mb-2">{estimatedPrice.toLocaleString()}€</p>
-          <p className="text-sm text-gray-500 mb-4">Komplett-Installation inkl. MwSt.</p>
-          <Button 
-            className="w-full bg-solar-orange hover:bg-solar-orange-dark text-lg py-6"
-            onClick={() => {
-              setFormType("quote");
-              setShowLeadForm(true);
-            }}
-          >
-            Vor-Ort Termin vereinbaren
-          </Button>
         </div>
       </div>
     </div>
