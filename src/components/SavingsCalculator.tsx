@@ -72,7 +72,6 @@ export const SavingsCalculator = ({ yearlyProduction }: { yearlyProduction: numb
         </div>
       </div>
 
-      <div>
         <div className="flex items-center gap-2 sm:gap-3 mb-4">
           <Calculator className="h-5 w-5 sm:h-6 sm:w-6 text-solar-blue" />
           <h3 className="text-lg sm:text-xl font-semibold">Unverbindliches Angebot</h3>
@@ -107,7 +106,6 @@ export const SavingsCalculator = ({ yearlyProduction }: { yearlyProduction: numb
             </Button>
           </div>
         </div>
-      </div>
     </div>
   );
 };
