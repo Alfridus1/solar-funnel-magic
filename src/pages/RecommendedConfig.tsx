@@ -48,7 +48,7 @@ export const RecommendedConfig = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-solar-blue-50 to-white">
+    <div className="min-h-screen bg-solar-blue-50">
       <div className="relative">
         <HeroImage />
         {showLeadForm && (
@@ -58,7 +58,7 @@ export const RecommendedConfig = () => {
 
       <div className="container mx-auto px-4 py-12">
         <Card className="max-w-7xl mx-auto mb-12 p-8 bg-white/95 backdrop-blur shadow-lg rounded-xl">
-          <div className="mb-8 -mx-8 -mt-8 p-8 bg-gradient-to-br from-solar-orange/5 to-white rounded-t-xl">
+          <div className="mb-8 -mx-8 -mt-8 p-8 bg-gradient-to-br from-solar-orange/5 to-transparent rounded-t-xl">
             <SystemMetrics
               moduleCount={moduleCount}
               kWp={metrics.kWp}
@@ -71,8 +71,8 @@ export const RecommendedConfig = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
               <div className="space-y-6">
                 <h3 className="text-2xl font-bold">Potentialanalyse</h3>
-                <div className="group bg-gradient-to-br from-white via-solar-blue-50/50 to-solar-blue-100/30 rounded-xl p-8 shadow-xl backdrop-blur-sm border border-white/50 relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-solar-orange/10 via-solar-blue-100/20 to-white/30 opacity-75 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="group bg-gradient-to-br from-solar-blue-50/50 to-solar-blue-100/30 rounded-xl p-8 shadow-xl backdrop-blur-sm border border-white/50 relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
+                  <div className="absolute inset-0 bg-gradient-to-tr from-solar-orange/10 via-solar-blue-100/20 to-transparent opacity-75 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10 group-hover:opacity-20 transition-opacity duration-300" />
                   <div className="relative z-10 backdrop-blur-[2px]">
                     <SavingsCalculator yearlyProduction={annualProduction} />
@@ -93,7 +93,7 @@ export const RecommendedConfig = () => {
           </div>
         </Card>
 
-        <div className="max-w-7xl mx-auto mb-16 overflow-hidden">
+        <div className="max-w-7xl mx-auto mb-16">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-solar-orange to-solar-orange-dark bg-clip-text text-transparent">
               Unsere Premium Komponenten
@@ -103,10 +103,7 @@ export const RecommendedConfig = () => {
             </p>
           </div>
           
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-white via-transparent to-white z-10 pointer-events-none" />
-            <PremiumProductsCarousel />
-          </div>
+          <PremiumProductsCarousel />
 
           <PricingOptions
             estimatedPrice={estimatedPrice}
