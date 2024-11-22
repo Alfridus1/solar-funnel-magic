@@ -1,26 +1,19 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import { Index } from "@/pages/Index";
-import { RecommendedConfig } from "@/pages/RecommendedConfig";
-import { Debug } from "@/pages/Debug";
-import { AdminDashboard } from "@/pages/admin/Dashboard";
-import { Login } from "@/pages/Login";
-import { AffiliateLanding } from "@/pages/AffiliateLanding";
-import { Toaster } from "@/components/ui/toaster";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Index from "./pages/index";
+import AffiliateLanding from "./pages/affiliate";
+import AdminDashboard from "./components/admin/AdminDashboard";
+import { CustomerDashboard } from "./components/dashboard/CustomerDashboard";
 
 function App() {
   return (
-    <>
+    <BrowserRouter>
       <Routes>
         <Route path="/" element={<Index />} />
-        <Route path="/recommended-config" element={<RecommendedConfig />} />
-        <Route path="/debug" element={<Debug />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/login" element={<Login />} />
         <Route path="/affiliate" element={<AffiliateLanding />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/dashboard" element={<CustomerDashboard />} />
+        <Route path="/admin/*" element={<AdminDashboard />} />
       </Routes>
-      <Toaster />
-    </>
+    </BrowserRouter>
   );
 }
 
