@@ -40,16 +40,16 @@ export const RecommendedConfig = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <SystemMetrics
-            moduleCount={moduleCount}
-            kWp={metrics.kWp}
-            annualProduction={annualProduction}
-            roofArea={metrics.roofArea}
-          />
-        </div>
-
         <Card className="max-w-5xl mx-auto mb-8 p-8 bg-white/90 backdrop-blur shadow-lg">
+          <div className="mb-8 -mx-8 -mt-8 p-8 bg-gradient-to-br from-solar-orange/5 to-white">
+            <SystemMetrics
+              moduleCount={moduleCount}
+              kWp={metrics.kWp}
+              annualProduction={annualProduction}
+              roofArea={metrics.roofArea}
+            />
+          </div>
+
           <div className="space-y-8">
             <div className="text-center">
               <h2 className="text-3xl font-bold mb-4">Ihr Beitrag zum Klimaschutz</h2>
