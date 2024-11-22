@@ -3,6 +3,7 @@ import { Users, MessageSquare, Package, Crown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { LeadSourceChart } from "./LeadSourceChart";
 
 const StatCard = ({ label, value, icon: Icon, change, isLoading }: {
   label: string;
@@ -114,6 +115,8 @@ export const Overview = () => {
           />
         ))}
       </div>
+
+      <LeadSourceChart />
     </div>
   );
 };
