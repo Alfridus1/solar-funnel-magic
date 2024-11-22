@@ -7,7 +7,7 @@ import './index.css'
 const queryClient = new QueryClient()
 
 createRoot(document.getElementById("root")!).render(
-  <BrowserRouter basename="/">
+  <BrowserRouter>
     <QueryClientProvider client={queryClient}>
       <App />
     </QueryClientProvider>
