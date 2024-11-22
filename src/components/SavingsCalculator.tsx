@@ -45,7 +45,7 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
   // ROI in Jahren
   const roiYears = Math.round((estimatedSystemCost / totalYearlySavings) * 10) / 10;
   
-  const twentyYearSavings = totalYearlySavings * 20;
+  const thirtyYearSavings = totalYearlySavings * 30;
 
   return (
     <div className="space-y-6">
@@ -139,9 +139,9 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
                 <div className="p-2 bg-blue-100 rounded-lg">
                   <Home className="h-5 w-5 text-blue-600" />
                 </div>
-                <span className="text-gray-600">20 Jahre Ersparnis</span>
+                <span className="text-gray-600">30 Jahre Ersparnis (HJT 3.0)</span>
               </div>
-              <span className="text-2xl font-bold text-blue-600">{twentyYearSavings.toLocaleString()}€</span>
+              <span className="text-2xl font-bold text-blue-600">{thirtyYearSavings.toLocaleString()}€</span>
             </div>
           </div>
         </div>
