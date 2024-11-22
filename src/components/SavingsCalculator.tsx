@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Sun, Battery, Leaf, Euro, Home, TrendingUp } from "lucide-react";
+import { Sun, Battery, Euro, Home, TrendingUp } from "lucide-react";
 
 interface SavingsCalculatorProps {
   yearlyProduction: number;
@@ -10,12 +10,15 @@ interface SavingsCalculatorProps {
 
 export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) => {
   const [electricityPrice, setElectricityPrice] = useState(0.40);
-  const SELF_CONSUMPTION_RATE = 0.80; // 80% Eigenverbrauch
+  const YEARLY_CONSUMPTION = 4000; // 4000 kWh Jahresverbrauch
+  const SELF_CONSUMPTION_RATE = 0.90; // 90% Eigenverbrauch
   const FEED_IN_RATE = 0.09; // 9 Cent Einspeisevergütung
   const SYSTEM_COST_PER_KWP = 1950; // Durchschnittlicher Anlagenpreis pro kWp
   
-  const selfConsumedEnergy = yearlyProduction * SELF_CONSUMPTION_RATE;
-  const feedInEnergy = yearlyProduction * (1 - SELF_CONSUMPTION_RATE);
+  // Berechne Eigenverbrauch (maximal 90% des Jahresverbrauchs)
+  const selfConsumedEnergy = Math.min(yearlyProduction * SELF_CONSUMPTION_RATE, YEARLY_CONSUMPTION * 0.90);
+  // Rest wird eingespeist
+  const feedInEnergy = yearlyProduction - selfConsumedEnergy;
   
   const yearlySavingsSelfConsumption = Math.round(selfConsumedEnergy * electricityPrice);
   const yearlySavingsFeedIn = Math.round(feedInEnergy * FEED_IN_RATE);
@@ -29,9 +32,8 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
   // ROI in Jahren
   const roiYears = Math.round((estimatedSystemCost / totalYearlySavings) * 10) / 10;
   
-  // Calculate additional metrics
+  // Calculate CO2 savings
   const co2Savings = Math.round(yearlyProduction * 0.366); // 366g CO2 per kWh
-  const treesEquivalent = Math.round(co2Savings / 21000); // Average tree absorbs 21kg CO2 per year
   const twentyYearSavings = totalYearlySavings * 20;
 
   return (
@@ -114,7 +116,6 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
               <span className="text-2xl font-bold text-blue-600">{twentyYearSavings.toLocaleString()}€</span>
               <div className="mt-2 text-sm text-gray-500">
                 <div>CO₂-Einsparung: {co2Savings} kg/Jahr</div>
-                <div>≈ {treesEquivalent} Bäume/Jahr</div>
               </div>
             </div>
           </div>
