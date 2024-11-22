@@ -5,6 +5,7 @@ export interface PremiumProduct {
   image_url: string;
   features: string[];
   climate_impact: string;
+  order_number: number;
   purchase_options: {
     price: number;
     financing: {

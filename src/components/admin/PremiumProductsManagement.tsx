@@ -1,47 +1,9 @@
 import { useState, useEffect } from "react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { X, Pencil } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { PremiumProductForm } from "./product/PremiumProductForm";
 import { PremiumProductList } from "./product/PremiumProductList";
-
-interface PremiumProduct {
-  id: string;
-  name: string;
-  description: string;
-  image_url: string;
-  features: string[];
-  climate_impact: string;
-  order_number: number;
-  purchase_options: {
-    price: number;
-    financing: {
-      available: boolean;
-      min_rate: number;
-      max_term: number;
-    };
-  };
-}
-
-interface SupabaseProduct {
-  id: string;
-  name: string;
-  description: string;
-  image_url: string;
-  features: string[];
-  climate_impact: string;
-  order_number: number;
-  purchase_options?: {
-    price: number;
-    financing: {
-      available: boolean;
-      min_rate: number;
-      max_term: number;
-    };
-  };
-}
+import { PremiumProduct } from "./product/types";
 
 export const PremiumProductsManagement = () => {
   const [products, setProducts] = useState<PremiumProduct[]>([]);
@@ -65,7 +27,7 @@ export const PremiumProductsManagement = () => {
     }
 
     // Transform the data to ensure it matches our PremiumProduct interface
-    const transformedData: PremiumProduct[] = (data as SupabaseProduct[]).map(item => ({
+    const transformedData: PremiumProduct[] = (data as any[]).map(item => ({
       ...item,
       purchase_options: item.purchase_options || {
         price: 0,
