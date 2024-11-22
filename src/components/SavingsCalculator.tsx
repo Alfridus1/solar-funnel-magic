@@ -8,7 +8,7 @@ export const SavingsCalculator = ({ yearlyProduction }: { yearlyProduction: numb
   const yearlySavings = yearlyProduction * electricityPrice;
   
   // Calculate 25 year savings with 4.5% annual price increase
-  const twentyFiveYearSavings = Array.from({ length: 25 }).reduce((total, _, index) => {
+  const twentyFiveYearSavings = Array.from({ length: 25 }).reduce<number>((total, _, index) => {
     const priceWithIncrease = electricityPrice * Math.pow(1.045, index);
     return total + (yearlyProduction * priceWithIncrease);
   }, 0);
