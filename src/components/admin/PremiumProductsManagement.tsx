@@ -26,7 +26,15 @@ export const PremiumProductsManagement = () => {
       return;
     }
 
-    setProducts(data || []);
+    // Transform the data to ensure it matches the PremiumProduct type
+    const transformedData: PremiumProduct[] = data?.map(item => ({
+      ...item,
+      purchase_options: typeof item.purchase_options === 'string' 
+        ? JSON.parse(item.purchase_options)
+        : item.purchase_options
+    })) || [];
+
+    setProducts(transformedData);
   };
 
   useEffect(() => {
