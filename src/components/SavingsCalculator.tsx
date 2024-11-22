@@ -23,13 +23,13 @@ export const SavingsCalculator = ({ yearlyProduction }: { yearlyProduction: numb
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <Card className="p-4 sm:p-6 bg-gradient-to-br from-solar-orange-50 to-white/80 backdrop-blur">
-        <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 sm:gap-3 mb-4">
           <Calculator className="h-5 w-5 sm:h-6 sm:w-6 text-solar-orange" />
           <h3 className="text-lg sm:text-xl font-semibold">Ihre Potentialanalyse</h3>
         </div>
         
-        <div className="space-y-3 sm:space-y-4">
+        <div className="space-y-3">
           <div className="flex justify-between items-center p-2 sm:p-3 bg-white/50 rounded-lg text-sm sm:text-base">
             <span>Jährliche Produktion:</span>
             <div className="text-right">
@@ -70,10 +70,10 @@ export const SavingsCalculator = ({ yearlyProduction }: { yearlyProduction: numb
             </span>
           </div>
         </div>
-      </Card>
+      </div>
 
-      <Card className="p-4 sm:p-6 bg-gradient-to-br from-solar-blue-50 to-white/80 backdrop-blur">
-        <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 sm:gap-3 mb-4">
           <Calculator className="h-5 w-5 sm:h-6 sm:w-6 text-solar-blue" />
           <h3 className="text-lg sm:text-xl font-semibold">Unverbindliches Angebot</h3>
         </div>
@@ -107,7 +107,7 @@ export const SavingsCalculator = ({ yearlyProduction }: { yearlyProduction: numb
             </Button>
           </div>
         </div>
-      </Card>
+      </div>
     </div>
   );
 };
