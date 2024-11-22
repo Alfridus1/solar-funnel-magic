@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, Folder, Users, Wallet } from "lucide-react";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
+import { CustomerLayout } from "./layout/CustomerLayout";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface DashboardData {
   leads: any[];
@@ -21,6 +23,15 @@ export function CustomerDashboard() {
     affiliateData: null
   });
   const { toast } = useToast();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const currentTab = location.hash.replace("#", "") || "solar";
+
+  useEffect(() => {
+    if (!location.hash) {
+      navigate("#solar", { replace: true });
+    }
+  }, [location, navigate]);
 
   useEffect(() => {
     loadDashboardData();
@@ -35,7 +46,7 @@ export function CustomerDashboard() {
       const { data: leadsData, error: leadsError } = await supabase
         .from('leads')
         .select('*')
-        .eq('email', userData.user.email)
+        .eq('user_id', userData.user.id)
         .order('created_at', { ascending: false });
 
       if (leadsError) throw leadsError;
@@ -85,12 +96,35 @@ export function CustomerDashboard() {
     }
   };
 
+  const renderContent = () => {
+    switch (currentTab) {
+      case "solar":
+        return <SolarSystemOverview data={data} />;
+      case "documents":
+        return <DocumentsOverview data={data} />;
+      case "affiliates":
+        return <AffiliatesOverview data={data} />;
+      case "wallet":
+        return <WalletOverview data={data} />;
+      case "settings":
+        return <SettingsOverview />;
+      default:
+        return <SolarSystemOverview data={data} />;
+    }
+  };
+
   return (
-    <div className="container mx-auto py-8 px-4 max-w-7xl">
-      <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {/* Requests Card */}
+    <CustomerLayout>
+      {renderContent()}
+    </CustomerLayout>
+  );
+}
+
+// Komponenten für die verschiedenen Tabs
+const SolarSystemOverview = ({ data }: { data: DashboardData }) => (
+  <div className="space-y-6">
+    <h1 className="text-3xl font-bold">Meine Solaranlage</h1>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="bg-white hover:shadow-lg transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">Anfragen</CardTitle>
@@ -155,36 +189,74 @@ export function CustomerDashboard() {
             </p>
           </CardContent>
         </Card>
-      </div>
-
-      {/* Recent Requests */}
-      <Card className="bg-white">
-        <CardHeader>
-          <CardTitle>Letzte Anfragen</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {data.leads.slice(0, 5).map((lead) => (
-              <div key={lead.id} className="flex items-center justify-between border-b pb-4 last:border-0">
-                <div>
-                  <p className="font-medium">{lead.type === 'quote' ? 'Angebot' : 'Beratung'}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {format(new Date(lead.created_at), 'dd. MMMM yyyy', {locale: de})}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium">{lead.status === 'new' ? 'Neu' : 'In Bearbeitung'}</p>
-                </div>
-              </div>
-            ))}
-            {data.leads.length === 0 && (
-              <p className="text-muted-foreground text-center py-4">
-                Keine Anfragen vorhanden
-              </p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
     </div>
-  );
-}
+  </div>
+);
+
+const DocumentsOverview = ({ data }: { data: DashboardData }) => (
+  <div className="space-y-6">
+    <h1 className="text-3xl font-bold">Dokumente</h1>
+    <Card>
+      <CardHeader>
+        <CardTitle>Ihre Dokumente</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-muted-foreground">Noch keine Dokumente vorhanden</p>
+      </CardContent>
+    </Card>
+  </div>
+);
+
+const AffiliatesOverview = ({ data }: { data: DashboardData }) => (
+  <div className="space-y-6">
+    <h1 className="text-3xl font-bold">Meine Affiliates</h1>
+    <Card>
+      <CardHeader>
+        <CardTitle>Affiliate Übersicht</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {data.affiliateData ? (
+          <div className="space-y-4">
+            <p>Empfehlungen: {data.affiliateData.referralCount}</p>
+            <p>Generierte Anfragen: {data.affiliateData.totalLeads}</p>
+          </div>
+        ) : (
+          <p className="text-muted-foreground">Werden Sie jetzt Affiliate Partner</p>
+        )}
+      </CardContent>
+    </Card>
+  </div>
+);
+
+const WalletOverview = ({ data }: { data: DashboardData }) => (
+  <div className="space-y-6">
+    <h1 className="text-3xl font-bold">Wallet</h1>
+    <Card>
+      <CardHeader>
+        <CardTitle>Ihr Guthaben</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="text-3xl font-bold">
+          {data.affiliateData ? 
+            `${data.affiliateData.earnings.toLocaleString('de-DE')} €` : 
+            '0 €'}
+        </div>
+        <p className="text-muted-foreground">Verfügbares Guthaben</p>
+      </CardContent>
+    </Card>
+  </div>
+);
+
+const SettingsOverview = () => (
+  <div className="space-y-6">
+    <h1 className="text-3xl font-bold">Einstellungen</h1>
+    <Card>
+      <CardHeader>
+        <CardTitle>Ihre Einstellungen</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-muted-foreground">Einstellungen werden hier angezeigt</p>
+      </CardContent>
+    </Card>
+  </div>
+);
