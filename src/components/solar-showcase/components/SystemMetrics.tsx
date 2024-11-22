@@ -11,6 +11,7 @@ interface SystemMetricsProps {
 export const SystemMetrics = ({ moduleCount, kWp, annualProduction, roofArea }: SystemMetricsProps) => {
   // Berechne kWp direkt aus der Modulanzahl (jedes Modul = 0,5 kWp)
   const calculatedKWp = moduleCount * 0.5;
+  const co2Savings = Math.round(annualProduction * 0.69); // 690g = 0.69kg CO₂-Äquivalente pro kWh
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -47,7 +48,7 @@ export const SystemMetrics = ({ moduleCount, kWp, annualProduction, roofArea }: 
           <span className="text-sm font-medium">Jahresertrag</span>
         </div>
         <p className="text-2xl font-bold">{annualProduction} kWh</p>
-        <p className="text-sm text-gray-600">pro Jahr</p>
+        <p className="text-sm text-gray-600">{co2Savings} kg CO₂-Äquivalente/Jahr</p>
       </Card>
     </div>
   );
