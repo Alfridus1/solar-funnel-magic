@@ -23,7 +23,14 @@ export const ProductOverview = () => {
       return;
     }
 
-    setProducts(data || []);
+    // Transform the data to match our Product type
+    const transformedData = data.map(item => ({
+      ...item,
+      category: item.category as 'module' | 'inverter' | 'battery',
+      specs: item.specs || {}
+    }));
+
+    setProducts(transformedData);
   };
 
   const defaultProducts = [

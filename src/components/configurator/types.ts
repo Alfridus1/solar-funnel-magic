@@ -11,6 +11,7 @@ export interface Product {
     warranty?: number;
   };
   image_url?: string;
+  datasheet_url?: string;
   created_at?: string;
   updated_at?: string;
 }
