@@ -9,7 +9,6 @@ import { Testimonials } from "@/components/Testimonials";
 import { FAQ } from "@/components/FAQ";
 import { Shield, Wrench, Clock, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ClimateEffects } from "@/components/solar-showcase/components/ClimateEffects";
 import { PremiumProductsCarousel } from "@/components/solar-showcase/components/PremiumProductsCarousel";
 
 export const RecommendedConfig = () => {
@@ -50,11 +49,6 @@ export const RecommendedConfig = () => {
           </div>
 
           <div className="space-y-12">
-            <div className="text-center max-w-3xl mx-auto">
-              <h2 className="text-3xl font-bold mb-6">Ihr Beitrag zum Klimaschutz</h2>
-              <ClimateEffects annualProduction={annualProduction} />
-            </div>
-
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
               <div className="space-y-6">
                 <h3 className="text-2xl font-bold">Potentialanalyse</h3>
