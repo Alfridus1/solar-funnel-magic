@@ -70,7 +70,7 @@ export const UserManagement = () => {
     await supabase.auth.signOut();
     
     // Admin Access Token verwenden (muss in der Supabase-Konfiguration eingerichtet sein)
-    const { data: { session }, error } = await supabase.auth.admin.signIn({
+    const { data: { session }, error } = await supabase.auth.admin.signInWithEmail({
       email: profile.email,
     });
 
