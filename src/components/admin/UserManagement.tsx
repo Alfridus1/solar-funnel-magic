@@ -66,9 +66,12 @@ export const UserManagement = () => {
   };
 
   const handleLoginAs = async (profile: Profile) => {
-    const { error } = await supabase.auth.signInWithPassword({ 
+    // Zuerst die aktuelle Session beenden
+    await supabase.auth.signOut();
+    
+    // Admin Access Token verwenden (muss in der Supabase-Konfiguration eingerichtet sein)
+    const { data: { session }, error } = await supabase.auth.admin.signIn({
       email: profile.email,
-      password: 'temporary-password' // This is just a placeholder, you'll need proper implementation
     });
 
     if (error) {
@@ -80,10 +83,14 @@ export const UserManagement = () => {
       return;
     }
 
-    toast({
-      title: "Erfolgreich eingeloggt",
-      description: `Sie sind jetzt als ${profile.first_name} ${profile.last_name} eingeloggt.`,
-    });
+    if (session) {
+      toast({
+        title: "Erfolgreich eingeloggt",
+        description: `Sie sind jetzt als ${profile.first_name} ${profile.last_name} eingeloggt.`,
+      });
+      // Optional: Seite neu laden oder zur Benutzer-Startseite navigieren
+      window.location.href = '/';
+    }
   };
 
   return (
