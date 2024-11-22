@@ -74,7 +74,6 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
                 <span className="text-gray-600">CO₂-Einsparung/Jahr</span>
               </div>
               <span className="text-2xl font-bold text-green-600">{co2Savings} kg</span>
-              <p className="text-sm text-gray-500 mt-1">≈ {treesEquivalent} Bäume pro Jahr</p>
             </div>
 
             <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 shadow-sm">
