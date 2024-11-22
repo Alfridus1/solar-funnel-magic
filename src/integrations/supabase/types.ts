@@ -268,10 +268,12 @@ export type Database = {
       }
       leads: {
         Row: {
+          address: string | null
           affiliate_id: string | null
           created_at: string | null
           email: string
           id: string
+          metrics: Json | null
           name: string
           notes: string | null
           phone: string
@@ -281,10 +283,12 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          address?: string | null
           affiliate_id?: string | null
           created_at?: string | null
           email: string
           id?: string
+          metrics?: Json | null
           name: string
           notes?: string | null
           phone: string
@@ -294,10 +298,12 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          address?: string | null
           affiliate_id?: string | null
           created_at?: string | null
           email?: string
           id?: string
+          metrics?: Json | null
           name?: string
           notes?: string | null
           phone?: string

@@ -12,6 +12,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
+import { PDFDownloadButton } from "../solar-showcase/components/PDFDownloadButton";
 
 interface Lead {
   id: string;
@@ -21,6 +22,8 @@ interface Lead {
   type: string;
   status: string;
   created_at: string;
+  metrics?: any;
+  address?: string;
 }
 
 export const LeadManagement = () => {
@@ -112,13 +115,21 @@ export const LeadManagement = () => {
                 </Badge>
               </TableCell>
               <TableCell>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => updateLeadStatus(lead.id, lead.status === 'new' ? 'processed' : 'new')}
-                >
-                  Status ändern
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => updateLeadStatus(lead.id, lead.status === 'new' ? 'processed' : 'new')}
+                  >
+                    Status ändern
+                  </Button>
+                  {lead.metrics && lead.address && (
+                    <PDFDownloadButton 
+                      metrics={lead.metrics} 
+                      address={lead.address}
+                    />
+                  )}
+                </div>
               </TableCell>
             </TableRow>
           ))}
