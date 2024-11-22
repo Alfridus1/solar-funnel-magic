@@ -7,9 +7,10 @@ import { SystemMetrics } from "@/components/solar-showcase/components/SystemMetr
 import { SavingsCalculator } from "@/components/SavingsCalculator";
 import { Testimonials } from "@/components/Testimonials";
 import { FAQ } from "@/components/FAQ";
-import { Shield, Wrench, Clock, Package, CreditCard, Wallet } from "lucide-react";
+import { CreditCard, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PremiumProductsCarousel } from "@/components/solar-showcase/components/PremiumProductsCarousel";
+import { PricingCard } from "@/components/solar-showcase/components/PricingCard";
 
 export const RecommendedConfig = () => {
   const location = useLocation();
@@ -27,6 +28,16 @@ export const RecommendedConfig = () => {
   const moduleCount = Math.round(metrics.kWp * 2);
   const annualProduction = Math.round(metrics.kWp * 950);
   const estimatedPrice = Math.round(metrics.kWp * 1950);
+
+  const handleShowQuoteForm = () => {
+    setFormType("quote");
+    setShowLeadForm(true);
+  };
+
+  const handleShowConsultationForm = () => {
+    setFormType("consultation");
+    setShowLeadForm(true);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-solar-blue-50 to-white">
@@ -65,51 +76,10 @@ export const RecommendedConfig = () => {
 
               <div className="space-y-6">
                 <h3 className="text-2xl font-bold">Unverbindliche Preisschätzung</h3>
-                <Card className="p-6 bg-gradient-to-br from-solar-orange/10 to-white">
-                  <div className="space-y-6">
-                    <div className="flex items-start gap-4">
-                      <Shield className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
-                      <div>
-                        <h4 className="font-semibold text-lg mb-1">Premium Komponenten</h4>
-                        <p className="text-gray-600">Hochwertige Module, Wechselrichter und ein 10 kWh Speicher für maximale Unabhängigkeit</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-4">
-                      <Wrench className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
-                      <div>
-                        <h4 className="font-semibold text-lg mb-1">Komplette Installation</h4>
-                        <p className="text-gray-600">Professionelle DC und AC Installation inklusive neuem Zählerschrank nach aktuellen Standards</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-4">
-                      <Clock className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
-                      <div>
-                        <h4 className="font-semibold text-lg mb-1">Schnelle Umsetzung</h4>
-                        <p className="text-gray-600">Von der Planung bis zur Inbetriebnahme - alles aus einer Hand</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-4">
-                      <Package className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
-                      <div>
-                        <h4 className="font-semibold text-lg mb-1">Rundum-Sorglos-Paket</h4>
-                        <p className="text-gray-600">Inklusive aller Genehmigungen, Anmeldungen und Dokumentation</p>
-                      </div>
-                    </div>
-                    <div className="mt-8 p-6 bg-white rounded-xl shadow-lg">
-                      <p className="text-4xl font-bold text-solar-orange mb-2">{estimatedPrice.toLocaleString()}€</p>
-                      <p className="text-sm text-gray-500 mb-4">Komplett-Installation inkl. MwSt.</p>
-                      <Button 
-                        className="w-full bg-solar-orange hover:bg-solar-orange-dark text-lg py-6"
-                        onClick={() => {
-                          setFormType("quote");
-                          setShowLeadForm(true);
-                        }}
-                      >
-                        Vor-Ort Termin vereinbaren
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
+                <PricingCard 
+                  estimatedPrice={estimatedPrice} 
+                  onShowLeadForm={handleShowQuoteForm}
+                />
               </div>
             </div>
           </div>
@@ -153,8 +123,7 @@ export const RecommendedConfig = () => {
                     <Button 
                       className="w-full bg-solar-orange hover:bg-solar-orange-dark"
                       onClick={() => {
-                        setFormType("quote");
-                        setShowLeadForm(true);
+                        handleShowQuoteForm();
                       }}
                     >
                       Jetzt kaufen
@@ -184,8 +153,7 @@ export const RecommendedConfig = () => {
                     <Button 
                       className="w-full bg-blue-500 hover:bg-blue-600"
                       onClick={() => {
-                        setFormType("consultation");
-                        setShowLeadForm(true);
+                        handleShowConsultationForm();
                       }}
                     >
                       Finanzierung anfragen
