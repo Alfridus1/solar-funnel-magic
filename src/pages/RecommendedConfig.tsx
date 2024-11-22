@@ -31,7 +31,7 @@ export const RecommendedConfig = () => {
   const co2Savings = Math.round(annualProduction * 0.366); // kg CO2 per kWh
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F75c03]/5 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-solar-blue-50 to-white">
       <div className="relative">
         <HeroImage />
         {showLeadForm && (
@@ -39,9 +39,9 @@ export const RecommendedConfig = () => {
         )}
       </div>
 
-      <div className="container mx-auto px-4 py-8">
-        <Card className="max-w-5xl mx-auto mb-8 p-8 bg-white/90 backdrop-blur shadow-lg">
-          <div className="mb-8 -mx-8 -mt-8 p-8 bg-gradient-to-br from-solar-orange/5 to-white">
+      <div className="container mx-auto px-4 py-12">
+        <Card className="max-w-7xl mx-auto mb-12 p-8 bg-white/95 backdrop-blur shadow-lg rounded-xl">
+          <div className="mb-8 -mx-8 -mt-8 p-8 bg-gradient-to-br from-solar-orange/5 to-white rounded-t-xl">
             <SystemMetrics
               moduleCount={moduleCount}
               kWp={metrics.kWp}
@@ -50,75 +50,75 @@ export const RecommendedConfig = () => {
             />
           </div>
 
-          <div className="space-y-8">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold mb-4">Ihr Beitrag zum Klimaschutz</h2>
+          <div className="space-y-12">
+            <div className="text-center max-w-3xl mx-auto">
+              <h2 className="text-3xl font-bold mb-6">Ihr Beitrag zum Klimaschutz</h2>
               <ClimateEffects co2Savings={co2Savings} annualProduction={annualProduction} />
             </div>
 
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Left Column - Potential Analysis */}
-                <div className="space-y-6">
-                  <h3 className="text-2xl font-bold">Potentialanalyse</h3>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+              {/* Left Column - Potential Analysis */}
+              <div className="space-y-6">
+                <h3 className="text-2xl font-bold">Potentialanalyse</h3>
+                <div className="bg-white/50 rounded-xl p-6 shadow-sm">
                   <SavingsCalculator yearlyProduction={annualProduction} />
                 </div>
+              </div>
 
-                {/* Right Column - Price Estimation */}
-                <div className="space-y-6">
-                  <h3 className="text-2xl font-bold">Unverbindliche Preisschätzung</h3>
-                  <Card className="p-6 bg-gradient-to-br from-solar-orange/10 to-white">
-                    <div className="space-y-6">
-                      <div className="flex items-start gap-3">
-                        <Shield className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
-                        <div>
-                          <h4 className="font-semibold">Premium Komponenten</h4>
-                          <p className="text-gray-600">Hochwertige Module, Wechselrichter und ein 10 kWh Speicher für maximale Unabhängigkeit</p>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <Wrench className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
-                        <div>
-                          <h4 className="font-semibold">Komplette Installation</h4>
-                          <p className="text-gray-600">Professionelle DC und AC Installation inklusive neuem Zählerschrank nach aktuellen Standards</p>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <Clock className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
-                        <div>
-                          <h4 className="font-semibold">Schnelle Umsetzung</h4>
-                          <p className="text-gray-600">Von der Planung bis zur Inbetriebnahme - alles aus einer Hand</p>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <Package className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
-                        <div>
-                          <h4 className="font-semibold">Rundum-Sorglos-Paket</h4>
-                          <p className="text-gray-600">Inklusive aller Genehmigungen, Anmeldungen und Dokumentation</p>
-                        </div>
-                      </div>
-                      <div className="mt-6 p-6 bg-white rounded-lg shadow-lg">
-                        <p className="text-3xl font-bold text-solar-orange mb-2">{estimatedPrice.toLocaleString()}€</p>
-                        <p className="text-sm text-gray-500">Komplett-Installation inkl. MwSt.</p>
-                        <Button 
-                          className="w-full mt-4 bg-solar-orange hover:bg-solar-orange/90"
-                          onClick={() => {
-                            setFormType("quote");
-                            setShowLeadForm(true);
-                          }}
-                        >
-                          Vor-Ort Termin vereinbaren
-                        </Button>
+              {/* Right Column - Price Estimation */}
+              <div className="space-y-6">
+                <h3 className="text-2xl font-bold">Unverbindliche Preisschätzung</h3>
+                <Card className="p-6 bg-gradient-to-br from-solar-orange/10 to-white">
+                  <div className="space-y-6">
+                    <div className="flex items-start gap-4">
+                      <Shield className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
+                      <div>
+                        <h4 className="font-semibold text-lg mb-1">Premium Komponenten</h4>
+                        <p className="text-gray-600">Hochwertige Module, Wechselrichter und ein 10 kWh Speicher für maximale Unabhängigkeit</p>
                       </div>
                     </div>
-                  </Card>
-                </div>
+                    <div className="flex items-start gap-4">
+                      <Wrench className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
+                      <div>
+                        <h4 className="font-semibold text-lg mb-1">Komplette Installation</h4>
+                        <p className="text-gray-600">Professionelle DC und AC Installation inklusive neuem Zählerschrank nach aktuellen Standards</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <Clock className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
+                      <div>
+                        <h4 className="font-semibold text-lg mb-1">Schnelle Umsetzung</h4>
+                        <p className="text-gray-600">Von der Planung bis zur Inbetriebnahme - alles aus einer Hand</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <Package className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
+                      <div>
+                        <h4 className="font-semibold text-lg mb-1">Rundum-Sorglos-Paket</h4>
+                        <p className="text-gray-600">Inklusive aller Genehmigungen, Anmeldungen und Dokumentation</p>
+                      </div>
+                    </div>
+                    <div className="mt-8 p-6 bg-white rounded-xl shadow-lg">
+                      <p className="text-4xl font-bold text-solar-orange mb-2">{estimatedPrice.toLocaleString()}€</p>
+                      <p className="text-sm text-gray-500 mb-4">Komplett-Installation inkl. MwSt.</p>
+                      <Button 
+                        className="w-full bg-solar-orange hover:bg-solar-orange-dark text-lg py-6"
+                        onClick={() => {
+                          setFormType("quote");
+                          setShowLeadForm(true);
+                        }}
+                      >
+                        Vor-Ort Termin vereinbaren
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
               </div>
             </div>
           </div>
         </Card>
 
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto space-y-16">
           <Testimonials />
           <FAQ />
         </div>

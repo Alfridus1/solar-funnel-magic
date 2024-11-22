@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Calculator } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
-import { Button } from "@/components/ui/button";
 
 export const SavingsCalculator = ({ yearlyProduction }: { yearlyProduction: number }) => {
   const [electricityPrice, setElectricityPrice] = useState(0.40); // €/kWh
@@ -16,61 +15,51 @@ export const SavingsCalculator = ({ yearlyProduction }: { yearlyProduction: numb
 
   // Calculate system size in kWp (assuming 950 kWh/kWp annual production)
   const estimatedKWp = yearlyProduction / 950;
-  const estimatedPrice = Math.round(estimatedKWp * 1950);
   
   // Calculate CO2 savings (0.366 kg CO2 per kWh)
   const yearlyCO2Savings = Math.round(yearlyProduction * 0.366 / 1000); // Convert to tons
 
   return (
-    <div className="w-full max-w-6xl mx-auto">
-      <div className="flex items-center gap-2 sm:gap-3 mb-6">
-        <Calculator className="h-5 w-5 sm:h-6 sm:w-6 text-solar-orange" />
-        <h3 className="text-lg sm:text-xl font-semibold">Ihre Potentialanalyse</h3>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <div className="flex justify-between items-center p-3 sm:p-4 bg-white/50 rounded-lg text-sm sm:text-base">
-            <span>Jährliche Produktion:</span>
-            <div className="text-right">
-              <span className="font-semibold">{yearlyProduction.toLocaleString()} kWh</span>
-              <div className="text-sm text-green-600">≈ {yearlyCO2Savings} Tonnen CO₂ Einsparung/Jahr</div>
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <div className="flex justify-between items-center text-sm sm:text-base">
-              <span>Strompreis:</span>
-              <span className="font-semibold">{electricityPrice.toFixed(2)} €/kWh</span>
-            </div>
-            <Slider
-              value={[electricityPrice]}
-              onValueChange={(values) => setElectricityPrice(values[0])}
-              min={0.25}
-              max={0.60}
-              step={0.01}
-              className="my-4"
-            />
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 gap-4">
+        <div className="flex justify-between items-center p-4 bg-white/80 rounded-xl shadow-sm">
+          <span className="text-gray-700">Jährliche Produktion:</span>
+          <div className="text-right">
+            <span className="font-semibold text-lg">{yearlyProduction.toLocaleString()} kWh</span>
+            <div className="text-sm text-green-600">≈ {yearlyCO2Savings} Tonnen CO₂ Einsparung/Jahr</div>
           </div>
         </div>
+        
+        <div className="space-y-3">
+          <div className="flex justify-between items-center text-gray-700">
+            <span>Strompreis:</span>
+            <span className="font-semibold">{electricityPrice.toFixed(2)} €/kWh</span>
+          </div>
+          <Slider
+            value={[electricityPrice]}
+            onValueChange={(values) => setElectricityPrice(values[0])}
+            min={0.25}
+            max={0.60}
+            step={0.01}
+            className="my-4"
+          />
+        </div>
 
-        <div className="space-y-4">
-          <div className="flex justify-between items-center p-3 sm:p-4 bg-solar-orange-50 rounded-lg text-sm sm:text-base">
-            <span>Anlagengröße:</span>
-            <span className="font-semibold text-solar-orange">{estimatedKWp.toFixed(1)} kWp</span>
-          </div>
-          
-          <div className="flex justify-between items-center p-3 sm:p-4 bg-solar-orange-50 rounded-lg text-sm sm:text-base">
-            <span>Jährliche Einsparung:</span>
-            <span className="font-semibold text-solar-orange">{Math.round(yearlySavings).toLocaleString()} €</span>
-          </div>
-          
-          <div className="flex justify-between items-center p-3 sm:p-4 bg-solar-orange-100 rounded-lg text-sm sm:text-base">
-            <span>Einsparung über 25 Jahre:</span>
-            <span className="font-semibold text-solar-orange-600">
-              {Math.round(twentyFiveYearSavings).toLocaleString()} €
-            </span>
-          </div>
+        <div className="flex justify-between items-center p-4 bg-solar-orange-50 rounded-xl shadow-sm">
+          <span className="text-gray-700">Anlagengröße:</span>
+          <span className="font-semibold text-solar-orange text-lg">{estimatedKWp.toFixed(1)} kWp</span>
+        </div>
+        
+        <div className="flex justify-between items-center p-4 bg-solar-orange-50 rounded-xl shadow-sm">
+          <span className="text-gray-700">Jährliche Einsparung:</span>
+          <span className="font-semibold text-solar-orange text-lg">{Math.round(yearlySavings).toLocaleString()} €</span>
+        </div>
+        
+        <div className="flex justify-between items-center p-4 bg-solar-orange-100 rounded-xl shadow-sm">
+          <span className="text-gray-700">Einsparung über 25 Jahre:</span>
+          <span className="font-semibold text-solar-orange-600 text-lg">
+            {Math.round(twentyFiveYearSavings).toLocaleString()} €
+          </span>
         </div>
       </div>
     </div>
