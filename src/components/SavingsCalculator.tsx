@@ -16,8 +16,8 @@ export const SavingsCalculator = ({ yearlyProduction }: { yearlyProduction: numb
   // Calculate system size in kWp (assuming 950 kWh/kWp annual production)
   const estimatedKWp = yearlyProduction / 950;
   
-  // Calculate CO2 savings (0.366 kg CO2 per kWh)
-  const yearlyCO2Savings = Math.round(yearlyProduction * 0.366 / 1000); // Convert to tons
+  // Calculate CO2 savings (690g = 0.69kg CO2 per kWh)
+  const yearlyCO2Savings = Math.round(yearlyProduction * 0.69 / 1000); // Convert to tons
 
   return (
     <div className="space-y-6">
@@ -26,7 +26,7 @@ export const SavingsCalculator = ({ yearlyProduction }: { yearlyProduction: numb
           <span className="text-gray-700">Jährliche Produktion:</span>
           <div className="text-right">
             <span className="font-semibold text-lg">{yearlyProduction.toLocaleString()} kWh</span>
-            <div className="text-sm text-green-600">≈ {yearlyCO2Savings} Tonnen CO₂ Einsparung/Jahr</div>
+            <div className="text-sm text-green-600">≈ {yearlyCO2Savings} Tonnen CO₂-Äquivalente/Jahr</div>
           </div>
         </div>
         
