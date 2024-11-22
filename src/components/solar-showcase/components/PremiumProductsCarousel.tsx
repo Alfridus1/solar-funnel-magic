@@ -60,8 +60,8 @@ export const PremiumProductsCarousel = () => {
     <section className="py-12 relative">
       <div className="w-full max-w-7xl mx-auto px-4">
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-white to-transparent z-10" />
-          <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-white to-transparent z-10" />
+          <div className="absolute inset-y-0 left-0 w-24 md:w-32 bg-gradient-to-r from-white via-white/80 to-transparent z-10 pointer-events-none" />
+          <div className="absolute inset-y-0 right-0 w-24 md:w-32 bg-gradient-to-l from-white via-white/80 to-transparent z-10 pointer-events-none" />
           
           <Carousel
             opts={{
@@ -69,14 +69,14 @@ export const PremiumProductsCarousel = () => {
               align: 'center',
               skipSnaps: false,
             }}
-            className="relative"
+            className="relative w-full"
             setApi={setApi}
           >
-            <CarouselContent>
+            <CarouselContent className="-ml-2 md:-ml-4">
               {products.map((product, index) => (
                 <CarouselItem 
                   key={product.id} 
-                  className="md:basis-1/2 lg:basis-1/3 transition-all duration-300 px-4"
+                  className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3 transition-all duration-300"
                 >
                   <ProductCard 
                     product={product}
@@ -85,8 +85,8 @@ export const PremiumProductsCarousel = () => {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="absolute -left-12 top-1/2 transform -translate-y-1/2" />
-            <CarouselNext className="absolute -right-12 top-1/2 transform -translate-y-1/2" />
+            <CarouselPrevious className="absolute -left-4 md:-left-12 top-1/2 transform -translate-y-1/2 z-20" />
+            <CarouselNext className="absolute -right-4 md:-right-12 top-1/2 transform -translate-y-1/2 z-20" />
           </Carousel>
         </div>
       </div>
