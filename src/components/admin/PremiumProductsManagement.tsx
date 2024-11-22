@@ -26,19 +26,19 @@ export const PremiumProductsManagement = () => {
       return;
     }
 
+    if (!data) return;
+
     // Transform the data to ensure it matches our PremiumProduct interface
     const transformedData: PremiumProduct[] = data.map(item => ({
       ...item,
-      purchase_options: item.purchase_options ? 
-        JSON.parse(item.purchase_options) : 
-        {
-          price: 0,
-          financing: {
-            available: false,
-            min_rate: 0,
-            max_term: 0
-          }
+      purchase_options: item.purchase_options || {
+        price: 0,
+        financing: {
+          available: false,
+          min_rate: 0,
+          max_term: 0
         }
+      }
     }));
 
     setProducts(transformedData);
@@ -48,18 +48,18 @@ export const PremiumProductsManagement = () => {
     loadProducts();
   }, []);
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: PremiumProductFormFields) => {
     setLoading(true);
     const features = data.features.split('\n').filter((f: string) => f.trim());
     
-    const purchase_options = JSON.stringify({
+    const purchase_options = {
       price: data.price,
       financing: {
         available: data.financing_available,
         min_rate: data.financing_min_rate,
         max_term: data.financing_max_term
       }
-    });
+    };
     
     const operation = editingProduct 
       ? supabase
