@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/carousel";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard } from "./ProductCard";
+import type { CarouselApi } from "@/components/ui/carousel";
 
 interface PremiumProduct {
   id: string;
@@ -25,6 +26,7 @@ interface SupabaseProduct extends PremiumProduct {
 export const PremiumProductsCarousel = () => {
   const [products, setProducts] = useState<PremiumProduct[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [api, setApi] = useState<CarouselApi>();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -44,6 +46,16 @@ export const PremiumProductsCarousel = () => {
     fetchProducts();
   }, []);
 
+  useEffect(() => {
+    if (!api) {
+      return;
+    }
+
+    api.on("select", () => {
+      setActiveIndex(api.selectedScrollSnap());
+    });
+  }, [api]);
+
   return (
     <section className="py-12 relative">
       <div className="w-full max-w-7xl mx-auto px-4">
@@ -58,9 +70,7 @@ export const PremiumProductsCarousel = () => {
               skipSnaps: false,
             }}
             className="relative"
-            onSelect={(api) => {
-              setActiveIndex(api.selectedScrollSnap());
-            }}
+            setApi={setApi}
           >
             <CarouselContent>
               {products.map((product, index) => (
