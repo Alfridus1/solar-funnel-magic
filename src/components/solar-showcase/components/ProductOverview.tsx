@@ -27,8 +27,14 @@ export const ProductOverview = () => {
     const transformedData = data.map(item => ({
       ...item,
       category: item.category as 'module' | 'inverter' | 'battery',
-      specs: item.specs || {}
-    }));
+      specs: {
+        watts: item.specs?.watts as number | undefined,
+        capacity: item.specs?.capacity as number | undefined,
+        power: item.specs?.power as number | undefined,
+        efficiency: item.specs?.efficiency as number | undefined,
+        warranty: item.specs?.warranty as number | undefined
+      }
+    })) as Product[];
 
     setProducts(transformedData);
   };
