@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { HeroImage } from "@/components/solar-showcase/components/HeroImage";
 import { LeadFormOverlay } from "@/components/solar-showcase/components/LeadFormOverlay";
+import { RegistrationOverlay } from "@/components/solar-showcase/components/RegistrationOverlay";
 import { SystemMetrics } from "@/components/solar-showcase/components/SystemMetrics";
 import { SavingsCalculator } from "@/components/SavingsCalculator";
 import { Testimonials } from "@/components/Testimonials";
@@ -17,6 +18,7 @@ export const RecommendedConfig = () => {
   const navigate = useNavigate();
   const [showLeadForm, setShowLeadForm] = useState(false);
   const [formType, setFormType] = useState<"quote" | "consultation" | null>(null);
+  const [isRegistered, setIsRegistered] = useState(false);
   
   const { metrics, address } = location.state || loadConfigFromCookie() || {};
 
@@ -49,14 +51,17 @@ export const RecommendedConfig = () => {
 
   return (
     <div className="min-h-screen bg-solar-blue-50">
-      <div className="relative">
-        <HeroImage />
-        {showLeadForm && (
-          <LeadFormOverlay formType={formType} />
-        )}
-      </div>
+      {!isRegistered && <RegistrationOverlay onComplete={() => setIsRegistered(true)} />}
+      
+      <div className={`relative transition-all duration-300 ${!isRegistered ? 'blur-md' : ''}`}>
+        <div className="relative">
+          <HeroImage />
+          {showLeadForm && (
+            <LeadFormOverlay formType={formType} />
+          )}
+        </div>
 
-      <div className="container mx-auto px-4 py-12">
+        <div className="container mx-auto px-4 py-12">
         <Card className="max-w-7xl mx-auto mb-12 p-8 bg-white/95 backdrop-blur shadow-lg rounded-xl">
           <div className="mb-8 -mx-8 -mt-8 p-8 bg-gradient-to-br from-solar-orange/5 to-transparent rounded-t-xl">
             <SystemMetrics
@@ -116,6 +121,8 @@ export const RecommendedConfig = () => {
         <div className="max-w-4xl mx-auto space-y-16">
           <Testimonials />
           <FAQ />
+        </div>
+      </div>
         </div>
       </div>
     </div>
