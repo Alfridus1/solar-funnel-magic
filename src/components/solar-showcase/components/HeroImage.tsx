@@ -10,7 +10,7 @@ export const HeroImage = ({ className }: HeroImageProps) => {
       <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-transparent z-10" />
       <div className="absolute inset-0 z-20 flex flex-col justify-center items-center text-white text-center p-8">
         <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-fade-up">
-          Premium Solarprodukte für Ihr Zuhause
+          Ihre unverbindliche Potenzialanalyse
         </h1>
         <p className="text-xl md:text-2xl max-w-2xl mx-auto animate-fade-up">
           Hochwertige Komponenten für maximale Effizienz und Langlebigkeit
