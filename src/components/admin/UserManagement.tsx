@@ -66,7 +66,7 @@ export const UserManagement = () => {
   };
 
   const handleLoginAs = async (profile: Profile) => {
-    const { error } = await supabase.auth.signIn({ 
+    const { error } = await supabase.auth.signInWithPassword({ 
       email: profile.email,
       password: 'temporary-password' // This is just a placeholder, you'll need proper implementation
     });
