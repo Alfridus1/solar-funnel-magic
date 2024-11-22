@@ -16,6 +16,7 @@ export type Database = {
           first_name: string
           id: string
           last_name: string
+          referral_code: string | null
           updated_at: string | null
           user_id: string | null
         }
@@ -25,6 +26,7 @@ export type Database = {
           first_name: string
           id?: string
           last_name: string
+          referral_code?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
@@ -34,6 +36,7 @@ export type Database = {
           first_name?: string
           id?: string
           last_name?: string
+          referral_code?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
@@ -265,6 +268,7 @@ export type Database = {
       }
       leads: {
         Row: {
+          affiliate_id: string | null
           created_at: string | null
           email: string
           id: string
@@ -277,6 +281,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          affiliate_id?: string | null
           created_at?: string | null
           email: string
           id?: string
@@ -289,6 +294,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          affiliate_id?: string | null
           created_at?: string | null
           email?: string
           id?: string
@@ -300,7 +306,15 @@ export type Database = {
           type?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "leads_affiliate_id_fkey"
+            columns: ["affiliate_id"]
+            isOneToOne: false
+            referencedRelation: "affiliates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       opensolar_installations: {
         Row: {
