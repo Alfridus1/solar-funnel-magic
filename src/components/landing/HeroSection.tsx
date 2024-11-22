@@ -29,13 +29,13 @@ export const HeroSection = ({
         className="h-24 mx-auto mb-8" 
       />
       <h2 className="text-2xl text-solar-orange font-semibold mb-4">
-        Ihre unverbindliche Potentialanalyse
+        Ihre maßgeschneiderte Solaranlage
       </h2>
       <h1 className="text-4xl md:text-6xl font-bold text-gray-900 tracking-tight">
-        Ihre <span className="text-solar-orange">Solaranlage</span> in wenigen Minuten planen
+        Entdecken Sie Ihr <span className="text-solar-orange">Solarpotential</span> in wenigen Minuten
       </h1>
       <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-        Zeichnen Sie Ihr Dach ein und erhalten Sie sofort Ihre optimale Konfiguration
+        Erhalten Sie Ihre individuelle Konfiguration und starten Sie jetzt in eine nachhaltige Zukunft
       </p>
 
       <Card className="max-w-xl mx-auto p-8 shadow-lg bg-white/90 backdrop-blur">
