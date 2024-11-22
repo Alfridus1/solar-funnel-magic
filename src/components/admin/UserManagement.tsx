@@ -9,6 +9,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { LogIn } from "lucide-react";
 
 interface Profile {
   id: string;
@@ -17,6 +19,7 @@ interface Profile {
   email: string;
   phone: string;
   created_at: string;
+  referral_count: number;
 }
 
 export const UserManagement = () => {
@@ -30,7 +33,10 @@ export const UserManagement = () => {
   const loadProfiles = async () => {
     const { data, error } = await supabase
       .from('profiles')
-      .select('*')
+      .select(`
+        *,
+        referral_count:leads(count)
+      `)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -42,7 +48,34 @@ export const UserManagement = () => {
       return;
     }
 
-    setProfiles(data || []);
+    setProfiles(data.map(profile => ({
+      ...profile,
+      referral_count: profile.referral_count || 0
+    })));
+  };
+
+  const handleImpersonation = async (email: string) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: "test1234" // Dies ist nur für Entwicklungszwecke!
+    });
+
+    if (error) {
+      toast({
+        title: "Fehler beim Einloggen",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Erfolgreich eingeloggt",
+      description: `Sie sind jetzt als ${email} eingeloggt.`,
+    });
+
+    // Weiterleitung zur Hauptseite
+    window.location.href = "/";
   };
 
   return (
@@ -58,6 +91,8 @@ export const UserManagement = () => {
             <TableHead>Email</TableHead>
             <TableHead>Telefon</TableHead>
             <TableHead>Registriert am</TableHead>
+            <TableHead>Geworbene Kunden</TableHead>
+            <TableHead>Aktionen</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -68,6 +103,17 @@ export const UserManagement = () => {
               <TableCell>{profile.phone}</TableCell>
               <TableCell>
                 {new Date(profile.created_at).toLocaleDateString('de-DE')}
+              </TableCell>
+              <TableCell>{profile.referral_count}</TableCell>
+              <TableCell>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleImpersonation(profile.email)}
+                >
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Als Benutzer einloggen
+                </Button>
               </TableCell>
             </TableRow>
           ))}
