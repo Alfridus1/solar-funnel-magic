@@ -6,7 +6,6 @@ import { calculateRoofArea, calculateSolarMetrics } from "@/utils/roofCalculatio
 import { RoofCheckContent } from "./RoofCheck/RoofCheckContent";
 import { RoofCheckLoading } from "./RoofCheck/RoofCheckLoading";
 
-// Define libraries outside component to prevent reloading
 const libraries: ("places" | "drawing" | "geometry")[] = ["places", "drawing", "geometry"];
 
 interface RoofCheckProps {
@@ -20,7 +19,7 @@ interface Metrics {
   roofArea: number;
   possiblePanels: number;
   kWp: number;
-  roofDetails: { roofId: string; moduleCount: number }[];
+  roofDetails: { roofId: string; moduleCount: number; kWp: number }[];
 }
 
 export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
@@ -42,7 +41,7 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
   });
 
   const handleRoofOutlineComplete = useCallback(
-    (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number }[]) => {
+    (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number; kWp: number }[]) => {
       setPaths(paths);
       const totalArea = calculateRoofArea(paths);
       const calculatedMetrics = calculateSolarMetrics(totalArea);

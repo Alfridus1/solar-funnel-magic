@@ -6,9 +6,9 @@ interface UseModuleManagementProps {
   polygons: google.maps.Polygon[];
   modules: google.maps.Rectangle[];
   setModules: (modules: google.maps.Rectangle[]) => void;
-  roofDetails: { roofId: string; moduleCount: number }[];
-  setRoofDetails: (details: { roofId: string; moduleCount: number }[]) => void;
-  onRoofOutlineComplete: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number }[]) => void;
+  roofDetails: { roofId: string; moduleCount: number; kWp: number }[];
+  setRoofDetails: React.Dispatch<React.SetStateAction<{ roofId: string; moduleCount: number; kWp: number }[]>>;
+  onRoofOutlineComplete: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number; kWp: number }[]) => void;
   onLog?: (message: string) => void;
 }
 
@@ -33,13 +33,13 @@ export const useModuleManagement = ({
     clearModules();
     
     const newModules: google.maps.Rectangle[] = [];
-    const newRoofDetails: { roofId: string; moduleCount: number }[] = [];
+    const newRoofDetails: { roofId: string; moduleCount: number; kWp: number }[] = [];
 
     polygons.forEach(polygon => {
-      const { moduleCount, roofId } = calculateModulePositions(polygon, map, (calculatedModules) => {
+      const { moduleCount, roofId, kWp } = calculateModulePositions(polygon, map, (calculatedModules) => {
         newModules.push(...calculatedModules);
       });
-      newRoofDetails.push({ roofId, moduleCount });
+      newRoofDetails.push({ roofId, moduleCount, kWp });
     });
 
     setModules(newModules);
@@ -61,13 +61,11 @@ export const useModuleManagement = ({
       }, 100);
     };
 
-    // Event-Listener für Vertex-Änderungen
     google.maps.event.addListener(polygon, 'mouseup', () => {
       onLog?.("Polygon-MouseUp-Event ausgelöst");
       recalculateAllModules();
     });
 
-    // Event-Listener für Pfadänderungen
     const paths = polygon.getPaths();
     paths.forEach((path) => {
       ['insert_at', 'remove_at', 'set_at'].forEach(eventName => {
@@ -78,7 +76,6 @@ export const useModuleManagement = ({
       });
     });
 
-    // Event-Listener für Polygon-Bewegungen
     google.maps.event.addListener(polygon, 'drag', () => {
       onLog?.("Polygon wird gezogen");
       handleUpdate();

@@ -6,9 +6,9 @@ interface UseRectangleCreationProps {
   polygons: google.maps.Polygon[];
   setPolygons: React.Dispatch<React.SetStateAction<google.maps.Polygon[]>>;
   setModules: (modules: google.maps.Rectangle[]) => void;
-  roofDetails: { roofId: string; moduleCount: number }[];
-  setRoofDetails: (details: { roofId: string; moduleCount: number }[]) => void;
-  onRoofOutlineComplete: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number }[]) => void;
+  roofDetails: { roofId: string; moduleCount: number; kWp: number }[];
+  setRoofDetails: React.Dispatch<React.SetStateAction<{ roofId: string; moduleCount: number; kWp: number }[]>>;
+  onRoofOutlineComplete: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number; kWp: number }[]) => void;
   addPolygonListeners: (polygon: google.maps.Polygon, roofId: string) => void;
 }
 
@@ -51,10 +51,10 @@ export const useRectangleCreation = ({
       map: map
     });
 
-    const { moduleCount, roofId } = calculateModulePositions(polygon, map, setModules);
+    const { moduleCount, roofId, kWp } = calculateModulePositions(polygon, map, setModules);
     addPolygonListeners(polygon, roofId);
     
-    const newRoofDetails = [...roofDetails, { roofId, moduleCount }];
+    const newRoofDetails = [...roofDetails, { roofId, moduleCount, kWp }];
     setRoofDetails(newRoofDetails);
     
     setPolygons(prevPolygons => [...prevPolygons, polygon]);
