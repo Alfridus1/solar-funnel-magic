@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import { UserDetailsDialog } from "./UserDetailsDialog";
 import { Profile, AffiliateInfo } from "./types/userManagement";
 
@@ -45,9 +46,9 @@ export const UserManagement = () => {
       .from('affiliates')
       .select('*')
       .eq('user_id', userId)
-      .maybeSingle(); // Changed from .single() to .maybeSingle()
+      .maybeSingle();
 
-    if (error && error.code !== 'PGRST116') { // Only throw if it's not a "no rows returned" error
+    if (error && error.code !== 'PGRST116') {
       toast({
         title: "Fehler beim Laden der Affiliate-Informationen",
         description: error.message,
@@ -64,6 +65,27 @@ export const UserManagement = () => {
     await loadAffiliateInfo(profile.id);
   };
 
+  const handleLoginAs = async (profile: Profile) => {
+    const { error } = await supabase.auth.signIn({ 
+      email: profile.email,
+      password: 'temporary-password' // This is just a placeholder, you'll need proper implementation
+    });
+
+    if (error) {
+      toast({
+        title: "Fehler beim Einloggen",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Erfolgreich eingeloggt",
+      description: `Sie sind jetzt als ${profile.first_name} ${profile.last_name} eingeloggt.`,
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -77,6 +99,7 @@ export const UserManagement = () => {
             <TableHead>Email</TableHead>
             <TableHead>Telefon</TableHead>
             <TableHead>Registriert am</TableHead>
+            <TableHead>Aktionen</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -84,13 +107,30 @@ export const UserManagement = () => {
             <TableRow 
               key={profile.id}
               className="cursor-pointer hover:bg-gray-50"
-              onClick={() => handleUserClick(profile)}
             >
-              <TableCell>{`${profile.first_name} ${profile.last_name}`}</TableCell>
-              <TableCell>{profile.email}</TableCell>
-              <TableCell>{profile.phone}</TableCell>
-              <TableCell>
+              <TableCell onClick={() => handleUserClick(profile)}>
+                {`${profile.first_name} ${profile.last_name}`}
+              </TableCell>
+              <TableCell onClick={() => handleUserClick(profile)}>
+                {profile.email}
+              </TableCell>
+              <TableCell onClick={() => handleUserClick(profile)}>
+                {profile.phone}
+              </TableCell>
+              <TableCell onClick={() => handleUserClick(profile)}>
                 {new Date(profile.created_at).toLocaleDateString('de-DE')}
+              </TableCell>
+              <TableCell>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleLoginAs(profile);
+                  }}
+                >
+                  Einloggen als
+                </Button>
               </TableCell>
             </TableRow>
           ))}
