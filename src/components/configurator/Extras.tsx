@@ -20,21 +20,21 @@ export const Extras = () => {
       name: "Wallbox",
       description: "11kW Ladeleistung für Ihr E-Auto",
       price: 1299,
-      icon: <Plug className="h-6 w-6" />,
+      icon: <Plug className="h-5 w-5 sm:h-6 sm:w-6" />,
     },
     {
       id: "battery",
       name: "Batteriespeicher",
       description: "10kWh Speicherkapazität",
       price: 8499,
-      icon: <Battery className="h-6 w-6" />,
+      icon: <Battery className="h-5 w-5 sm:h-6 sm:w-6" />,
     },
     {
       id: "smartHome",
       name: "Smart Home Integration",
       description: "Intelligente Haussteuerung",
       price: 799,
-      icon: <HomeIcon className="h-6 w-6" />,
+      icon: <HomeIcon className="h-5 w-5 sm:h-6 sm:w-6" />,
     },
   ];
 
@@ -47,29 +47,29 @@ export const Extras = () => {
   };
 
   return (
-    <Card className="p-6">
-      <h2 className="text-2xl font-bold mb-6">Optionale Erweiterungen</h2>
-      <div className="space-y-4">
+    <Card className="p-4 sm:p-6 w-full">
+      <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Optionale Erweiterungen</h2>
+      <div className="space-y-3 sm:space-y-4">
         {extras.map((extra) => (
           <div
             key={extra.id}
-            className="flex items-center justify-between p-4 border rounded-lg hover:border-blue-500 transition-colors"
+            className="flex items-center justify-between p-3 sm:p-4 border rounded-lg hover:border-blue-500 transition-colors"
           >
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
               <div className="p-2 bg-gray-100 rounded-lg">
                 {extra.icon}
               </div>
               <div>
-                <h3 className="font-semibold">{extra.name}</h3>
-                <p className="text-sm text-gray-600">{extra.description}</p>
+                <h3 className="font-semibold text-sm sm:text-base">{extra.name}</h3>
+                <p className="text-xs sm:text-sm text-gray-600">{extra.description}</p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <span className="font-semibold">{extra.price}€</span>
+            <div className="flex items-center gap-2 sm:gap-4">
+              <span className="font-semibold text-sm sm:text-base whitespace-nowrap">{extra.price}€</span>
               <Button
                 variant={selectedExtras.includes(extra.id) ? "secondary" : "default"}
                 onClick={() => toggleExtra(extra.id)}
-                className={selectedExtras.includes(extra.id) ? "bg-blue-100" : ""}
+                className={`text-xs sm:text-sm px-2 sm:px-4 ${selectedExtras.includes(extra.id) ? "bg-blue-100" : ""}`}
               >
                 {selectedExtras.includes(extra.id) ? "Ausgewählt" : "Hinzufügen"}
               </Button>
