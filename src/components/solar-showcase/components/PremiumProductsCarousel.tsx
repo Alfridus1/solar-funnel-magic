@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Leaf } from "lucide-react";
+import { Leaf, Zap, Home } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import {
   Carousel,
@@ -47,10 +47,72 @@ interface SupabaseProduct {
 
 export const PremiumProductsCarousel = () => {
   const [products, setProducts] = useState<PremiumProduct[]>([]);
-  const [showLeadForm, setShowLeadForm] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
+      // First, let's insert our new products if they don't exist
+      const newProducts = [
+        {
+          name: "Smart Wallbox Pro",
+          description: "Intelligente Ladestation für Ihr Elektrofahrzeug mit bidirektionalem Laden",
+          image_url: "/wallbox-image.png", // You'll need to add this image
+          features: [
+            "22 kW Ladeleistung",
+            "Bidirektionales Laden",
+            "Smart Home Integration",
+            "Dynamisches Lastmanagement",
+            "RFID Zugangskontrolle"
+          ],
+          climate_impact: "Reduziert CO2-Emissionen durch intelligentes Laden",
+          order_number: 4,
+          purchase_options: {
+            price: 1299,
+            financing: {
+              available: true,
+              min_rate: 2.99,
+              max_term: 48
+            }
+          }
+        },
+        {
+          name: "Coppen Connect",
+          description: "Smart Home System für maximale Energieeffizienz",
+          image_url: "/smart-home-image.png", // You'll need to add this image
+          features: [
+            "Intelligente Energiesteuerung",
+            "PV-Optimierung",
+            "Wärmepumpen-Integration",
+            "Mobile App Steuerung",
+            "Automatisierte Szenarien"
+          ],
+          climate_impact: "Optimiert Energieverbrauch und reduziert CO2-Fußabdruck",
+          order_number: 5,
+          purchase_options: {
+            price: 799,
+            financing: {
+              available: true,
+              min_rate: 0,
+              max_term: 24
+            }
+          }
+        }
+      ];
+
+      for (const product of newProducts) {
+        const { data: existingProduct } = await supabase
+          .from('premium_products')
+          .select('id')
+          .eq('name', product.name)
+          .single();
+
+        if (!existingProduct) {
+          await supabase
+            .from('premium_products')
+            .insert([product]);
+        }
+      }
+
+      // Then fetch all products
       const { data, error } = await supabase
         .from('premium_products')
         .select('*')
@@ -61,7 +123,6 @@ export const PremiumProductsCarousel = () => {
         return;
       }
 
-      // Transform the data to ensure it matches our PremiumProduct interface
       const transformedData: PremiumProduct[] = (data as SupabaseProduct[]).map(item => ({
         ...item,
         purchase_options: item.purchase_options || {
@@ -111,6 +172,18 @@ export const PremiumProductsCarousel = () => {
                       </li>
                     ))}
                   </ul>
+                  {product.purchase_options && (
+                    <div className="mt-4 pt-4 border-t">
+                      <p className="text-2xl font-bold text-solar-orange">
+                        {product.purchase_options.price.toLocaleString()}€
+                      </p>
+                      {product.purchase_options.financing.available && (
+                        <p className="text-sm text-gray-600">
+                          Finanzierung ab {product.purchase_options.financing.min_rate}% für bis zu {product.purchase_options.financing.max_term} Monate
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
               </Card>
             </CarouselItem>
