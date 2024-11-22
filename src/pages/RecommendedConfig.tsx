@@ -7,7 +7,8 @@ import { SystemMetrics } from "@/components/solar-showcase/components/SystemMetr
 import { SavingsCalculator } from "@/components/SavingsCalculator";
 import { Testimonials } from "@/components/Testimonials";
 import { FAQ } from "@/components/FAQ";
-import { PricingOptions } from "@/components/solar-showcase/components/PricingOptions";
+import { Shield, Wrench, Clock, Package, CreditCard, Wallet } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { PremiumProductsCarousel } from "@/components/solar-showcase/components/PremiumProductsCarousel";
 
 export const RecommendedConfig = () => {
@@ -26,16 +27,6 @@ export const RecommendedConfig = () => {
   const moduleCount = Math.round(metrics.kWp * 2);
   const annualProduction = Math.round(metrics.kWp * 950);
   const estimatedPrice = Math.round(metrics.kWp * 1950);
-
-  const handleQuoteRequest = () => {
-    setFormType("quote");
-    setShowLeadForm(true);
-  };
-
-  const handleConsultationRequest = () => {
-    setFormType("consultation");
-    setShowLeadForm(true);
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-solar-blue-50 to-white">
@@ -74,11 +65,51 @@ export const RecommendedConfig = () => {
 
               <div className="space-y-6">
                 <h3 className="text-2xl font-bold">Unverbindliche Preisschätzung</h3>
-                <PricingOptions
-                  estimatedPrice={estimatedPrice}
-                  onQuoteRequest={handleQuoteRequest}
-                  onConsultationRequest={handleConsultationRequest}
-                />
+                <Card className="p-6 bg-gradient-to-br from-solar-orange/10 to-white">
+                  <div className="space-y-6">
+                    <div className="flex items-start gap-4">
+                      <Shield className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
+                      <div>
+                        <h4 className="font-semibold text-lg mb-1">Premium Komponenten</h4>
+                        <p className="text-gray-600">Hochwertige Module, Wechselrichter und ein 10 kWh Speicher für maximale Unabhängigkeit</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <Wrench className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
+                      <div>
+                        <h4 className="font-semibold text-lg mb-1">Komplette Installation</h4>
+                        <p className="text-gray-600">Professionelle DC und AC Installation inklusive neuem Zählerschrank nach aktuellen Standards</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <Clock className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
+                      <div>
+                        <h4 className="font-semibold text-lg mb-1">Schnelle Umsetzung</h4>
+                        <p className="text-gray-600">Von der Planung bis zur Inbetriebnahme - alles aus einer Hand</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <Package className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
+                      <div>
+                        <h4 className="font-semibold text-lg mb-1">Rundum-Sorglos-Paket</h4>
+                        <p className="text-gray-600">Inklusive aller Genehmigungen, Anmeldungen und Dokumentation</p>
+                      </div>
+                    </div>
+                    <div className="mt-8 p-6 bg-white rounded-xl shadow-lg">
+                      <p className="text-4xl font-bold text-solar-orange mb-2">{estimatedPrice.toLocaleString()}€</p>
+                      <p className="text-sm text-gray-500 mb-4">Komplett-Installation inkl. MwSt.</p>
+                      <Button 
+                        className="w-full bg-solar-orange hover:bg-solar-orange-dark text-lg py-6"
+                        onClick={() => {
+                          setFormType("quote");
+                          setShowLeadForm(true);
+                        }}
+                      >
+                        Vor-Ort Termin vereinbaren
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
               </div>
             </div>
           </div>
@@ -97,6 +128,72 @@ export const RecommendedConfig = () => {
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-white via-transparent to-white z-10 pointer-events-none" />
             <PremiumProductsCarousel />
+          </div>
+
+          <div className="mt-16 max-w-4xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-8">
+              <Card className="p-8 bg-gradient-to-br from-solar-orange/5 to-white hover:shadow-lg transition-all">
+                <div className="space-y-6">
+                  <div className="flex items-center gap-4">
+                    <Wallet className="h-8 w-8 text-solar-orange" />
+                    <h3 className="text-2xl font-bold">KAUFEN</h3>
+                  </div>
+                  <ul className="space-y-4">
+                    <li className="flex items-start gap-3">
+                      <Shield className="h-5 w-5 text-solar-orange flex-shrink-0 mt-1" />
+                      <span>Einmalige Investition</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <Package className="h-5 w-5 text-solar-orange flex-shrink-0 mt-1" />
+                      <span>Sofortige Eigentumsübertragung</span>
+                    </li>
+                  </ul>
+                  <div className="pt-4">
+                    <p className="text-3xl font-bold text-solar-orange mb-2">{estimatedPrice.toLocaleString()}€</p>
+                    <Button 
+                      className="w-full bg-solar-orange hover:bg-solar-orange-dark"
+                      onClick={() => {
+                        setFormType("quote");
+                        setShowLeadForm(true);
+                      }}
+                    >
+                      Jetzt kaufen
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-8 bg-gradient-to-br from-blue-500/5 to-white hover:shadow-lg transition-all">
+                <div className="space-y-6">
+                  <div className="flex items-center gap-4">
+                    <CreditCard className="h-8 w-8 text-blue-500" />
+                    <h3 className="text-2xl font-bold">COPPEN Flex</h3>
+                  </div>
+                  <ul className="space-y-4">
+                    <li className="flex items-start gap-3">
+                      <Shield className="h-5 w-5 text-blue-500 flex-shrink-0 mt-1" />
+                      <span>Flexible Finanzierung ab 0% Zinsen</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <Clock className="h-5 w-5 text-blue-500 flex-shrink-0 mt-1" />
+                      <span>Laufzeiten bis zu 20 Jahre</span>
+                    </li>
+                  </ul>
+                  <div className="pt-4">
+                    <p className="text-3xl font-bold text-blue-500 mb-2">ab {Math.round(estimatedPrice / 240).toLocaleString()}€/Monat</p>
+                    <Button 
+                      className="w-full bg-blue-500 hover:bg-blue-600"
+                      onClick={() => {
+                        setFormType("consultation");
+                        setShowLeadForm(true);
+                      }}
+                    >
+                      Finanzierung anfragen
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            </div>
           </div>
         </div>
 
