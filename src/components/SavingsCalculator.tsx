@@ -72,13 +72,6 @@ export const SavingsCalculator = ({ yearlyProduction }: { yearlyProduction: numb
         </div>
       </div>
 
-        <div className="p-4 bg-white/50 rounded-lg">
-          <div className="text-2xl font-bold text-solar-blue mb-2">
-            {estimatedPrice.toLocaleString()} €
-          </div>
-          <div className="text-sm text-gray-600">Geschätzter Anlagenpreis inkl. MwSt.</div>
-        </div>
-
         <div className="space-y-2 text-sm">
           <div className="flex items-start gap-2">
             <div className="w-1.5 h-1.5 rounded-full bg-solar-blue mt-1.5" />
