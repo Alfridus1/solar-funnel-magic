@@ -9,7 +9,6 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { supabase } from "@/integrations/supabase/client";
-import { PurchaseOptions } from "./PurchaseOptions";
 
 interface PremiumProduct {
   id: string;
@@ -115,10 +114,6 @@ export const PremiumProductsCarousel = () => {
                       </li>
                     ))}
                   </ul>
-                  <PurchaseOptions 
-                    options={product.purchase_options}
-                    onRequestQuote={() => setShowLeadForm(true)}
-                  />
                 </div>
               </Card>
             </CarouselItem>
