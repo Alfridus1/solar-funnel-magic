@@ -139,7 +139,7 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
                 <div className="p-2 bg-blue-100 rounded-lg">
                   <Home className="h-5 w-5 text-blue-600" />
                 </div>
-                <span className="text-gray-600">30 Jahre Ersparnis (HJT 3.0)</span>
+                <span className="text-gray-600">30 Jahre Ersparnis</span>
               </div>
               <span className="text-2xl font-bold text-blue-600">{thirtyYearSavings.toLocaleString()}€</span>
             </div>
