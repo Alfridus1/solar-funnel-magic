@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/carousel";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
-import useEmblaCarousel from 'embla-carousel-react';
 
 interface PremiumProduct {
   id: string;
@@ -19,14 +18,6 @@ interface PremiumProduct {
   image_url: string;
   features: string[];
   climate_impact: string;
-  purchase_options: {
-    price: number;
-    financing: {
-      available: boolean;
-      min_rate: number;
-      max_term: number;
-    };
-  };
 }
 
 interface SupabaseProduct {
@@ -37,24 +28,11 @@ interface SupabaseProduct {
   features: string[];
   climate_impact: string;
   order_number: number;
-  purchase_options?: {
-    price: number;
-    financing: {
-      available: boolean;
-      min_rate: number;
-      max_term: number;
-    };
-  };
 }
 
 export const PremiumProductsCarousel = () => {
   const [products, setProducts] = useState<PremiumProduct[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: true,
-    align: 'center',
-    skipSnaps: false,
-  });
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -68,43 +46,26 @@ export const PremiumProductsCarousel = () => {
         return;
       }
 
-      const transformedData: PremiumProduct[] = (data as SupabaseProduct[]).map(item => ({
-        ...item,
-        purchase_options: item.purchase_options || {
-          price: 0,
-          financing: {
-            available: false,
-            min_rate: 0,
-            max_term: 0
-          }
-        }
-      }));
-
+      const transformedData: PremiumProduct[] = (data as SupabaseProduct[]);
       setProducts(transformedData);
     };
 
     fetchProducts();
   }, []);
 
-  useEffect(() => {
-    if (emblaApi) {
-      emblaApi.on('select', () => {
-        setActiveIndex(emblaApi.selectedScrollSnap());
-      });
-    }
-  }, [emblaApi]);
-
   return (
     <section className="py-12">
       <div className="w-full max-w-7xl mx-auto px-4">
         <Carousel
-          ref={emblaRef}
           opts={{
             loop: true,
             align: 'center',
             skipSnaps: false,
           }}
           className="relative"
+          onSelect={(api) => {
+            setActiveIndex(api.selectedScrollSnap());
+          }}
         >
           <CarouselContent>
             {products.map((product, index) => (
@@ -141,18 +102,6 @@ export const PremiumProductsCarousel = () => {
                           </li>
                         ))}
                       </ul>
-                      {product.purchase_options && (
-                        <div className="mt-4 pt-4 border-t">
-                          <p className="text-2xl font-bold text-solar-orange">
-                            {product.purchase_options.price.toLocaleString()}€
-                          </p>
-                          {product.purchase_options.financing.available && (
-                            <p className="text-sm text-gray-600">
-                              Finanzierung ab {product.purchase_options.financing.min_rate}% für bis zu {product.purchase_options.financing.max_term} Monate
-                            </p>
-                          )}
-                        </div>
-                      )}
                     </div>
                   </Card>
                 </div>
