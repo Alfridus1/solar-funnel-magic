@@ -20,19 +20,27 @@ export function AffiliateDashboard() {
         const { data: affiliateData, error: affiliateError } = await supabase
           .from("affiliates")
           .select("*")
-          .single();
+          .limit(1);
 
         if (affiliateError) throw affiliateError;
-        setAffiliate(affiliateData);
+        if (affiliateData && affiliateData.length > 0) {
+          setAffiliate(affiliateData[0]);
 
-        // Fetch leads data
-        const { data: leadsData, error: leadsError } = await supabase
-          .from("leads")
-          .select("*")
-          .eq("affiliate_id", affiliateData.id);
+          // Fetch leads data only if we have an affiliate
+          const { data: leadsData, error: leadsError } = await supabase
+            .from("leads")
+            .select("*")
+            .eq("affiliate_id", affiliateData[0].id);
 
-        if (leadsError) throw leadsError;
-        setLeads(leadsData);
+          if (leadsError) throw leadsError;
+          setLeads(leadsData || []);
+        } else {
+          toast({
+            title: "Kein Affiliate-Konto gefunden",
+            description: "Bitte registrieren Sie sich zuerst als Affiliate.",
+            variant: "destructive",
+          });
+        }
       } catch (error) {
         toast({
           title: "Fehler beim Laden der Daten",
