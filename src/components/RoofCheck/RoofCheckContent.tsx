@@ -5,7 +5,7 @@ import { ProgressBar } from "@/components/ProgressBar";
 
 interface RoofCheckContentProps {
   address: string;
-  handleRoofOutlineComplete: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number }[]) => void;
+  handleRoofOutlineComplete: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number; kWp: number }[]) => void;
   paths: google.maps.LatLng[][];
   metrics: any;
   handleContinue: () => void;

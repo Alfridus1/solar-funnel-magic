@@ -8,9 +8,9 @@ interface UseRoofMapHandlersProps {
   setModules: (modules: google.maps.Rectangle[]) => void;
   isDrawing: boolean;
   setIsDrawing: (isDrawing: boolean) => void;
-  roofDetails: { roofId: string; moduleCount: number }[];
-  setRoofDetails: (roofDetails: { roofId: string; moduleCount: number }[]) => void;
-  onRoofOutlineComplete: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number }[]) => void;
+  roofDetails: { roofId: string; moduleCount: number; kWp: number }[];
+  setRoofDetails: (roofDetails: { roofId: string; moduleCount: number; kWp: number }[]) => void;
+  onRoofOutlineComplete: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number; kWp: number }[]) => void;
   setIsAnalyzing: (isAnalyzing: boolean) => void;
   toast: any;
   onLog?: (message: string) => void;
@@ -78,10 +78,10 @@ export const useRoofMapHandlers = ({
     setPolygons(prevPolygons => [...prevPolygons, polygon]);
     setIsDrawing(false);
 
-    const { moduleCount, roofId } = calculateModulePositions(polygon, map, setModules);
-    onLog?.(`Module berechnet: ${moduleCount}`);
+    const { moduleCount, roofId, kWp } = calculateModulePositions(polygon, map, setModules);
+    onLog?.(`Module berechnet: ${moduleCount} (${kWp} kWp)`);
     
-    const newRoofDetails = [...roofDetails, { roofId, moduleCount }];
+    const newRoofDetails = [...roofDetails, { roofId, moduleCount, kWp }];
     setRoofDetails(newRoofDetails);
 
     const allPaths = [...polygons, polygon].map((poly) =>
@@ -91,7 +91,7 @@ export const useRoofMapHandlers = ({
 
     toast({
       title: "Sehr gut!",
-      description: `${moduleCount} Module können optimal auf dieser Dachfläche installiert werden. ${
+      description: `${moduleCount} Module mit ${kWp} kWp können optimal auf dieser Dachfläche installiert werden. ${
         polygons.length === 0
           ? "Sie können weitere Dächer hinzufügen oder die Form durch Ziehen der Punkte anpassen."
           : "Sie können weitere Dachflächen einzeichnen oder die Formen anpassen."

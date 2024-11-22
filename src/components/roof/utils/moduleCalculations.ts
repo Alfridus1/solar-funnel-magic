@@ -35,7 +35,7 @@ export const calculateModulePositions = (
         sw.lng() + col * (panelWidthDeg + spacingDeg)
       );
 
-      // Überprüfen, ob der Mittelpunkt des Moduls innerhalb des Polygons liegt
+      // Check if module center is within polygon
       if (google.maps.geometry.poly.containsLocation(position, polygon)) {
         const moduleBounds = new google.maps.LatLngBounds(
           new google.maps.LatLng(
@@ -66,5 +66,7 @@ export const calculateModulePositions = (
 
   setModules(newModules);
   const roofId = uuidv4();
-  return { moduleCount: newModules.length, roofId };
+  // Calculate kWp based on module count (500Wp per module = 0.5 kWp per module)
+  const kWp = Math.round(newModules.length * 0.5 * 2) / 2; // Round to nearest 0.5
+  return { moduleCount: newModules.length, roofId, kWp };
 };
