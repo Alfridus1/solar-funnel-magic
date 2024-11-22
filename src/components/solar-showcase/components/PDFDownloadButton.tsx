@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
-import { PDFDownloadLink, PDFDownloadLinkProps } from "@react-pdf/renderer";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import { SolarOfferPDF } from "@/components/pdf/SolarOfferPDF";
 import { ReactElement } from "react";
 
@@ -15,7 +15,7 @@ export const PDFDownloadButton = ({ metrics, address }: PDFDownloadButtonProps) 
       document={<SolarOfferPDF metrics={metrics} address={address} />}
       fileName="solar-angebot.pdf"
     >
-      {({ loading }) => (
+      {({ loading }): ReactElement => (
         <Button
           className="bg-solar-orange hover:bg-solar-orange-dark"
           disabled={loading}
