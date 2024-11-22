@@ -35,13 +35,16 @@ export const RegistrationOverlay = ({ onComplete }: RegistrationOverlayProps) =>
 
     try {
       // First check if a profile with this email already exists
-      const { data: existingProfiles } = await supabase
+      const { data: existingProfiles, error: queryError } = await supabase
         .from('profiles')
         .select('id')
-        .eq('email', formData.email)
-        .single();
+        .eq('email', formData.email);
 
-      if (existingProfiles) {
+      if (queryError) throw queryError;
+
+      const existingProfile = existingProfiles?.[0];
+
+      if (existingProfile) {
         // If profile exists, just update it
         const { error: updateError } = await supabase
           .from('profiles')
@@ -50,7 +53,7 @@ export const RegistrationOverlay = ({ onComplete }: RegistrationOverlayProps) =>
             last_name: formData.lastName,
             phone: formData.phone,
           })
-          .eq('id', existingProfiles.id);
+          .eq('id', existingProfile.id);
 
         if (updateError) throw updateError;
       } else {
