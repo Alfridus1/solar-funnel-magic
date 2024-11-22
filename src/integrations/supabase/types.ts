@@ -9,6 +9,51 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      affiliate_bonuses: {
+        Row: {
+          affiliate_id: string | null
+          amount: number
+          created_at: string | null
+          id: string
+          lead_id: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          affiliate_id?: string | null
+          amount: number
+          created_at?: string | null
+          id?: string
+          lead_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          affiliate_id?: string | null
+          amount?: number
+          created_at?: string | null
+          id?: string
+          lead_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_bonuses_affiliate_id_fkey"
+            columns: ["affiliate_id"]
+            isOneToOne: false
+            referencedRelation: "affiliates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliate_bonuses_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       affiliates: {
         Row: {
           created_at: string | null
@@ -72,6 +117,7 @@ export type Database = {
       company_settings: {
         Row: {
           address: string | null
+          affiliate_bonus: number | null
           bank_details: string | null
           company_name: string
           created_at: string | null
@@ -82,6 +128,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          affiliate_bonus?: number | null
           bank_details?: string | null
           company_name: string
           created_at?: string | null
@@ -92,6 +139,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          affiliate_bonus?: number | null
           bank_details?: string | null
           company_name?: string
           created_at?: string | null
