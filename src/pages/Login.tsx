@@ -74,7 +74,7 @@ export function Login() {
                 button_label: 'Passwort zurücksetzen',
                 loading_button_label: 'Sende Anweisungen...',
                 email_input_placeholder: 'Ihre E-Mail Adresse',
-                confirmation_text: 'Überprüfen Sie Ihre E-Mails für den Reset-Link',
+                confirmation_text: 'Überprüfen Sie Ihre E-Mails für den Bestätigungslink',
               },
             },
           }}
