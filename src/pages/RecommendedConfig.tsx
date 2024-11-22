@@ -57,10 +57,9 @@ export const RecommendedConfig = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-              {/* Left Column - Potential Analysis */}
               <div className="space-y-6">
                 <h3 className="text-2xl font-bold">Potentialanalyse</h3>
-                <div className="bg-white/50 rounded-xl p-6 shadow-sm">
+                <div className="bg-gradient-to-br from-white via-solar-blue-50/50 to-solar-blue-100/30 rounded-xl p-6 shadow-lg backdrop-blur-sm border border-white/50">
                   <SavingsCalculator yearlyProduction={annualProduction} />
                 </div>
               </div>
