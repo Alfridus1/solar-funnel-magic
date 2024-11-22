@@ -22,15 +22,15 @@ export const SavingsCalculator = ({ yearlyProduction }: { yearlyProduction: numb
   const yearlyCO2Savings = Math.round(yearlyProduction * 0.366 / 1000); // Convert to tons
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 sm:gap-3 mb-4">
-          <Calculator className="h-5 w-5 sm:h-6 sm:w-6 text-solar-orange" />
-          <h3 className="text-lg sm:text-xl font-semibold">Ihre Potentialanalyse</h3>
-        </div>
-        
-        <div className="space-y-3">
-          <div className="flex justify-between items-center p-2 sm:p-3 bg-white/50 rounded-lg text-sm sm:text-base">
+    <div className="w-full max-w-6xl mx-auto">
+      <div className="flex items-center gap-2 sm:gap-3 mb-6">
+        <Calculator className="h-5 w-5 sm:h-6 sm:w-6 text-solar-orange" />
+        <h3 className="text-lg sm:text-xl font-semibold">Ihre Potentialanalyse</h3>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <div className="flex justify-between items-center p-3 sm:p-4 bg-white/50 rounded-lg text-sm sm:text-base">
             <span>Jährliche Produktion:</span>
             <div className="text-right">
               <span className="font-semibold">{yearlyProduction.toLocaleString()} kWh</span>
@@ -52,18 +52,20 @@ export const SavingsCalculator = ({ yearlyProduction }: { yearlyProduction: numb
               className="my-4"
             />
           </div>
+        </div>
 
-          <div className="flex justify-between items-center p-2 sm:p-3 bg-solar-orange-50 rounded-lg text-sm sm:text-base">
+        <div className="space-y-4">
+          <div className="flex justify-between items-center p-3 sm:p-4 bg-solar-orange-50 rounded-lg text-sm sm:text-base">
             <span>Anlagengröße:</span>
             <span className="font-semibold text-solar-orange">{estimatedKWp.toFixed(1)} kWp</span>
           </div>
           
-          <div className="flex justify-between items-center p-2 sm:p-3 bg-solar-orange-50 rounded-lg text-sm sm:text-base">
+          <div className="flex justify-between items-center p-3 sm:p-4 bg-solar-orange-50 rounded-lg text-sm sm:text-base">
             <span>Jährliche Einsparung:</span>
             <span className="font-semibold text-solar-orange">{Math.round(yearlySavings).toLocaleString()} €</span>
           </div>
           
-          <div className="flex justify-between items-center p-2 sm:p-3 bg-solar-orange-100 rounded-lg text-sm sm:text-base">
+          <div className="flex justify-between items-center p-3 sm:p-4 bg-solar-orange-100 rounded-lg text-sm sm:text-base">
             <span>Einsparung über 25 Jahre:</span>
             <span className="font-semibold text-solar-orange-600">
               {Math.round(twentyFiveYearSavings).toLocaleString()} €
