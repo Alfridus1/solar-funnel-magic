@@ -29,7 +29,16 @@ export const PremiumProductsManagement = () => {
     // Transform the data to ensure it matches our PremiumProduct interface
     const transformedData: PremiumProduct[] = data.map(item => ({
       ...item,
-      purchase_options: JSON.parse(item.purchase_options || '{"price":0,"financing":{"available":false,"min_rate":0,"max_term":0}}')
+      purchase_options: item.purchase_options ? 
+        JSON.parse(item.purchase_options) : 
+        {
+          price: 0,
+          financing: {
+            available: false,
+            min_rate: 0,
+            max_term: 0
+          }
+        }
     }));
 
     setProducts(transformedData);
