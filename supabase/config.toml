@@ -1,3 +1,4 @@
 project_id = "uhyniesjgmhokapdrjnk"
-[functions.analyze-roof]
+
+[functions.opensolar]
 verify_jwt = false
