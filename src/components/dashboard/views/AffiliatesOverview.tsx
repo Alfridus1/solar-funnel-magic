@@ -9,11 +9,15 @@ export const AffiliatesOverview = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return null;
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('affiliates')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle(); // Changed from .single() to .maybeSingle()
+
+      if (error && error.code !== 'PGRST116') { // Only throw if it's not a "no rows returned" error
+        throw error;
+      }
 
       return data;
     }
