@@ -5,9 +5,18 @@ import { Shield, Wrench, Clock, Package } from "lucide-react";
 interface PricingCardProps {
   estimatedPrice: number;
   onShowLeadForm: () => void;
+  systemSizeKWp: number;
 }
 
-export const PricingCard = ({ estimatedPrice, onShowLeadForm }: PricingCardProps) => {
+export const PricingCard = ({ estimatedPrice, onShowLeadForm, systemSizeKWp }: PricingCardProps) => {
+  const getBatterySize = () => {
+    if (systemSizeKWp >= 18) return 20;
+    if (systemSizeKWp >= 12.5) return 15;
+    return 10;
+  };
+
+  const batterySize = getBatterySize();
+
   return (
     <Card className="p-6 bg-gradient-to-br from-solar-orange/10 to-white">
       <div className="space-y-6">
@@ -15,7 +24,9 @@ export const PricingCard = ({ estimatedPrice, onShowLeadForm }: PricingCardProps
           <Shield className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
           <div>
             <h4 className="font-semibold text-lg mb-1">Premium Komponenten</h4>
-            <p className="text-gray-600">Hochwertige Module, Wechselrichter und ein 10 kWh Speicher für maximale Unabhängigkeit</p>
+            <p className="text-gray-600">
+              Hochwertige Module, Wechselrichter und ein <span className="font-bold">{batterySize} kWh</span> Speicher für maximale Unabhängigkeit
+            </p>
           </div>
         </div>
         <div className="flex items-start gap-4">
