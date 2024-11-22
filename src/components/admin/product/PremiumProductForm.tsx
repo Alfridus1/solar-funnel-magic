@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Plus, Pencil } from "lucide-react";
 import { ImageUpload } from "./ImageUpload";
-import { PremiumProductFormFields } from "./types";
+import { PremiumProduct, PremiumProductFormFields } from "./types";
 
 interface PremiumProductFormProps {
   editingProduct: PremiumProduct | null;
