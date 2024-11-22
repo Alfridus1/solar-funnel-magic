@@ -11,7 +11,7 @@ export const Stats = () => {
         </div>
         <div className="flex flex-col items-center text-center space-y-2">
           <Users className="h-12 w-12 text-solar-orange mb-2" />
-          <h3 className="text-4xl font-bold text-gray-900">50+</h3>
+          <h3 className="text-4xl font-bold text-gray-900">130+</h3>
           <p className="text-gray-600">Experten im Team</p>
         </div>
         <div className="flex flex-col items-center text-center space-y-2">
