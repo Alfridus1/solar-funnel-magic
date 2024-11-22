@@ -87,6 +87,7 @@ export const RecommendedConfig = () => {
                 <PricingCard 
                   estimatedPrice={estimatedPrice} 
                   onShowLeadForm={handleShowQuoteForm}
+                  systemSizeKWp={metrics.kWp}
                 />
               </div>
             </div>
