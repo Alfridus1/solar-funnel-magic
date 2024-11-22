@@ -23,15 +23,14 @@ export const RoofCheckContent = ({
   const steps = [
     { title: "Adresse", description: "Ihre Adresse" },
     { title: "Dach vermessen", description: "Zeichnen Sie Ihr Dach" },
-    { title: "Konfiguration", description: "Wählen Sie Ihre Module" },
-    { title: "Angebot", description: "Ihr persönliches Angebot" },
-    { title: "Bestellung", description: "Auftrag abschließen" }
+    { title: "Potenzialanalyse", description: "Ihre Solaranlage" },
+    { title: "Unverbindliches Angebot", description: "Mit Vor-Ort Termin" }
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-8">
       <div className="container mx-auto px-4">
-        <ProgressBar currentStep={2} totalSteps={5} steps={steps} />
+        <ProgressBar currentStep={2} totalSteps={4} steps={steps} />
         
         <Card className="max-w-5xl mx-auto p-6">
           <div className="space-y-6">
