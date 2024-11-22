@@ -49,11 +49,6 @@ export const SavingsCalculator = ({ yearlyProduction }: { yearlyProduction: numb
           <span>Anlagengröße:</span>
           <span className="font-semibold text-solar-orange">{estimatedKWp.toFixed(1)} kWp</span>
         </div>
-
-        <div className="flex justify-between items-center p-2 sm:p-3 bg-solar-orange-50 rounded-lg text-sm sm:text-base">
-          <span>Unverbindliche Preisschätzung:</span>
-          <span className="font-semibold text-solar-orange">{estimatedPrice.toLocaleString()} €</span>
-        </div>
         
         <div className="flex justify-between items-center p-2 sm:p-3 bg-solar-orange-50 rounded-lg text-sm sm:text-base">
           <span>Jährliche Einsparung:</span>
@@ -65,6 +60,11 @@ export const SavingsCalculator = ({ yearlyProduction }: { yearlyProduction: numb
           <span className="font-semibold text-solar-orange-600">
             {Math.round(twentyFiveYearSavings).toLocaleString()} €
           </span>
+        </div>
+
+        <div className="flex justify-between items-center p-2 sm:p-3 bg-solar-orange-50 rounded-lg text-sm sm:text-base">
+          <span>Unverbindliche Preisschätzung:</span>
+          <span className="font-semibold text-solar-orange">{estimatedPrice.toLocaleString()} €</span>
         </div>
       </div>
     </Card>
