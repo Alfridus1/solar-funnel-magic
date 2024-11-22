@@ -3,12 +3,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { HeroImage } from "@/components/solar-showcase/components/HeroImage";
 import { LeadFormOverlay } from "@/components/solar-showcase/components/LeadFormOverlay";
-import { ProductOverview } from "@/components/solar-showcase/components/ProductOverview";
 import { SystemMetrics } from "@/components/solar-showcase/components/SystemMetrics";
 import { SavingsCalculator } from "@/components/SavingsCalculator";
 import { Testimonials } from "@/components/Testimonials";
 import { FAQ } from "@/components/FAQ";
 import { Shield, Wrench, Clock, Package } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export const RecommendedConfig = () => {
   const location = useLocation();
@@ -23,10 +23,30 @@ export const RecommendedConfig = () => {
     return null;
   }
 
-  // Calculate values based on 500W modules
-  const moduleCount = Math.round(metrics.kWp * 2); // Since each module is 0.5 kWp
-  const annualProduction = Math.round(metrics.kWp * 950); // 950 kWh per kWp annually
+  const moduleCount = Math.round(metrics.kWp * 2);
+  const annualProduction = Math.round(metrics.kWp * 950);
   const estimatedPrice = Math.round(metrics.kWp * 1950);
+
+  const premiumProducts = [
+    {
+      title: "Premium Solarmodule",
+      description: "Hocheffiziente Module mit 30 Jahren Garantie",
+      image: "https://images.unsplash.com/photo-1509391366360-2e959784a276",
+      features: ["500W Nennleistung", "21% Wirkungsgrad", "30 Jahre Garantie"]
+    },
+    {
+      title: "Smart Wechselrichter",
+      description: "Intelligente Steuerung Ihrer Solaranlage",
+      image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837",
+      features: ["98.6% Wirkungsgrad", "Integriertes Monitoring", "Smart-Home ready"]
+    },
+    {
+      title: "Hochleistungsspeicher",
+      description: "Maximale Unabhängigkeit durch effiziente Speicherung",
+      image: "https://images.unsplash.com/photo-1620677368158-41a63899f5ca",
+      features: ["15kWh Kapazität", "95% Entladetiefe", "10 Jahre Garantie"]
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F75c03]/5 to-white">
@@ -49,24 +69,38 @@ export const RecommendedConfig = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <SavingsCalculator yearlyProduction={annualProduction} />
-              <Card className="p-6">
-                <h3 className="text-xl font-bold mb-4">Umweltauswirkung</h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                    <span>CO₂-Einsparung/Jahr</span>
-                    <span className="font-bold text-green-700">{Math.round(annualProduction * 0.4)} kg</span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                    <span>Entspricht Bäumen</span>
-                    <span className="font-bold text-green-700">{Math.round(annualProduction * 0.4 / 25)} Stück</span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                    <span>Eingesparte Energie</span>
-                    <span className="font-bold text-green-700">{annualProduction} kWh/Jahr</span>
-                  </div>
-                </div>
-              </Card>
             </div>
+
+            <section className="py-12">
+              <h2 className="text-3xl font-bold text-center mb-8">
+                Unsere Premium Produkte für Sie
+              </h2>
+              <div className="grid md:grid-cols-3 gap-8">
+                {premiumProducts.map((product, index) => (
+                  <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow">
+                    <div className="aspect-video bg-gradient-to-br from-solar-blue-50 to-white">
+                      <img 
+                        src={product.image} 
+                        alt={product.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="p-6 space-y-4">
+                      <h3 className="text-xl font-semibold">{product.title}</h3>
+                      <p className="text-gray-600">{product.description}</p>
+                      <ul className="space-y-2">
+                        {product.features.map((feature, idx) => (
+                          <li key={idx} className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-solar-orange" />
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </section>
 
             <Card className="p-6 bg-gradient-to-br from-solar-orange/10 to-white">
               <h3 className="text-2xl font-bold mb-6">Ihr All-Inclusive Angebot</h3>
@@ -102,7 +136,6 @@ export const RecommendedConfig = () => {
                   </div>
                 </div>
                 <div className="flex flex-col justify-center p-6 bg-white rounded-lg shadow-lg">
-                  <p className="text-gray-600 mb-2">Unverbindliche Preisschätzung</p>
                   <p className="text-3xl font-bold text-solar-orange mb-4">{estimatedPrice.toLocaleString()}€</p>
                   <p className="text-sm text-gray-500">Komplett-Installation inkl. MwSt.</p>
                 </div>
@@ -112,7 +145,6 @@ export const RecommendedConfig = () => {
         </Card>
 
         <div className="max-w-4xl mx-auto">
-          <ProductOverview />
           <Testimonials />
           <FAQ />
         </div>
