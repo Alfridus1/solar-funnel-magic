@@ -4,6 +4,7 @@ import { LeadManagement } from "@/components/admin/LeadManagement";
 import { ProductManagement } from "@/components/admin/ProductManagement";
 import { SystemSettings } from "@/components/admin/SystemSettings";
 import { PremiumProductsManagement } from "@/components/admin/PremiumProductsManagement";
+import { UserManagement } from "@/components/admin/UserManagement";
 
 export const AdminDashboard = () => {
   return (
@@ -13,6 +14,7 @@ export const AdminDashboard = () => {
       <Tabs defaultValue="leads" className="space-y-6">
         <TabsList>
           <TabsTrigger value="leads">Anfragen</TabsTrigger>
+          <TabsTrigger value="users">Benutzer</TabsTrigger>
           <TabsTrigger value="products">Produkte</TabsTrigger>
           <TabsTrigger value="premium">Premium Produkte</TabsTrigger>
           <TabsTrigger value="settings">Einstellungen</TabsTrigger>
@@ -20,6 +22,10 @@ export const AdminDashboard = () => {
 
         <TabsContent value="leads">
           <LeadManagement />
+        </TabsContent>
+
+        <TabsContent value="users">
+          <UserManagement />
         </TabsContent>
 
         <TabsContent value="products">
