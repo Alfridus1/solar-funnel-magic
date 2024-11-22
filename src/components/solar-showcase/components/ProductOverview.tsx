@@ -1,9 +1,9 @@
+import { useState, useEffect } from 'react';
+import { supabase } from "@/integrations/supabase/client";
+import { Product } from "@/components/configurator/types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Download } from "lucide-react";
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Product } from "@/components/configurator/types";
 
 export const ProductOverview = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -24,17 +24,22 @@ export const ProductOverview = () => {
     }
 
     // Transform the data to match our Product type
-    const transformedData = data.map(item => ({
-      ...item,
-      category: item.category as 'module' | 'inverter' | 'battery',
-      specs: {
-        watts: item.specs?.watts as number | undefined,
-        capacity: item.specs?.capacity as number | undefined,
-        power: item.specs?.power as number | undefined,
-        efficiency: item.specs?.efficiency as number | undefined,
-        warranty: item.specs?.warranty as number | undefined
-      }
-    })) as Product[];
+    const transformedData = data.map(item => {
+      // Parse the specs JSON if it's a string
+      const specs = typeof item.specs === 'string' ? JSON.parse(item.specs) : item.specs;
+      
+      return {
+        ...item,
+        category: item.category as 'module' | 'inverter' | 'battery',
+        specs: {
+          watts: typeof specs?.watts === 'number' ? specs.watts : undefined,
+          capacity: typeof specs?.capacity === 'number' ? specs.capacity : undefined,
+          power: typeof specs?.power === 'number' ? specs.power : undefined,
+          efficiency: typeof specs?.efficiency === 'number' ? specs.efficiency : undefined,
+          warranty: typeof specs?.warranty === 'number' ? specs.warranty : undefined
+        }
+      };
+    }) as Product[];
 
     setProducts(transformedData);
   };
