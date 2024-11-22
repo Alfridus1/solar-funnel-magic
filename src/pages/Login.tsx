@@ -45,6 +45,8 @@ export function Login() {
               container: 'w-full',
               button: 'w-full bg-solar-orange hover:bg-solar-orange-light text-white',
               input: 'w-full rounded border-gray-300',
+              label: 'text-gray-700',
+              message: 'text-red-600',
             }
           }}
           localization={{
@@ -54,19 +56,29 @@ export function Login() {
                 password_label: 'Passwort',
                 button_label: 'Anmelden',
                 loading_button_label: 'Anmeldung läuft...',
-                social_provider_text: 'Anmelden mit {{provider}}',
-                link_text: 'Sie haben bereits ein Konto? Anmelden',
+                link_text: 'Noch kein Konto? Jetzt registrieren',
+                email_input_placeholder: 'Ihre E-Mail Adresse',
+                password_input_placeholder: 'Ihr Passwort',
               },
               sign_up: {
                 email_label: 'E-Mail Adresse',
                 password_label: 'Passwort',
                 button_label: 'Registrieren',
                 loading_button_label: 'Registrierung läuft...',
-                social_provider_text: 'Registrieren mit {{provider}}',
-                link_text: 'Kein Konto? Registrieren',
+                link_text: 'Bereits ein Konto? Jetzt anmelden',
+                email_input_placeholder: 'Ihre E-Mail Adresse',
+                password_input_placeholder: 'Wählen Sie ein sicheres Passwort',
+              },
+              forgotten_password: {
+                link_text: 'Passwort vergessen?',
+                button_label: 'Passwort zurücksetzen',
+                loading_button_label: 'Sende Anweisungen...',
+                email_input_placeholder: 'Ihre E-Mail Adresse',
+                confirmation_text: 'Überprüfen Sie Ihre E-Mails für den Reset-Link',
               },
             },
           }}
+          providers={[]}
           theme="light"
         />
       </Card>
