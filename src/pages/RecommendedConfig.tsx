@@ -7,7 +7,7 @@ import { SystemMetrics } from "@/components/solar-showcase/components/SystemMetr
 import { SavingsCalculator } from "@/components/SavingsCalculator";
 import { Testimonials } from "@/components/Testimonials";
 import { FAQ } from "@/components/FAQ";
-import { Shield, Wrench, Clock, Package } from "lucide-react";
+import { Shield, Wrench, Clock, Package, Leaf, CloudSun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const RecommendedConfig = () => {
@@ -26,25 +26,50 @@ export const RecommendedConfig = () => {
   const moduleCount = Math.round(metrics.kWp * 2);
   const annualProduction = Math.round(metrics.kWp * 950);
   const estimatedPrice = Math.round(metrics.kWp * 1950);
+  const co2Savings = Math.round(annualProduction * 0.366); // kg CO2 per kWh
 
   const premiumProducts = [
     {
       title: "Premium Solarmodule",
       description: "Hocheffiziente Module mit 30 Jahren Garantie",
-      image: "https://images.unsplash.com/photo-1509391366360-2e959784a276",
-      features: ["500W Nennleistung", "21% Wirkungsgrad", "30 Jahre Garantie"]
+      image: "/lovable-uploads/fe437c08-df76-4ced-92d4-e82b0a6afe5c.png",
+      features: ["500W Nennleistung", "21% Wirkungsgrad", "30 Jahre Garantie"],
+      climate: "Spart bis zu 12 Tonnen CO₂ pro Jahr"
     },
     {
       title: "Smart Wechselrichter",
       description: "Intelligente Steuerung Ihrer Solaranlage",
-      image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837",
-      features: ["98.6% Wirkungsgrad", "Integriertes Monitoring", "Smart-Home ready"]
+      image: "/lovable-uploads/f2d1edec-2b0f-4af0-9ec8-9e7caf7a8ea7.png",
+      features: ["98.6% Wirkungsgrad", "Integriertes Monitoring", "Smart-Home ready"],
+      climate: "Optimiert die Energieeffizienz um bis zu 15%"
     },
     {
       title: "Hochleistungsspeicher",
       description: "Maximale Unabhängigkeit durch effiziente Speicherung",
-      image: "https://images.unsplash.com/photo-1620677368158-41a63899f5ca",
-      features: ["15kWh Kapazität", "95% Entladetiefe", "10 Jahre Garantie"]
+      image: "/lovable-uploads/2b67e439-3bd1-4ad6-8498-ee34e8f6d45f.png",
+      features: ["15kWh Kapazität", "95% Entladetiefe", "10 Jahre Garantie"],
+      climate: "Erhöht den Eigenverbrauch auf bis zu 80%"
+    },
+    {
+      title: "Smart Wallbox",
+      description: "Intelligente Ladestation für Ihr E-Auto",
+      image: "/lovable-uploads/b078c6ba-faca-4278-af13-f78ce0cdb4cf.png",
+      features: ["22kW Ladeleistung", "Dynamisches Lastmanagement", "RFID-Zugangskontrolle"],
+      climate: "Ermöglicht CO₂-neutrales Fahren"
+    },
+    {
+      title: "Smart Home System",
+      description: "Vernetzte Haussteuerung für maximale Effizienz",
+      image: "/lovable-uploads/230bf2e3-b64a-4f51-bb2f-f246df2597be.png",
+      features: ["Energiemanagement", "App-Steuerung", "KNX-Integration"],
+      climate: "Reduziert den Energieverbrauch um bis zu 30%"
+    },
+    {
+      title: "Wärmepumpe",
+      description: "Effiziente Heizlösung für Ihr Zuhause",
+      image: "/lovable-uploads/03677377-bf21-4a7d-b8a4-c5f6e9b87885.png",
+      features: ["COP bis 5.0", "PV-Optimiert", "Smart Grid Ready"],
+      climate: "Bis zu 75% weniger CO₂-Ausstoß beim Heizen"
     }
   ];
 
@@ -58,8 +83,28 @@ export const RecommendedConfig = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        <Card className="max-w-4xl mx-auto mb-8 p-8 bg-white/90 backdrop-blur shadow-lg">
+        <Card className="max-w-5xl mx-auto mb-8 p-8 bg-white/90 backdrop-blur shadow-lg">
           <div className="space-y-8">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold mb-4">Ihr Beitrag zum Klimaschutz</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="flex items-center justify-center gap-3 p-4 bg-green-50 rounded-lg">
+                  <Leaf className="h-8 w-8 text-green-500" />
+                  <div className="text-left">
+                    <p className="text-2xl font-bold text-green-600">{co2Savings.toLocaleString()} kg</p>
+                    <p className="text-sm text-gray-600">CO₂-Einsparung pro Jahr</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-center gap-3 p-4 bg-blue-50 rounded-lg">
+                  <CloudSun className="h-8 w-8 text-blue-500" />
+                  <div className="text-left">
+                    <p className="text-2xl font-bold text-blue-600">{annualProduction.toLocaleString()} kWh</p>
+                    <p className="text-sm text-gray-600">Sauberer Solarstrom pro Jahr</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <SystemMetrics
               moduleCount={moduleCount}
               kWp={metrics.kWp}
@@ -75,19 +120,25 @@ export const RecommendedConfig = () => {
               <h2 className="text-3xl font-bold text-center mb-8">
                 Unsere Premium Produkte für Sie
               </h2>
-              <div className="grid md:grid-cols-3 gap-8">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {premiumProducts.map((product, index) => (
                   <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow">
-                    <div className="aspect-video bg-gradient-to-br from-solar-blue-50 to-white">
+                    <div className="aspect-square bg-gradient-to-br from-solar-blue-50 to-white p-8">
                       <img 
                         src={product.image} 
                         alt={product.title}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain hover:scale-105 transition-transform"
                       />
                     </div>
                     <div className="p-6 space-y-4">
                       <h3 className="text-xl font-semibold">{product.title}</h3>
                       <p className="text-gray-600">{product.description}</p>
+                      <div className="bg-green-50 p-3 rounded-lg">
+                        <p className="text-green-700 flex items-center gap-2">
+                          <Leaf className="h-4 w-4" />
+                          {product.climate}
+                        </p>
+                      </div>
                       <ul className="space-y-2">
                         {product.features.map((feature, idx) => (
                           <li key={idx} className="flex items-center gap-2">
