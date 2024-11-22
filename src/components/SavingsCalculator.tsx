@@ -45,8 +45,6 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
   // ROI in Jahren
   const roiYears = Math.round((estimatedSystemCost / totalYearlySavings) * 10) / 10;
   
-  // Calculate CO2 savings
-  const co2Savings = Math.round(yearlyProduction * 0.366); // 366g CO2 per kWh
   const twentyYearSavings = totalYearlySavings * 20;
 
   return (
@@ -144,9 +142,6 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
                 <span className="text-gray-600">20 Jahre Ersparnis</span>
               </div>
               <span className="text-2xl font-bold text-blue-600">{twentyYearSavings.toLocaleString()}€</span>
-              <div className="mt-2 text-sm text-gray-500">
-                <div>CO₂-Einsparung: {co2Savings} kg/Jahr</div>
-              </div>
             </div>
           </div>
         </div>
