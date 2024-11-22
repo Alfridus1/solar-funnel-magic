@@ -119,6 +119,22 @@ export const RecommendedConfig = () => {
           </div>
         </Card>
 
+        <div className="max-w-7xl mx-auto mb-16 overflow-hidden">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-solar-orange to-solar-orange-dark bg-clip-text text-transparent">
+              Unsere Premium Komponenten
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Entdecken Sie unsere sorgfältig ausgewählten Premium-Produkte für Ihre Solaranlage
+            </p>
+          </div>
+          
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-white via-transparent to-white z-10 pointer-events-none" />
+            <PremiumProductsCarousel />
+          </div>
+        </div>
+
         <div className="max-w-4xl mx-auto space-y-16">
           <Testimonials />
           <FAQ />
