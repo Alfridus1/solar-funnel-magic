@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Leaf } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import {
   Carousel,
   CarouselContent,
@@ -10,6 +9,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { supabase } from "@/integrations/supabase/client";
+import { PurchaseOptions } from "./PurchaseOptions";
 
 interface PremiumProduct {
   id: string;
@@ -18,10 +18,19 @@ interface PremiumProduct {
   image_url: string;
   features: string[];
   climate_impact: string;
+  purchase_options: {
+    price: number;
+    financing: {
+      available: boolean;
+      min_rate: number;
+      max_term: number;
+    };
+  };
 }
 
 export const PremiumProductsCarousel = () => {
   const [products, setProducts] = useState<PremiumProduct[]>([]);
+  const [showLeadForm, setShowLeadForm] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -75,6 +84,10 @@ export const PremiumProductsCarousel = () => {
                       </li>
                     ))}
                   </ul>
+                  <PurchaseOptions 
+                    options={product.purchase_options}
+                    onRequestQuote={() => setShowLeadForm(true)}
+                  />
                 </div>
               </Card>
             </CarouselItem>
