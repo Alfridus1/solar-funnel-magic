@@ -34,33 +34,56 @@ export const RegistrationOverlay = ({ onComplete }: RegistrationOverlayProps) =>
     setIsSubmitting(true);
 
     try {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: Math.random().toString(36).slice(-8),
-      });
+      // First check if a profile with this email already exists
+      const { data: existingProfiles } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', formData.email)
+        .single();
 
-      if (authError) {
-        if (authError.status === 429) {
-          setCooldown(true);
-          setTimeout(() => setCooldown(false), 15000);
-          throw new Error("Bitte warten Sie 15 Sekunden, bevor Sie es erneut versuchen.");
+      if (existingProfiles) {
+        // If profile exists, just update it
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            phone: formData.phone,
+          })
+          .eq('id', existingProfiles.id);
+
+        if (updateError) throw updateError;
+      } else {
+        // If no profile exists, create new auth user and profile
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: formData.email,
+          password: Math.random().toString(36).slice(-8),
+        });
+
+        if (authError) {
+          if (authError.status === 429) {
+            setCooldown(true);
+            setTimeout(() => setCooldown(false), 15000);
+            throw new Error("Bitte warten Sie 15 Sekunden, bevor Sie es erneut versuchen.");
+          }
+          throw authError;
         }
-        throw authError;
+
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([{
+            id: authData.user?.id,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            email: formData.email,
+            phone: formData.phone,
+          }]);
+
+        if (profileError) throw profileError;
+
+        await supabase.auth.signOut();
       }
 
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert([{
-          id: authData.user?.id,
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          email: formData.email,
-          phone: formData.phone,
-        }]);
-
-      if (profileError) throw profileError;
-
-      await supabase.auth.signOut();
       onComplete();
       
       toast({
