@@ -17,26 +17,41 @@ export const RegistrationOverlay = ({ onComplete }: RegistrationOverlayProps) =>
     phone: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cooldown, setCooldown] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (cooldown) {
+      toast({
+        title: "Bitte warten",
+        description: "Aus Sicherheitsgründen müssen Sie 15 Sekunden warten, bevor Sie es erneut versuchen können.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      // First, create an anonymous session
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
-        password: Math.random().toString(36).slice(-8), // Generate a random password
+        password: Math.random().toString(36).slice(-8),
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        if (authError.status === 429) {
+          setCooldown(true);
+          setTimeout(() => setCooldown(false), 15000);
+          throw new Error("Bitte warten Sie 15 Sekunden, bevor Sie es erneut versuchen.");
+        }
+        throw authError;
+      }
 
-      // Then insert the profile data
       const { error: profileError } = await supabase
         .from('profiles')
         .insert([{
-          id: authData.user?.id, // Link the profile to the auth user
+          id: authData.user?.id,
           first_name: formData.firstName,
           last_name: formData.lastName,
           email: formData.email,
@@ -45,9 +60,7 @@ export const RegistrationOverlay = ({ onComplete }: RegistrationOverlayProps) =>
 
       if (profileError) throw profileError;
 
-      // Sign out the temporary user since we don't need them to be logged in
       await supabase.auth.signOut();
-
       onComplete();
       
       toast({
@@ -106,9 +119,9 @@ export const RegistrationOverlay = ({ onComplete }: RegistrationOverlayProps) =>
           <Button
             type="submit"
             className="w-full bg-gradient-to-r from-solar-orange to-solar-orange-light hover:from-solar-orange-light hover:to-solar-orange text-white text-lg py-6"
-            disabled={isSubmitting}
+            disabled={isSubmitting || cooldown}
           >
-            {isSubmitting ? "Wird gespeichert..." : "Auswertung ansehen"}
+            {isSubmitting ? "Wird gespeichert..." : cooldown ? "Bitte warten..." : "Auswertung ansehen"}
           </Button>
           <p className="text-xs text-center text-gray-500 mt-4">
             Mit dem Absenden stimmen Sie unseren Datenschutzbestimmungen zu
