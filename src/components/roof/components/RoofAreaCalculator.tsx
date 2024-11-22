@@ -85,64 +85,75 @@ export const RoofAreaCalculator = ({ polygons }: RoofAreaCalculatorProps) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="mt-6 space-y-6"
+      className="mt-6 space-y-6 px-4 sm:px-0"
     >
       {/* Oberer Button */}
       <div className="flex justify-center">
-        <Button 
-          onClick={handleContinue}
-          className="bg-solar-orange hover:bg-solar-orange-600 text-lg py-6 px-8 shadow-lg hover:shadow-xl transition-all duration-300 animate-pulse"
+        <motion.div
+          animate={{
+            scale: [1, 1.02, 1],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
         >
-          Jetzt Ihre Einsparungen erfahren
-          <ArrowRight className="ml-2 h-5 w-5" />
-        </Button>
+          <Button 
+            onClick={handleContinue}
+            className="w-full sm:w-auto bg-solar-orange hover:bg-solar-orange-600 text-base sm:text-lg py-4 sm:py-6 px-4 sm:px-8 shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            Jetzt Ihre Einsparungen erfahren
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
+        </motion.div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="p-6 bg-gradient-to-br from-solar-blue-50 to-white">
+        <Card className="p-4 sm:p-6 bg-gradient-to-br from-solar-blue-50 to-white">
           <div className="flex items-center space-x-4">
             <div className="p-3 bg-solar-blue-100 rounded-lg">
-              <Ruler className="h-6 w-6 text-solar-blue-700" />
+              <Ruler className="h-5 w-5 sm:h-6 sm:w-6 text-solar-blue-700" />
             </div>
             <div>
               <p className="text-sm text-gray-600">Gesamte Dachfläche</p>
-              <p className="text-2xl font-bold">{totalArea.toLocaleString('de-DE')} m²</p>
+              <p className="text-xl sm:text-2xl font-bold">{totalArea.toLocaleString('de-DE')} m²</p>
             </div>
           </div>
         </Card>
 
-        <Card className="p-6 bg-gradient-to-br from-solar-orange-50 to-white">
+        <Card className="p-4 sm:p-6 bg-gradient-to-br from-solar-orange-50 to-white">
           <div className="flex items-center space-x-4">
             <div className="p-3 bg-solar-orange-100 rounded-lg">
-              <Sun className="h-6 w-6 text-solar-orange-700" />
+              <Sun className="h-5 w-5 sm:h-6 sm:w-6 text-solar-orange-700" />
             </div>
             <div>
               <p className="text-sm text-gray-600">Solar-Potenzial</p>
-              <p className="text-2xl font-bold">{solarPotential.toLocaleString('de-DE')} kWp</p>
+              <p className="text-xl sm:text-2xl font-bold">{solarPotential.toLocaleString('de-DE')} kWp</p>
             </div>
           </div>
         </Card>
 
-        <Card className="p-6 bg-gradient-to-br from-green-50 to-white">
+        <Card className="p-4 sm:p-6 bg-gradient-to-br from-green-50 to-white">
           <div className="flex items-center space-x-4">
             <div className="p-3 bg-green-100 rounded-lg">
-              <Home className="h-6 w-6 text-green-700" />
+              <Home className="h-5 w-5 sm:h-6 sm:w-6 text-green-700" />
             </div>
             <div>
               <p className="text-sm text-gray-600">Jahresertrag</p>
-              <p className="text-2xl font-bold">{Math.round(solarPotential * 1000).toLocaleString('de-DE')} kWh</p>
+              <p className="text-xl sm:text-2xl font-bold">{Math.round(solarPotential * 1000).toLocaleString('de-DE')} kWh</p>
             </div>
           </div>
         </Card>
       </div>
 
-      <Card className="p-6">
-        <div className="flex justify-between items-center mb-4">
+      <Card className="p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 space-y-4 sm:space-y-0">
           <h3 className="text-lg font-semibold">Geschätzter Jahresverlauf</h3>
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
             <Button 
               onClick={handleContinue}
-              className="bg-solar-orange hover:bg-solar-orange-600"
+              className="w-full sm:w-auto bg-solar-orange hover:bg-solar-orange-600"
             >
               Jetzt Ihre Einsparungen erfahren
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -150,14 +161,14 @@ export const RoofAreaCalculator = ({ polygons }: RoofAreaCalculatorProps) => {
             <Button 
               onClick={handleContinue}
               variant="outline"
-              className="border-solar-orange text-solar-orange hover:bg-solar-orange/10"
+              className="w-full sm:w-auto border-solar-orange text-solar-orange hover:bg-solar-orange/10"
             >
               Kostenlose Beratung
               <Calculator className="ml-2 h-4 w-4" />
             </Button>
           </div>
         </div>
-        <div className="h-[200px]">
+        <div className="h-[200px] mt-4">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData}>
               <defs>
