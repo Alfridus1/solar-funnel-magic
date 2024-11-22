@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import Cookies from 'js-cookie';
 import { Card } from "@/components/ui/card";
 import { HeroImage } from "@/components/solar-showcase/components/HeroImage";
 import { LeadFormOverlay } from "@/components/solar-showcase/components/LeadFormOverlay";
@@ -7,10 +8,13 @@ import { SystemMetrics } from "@/components/solar-showcase/components/SystemMetr
 import { SavingsCalculator } from "@/components/SavingsCalculator";
 import { Testimonials } from "@/components/Testimonials";
 import { FAQ } from "@/components/FAQ";
-import { CreditCard, Wallet } from "lucide-react";
+import { CreditCard, Wallet, Shield, Package, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PremiumProductsCarousel } from "@/components/solar-showcase/components/PremiumProductsCarousel";
 import { PricingCard } from "@/components/solar-showcase/components/PricingCard";
+
+const COOKIE_NAME = 'solar_config';
+const COOKIE_EXPIRY = 7; // days
 
 export const RecommendedConfig = () => {
   const location = useLocation();
@@ -18,10 +22,36 @@ export const RecommendedConfig = () => {
   const [showLeadForm, setShowLeadForm] = useState(false);
   const [formType, setFormType] = useState<"quote" | "consultation" | null>(null);
   
-  const { metrics, address } = location.state || {};
+  const { metrics, address } = location.state || loadConfigFromCookie() || {};
+
+  useEffect(() => {
+    if (!metrics) {
+      navigate("/");
+      return;
+    }
+
+    // Save configuration to cookie
+    saveConfigToCookie({ metrics, address });
+  }, [metrics, address]);
+
+  const loadConfigFromCookie = () => {
+    const savedConfig = Cookies.get(COOKIE_NAME);
+    if (savedConfig) {
+      try {
+        return JSON.parse(savedConfig);
+      } catch (e) {
+        console.error('Error parsing saved configuration:', e);
+        Cookies.remove(COOKIE_NAME);
+      }
+    }
+    return null;
+  };
+
+  const saveConfigToCookie = (config: { metrics: any; address: string }) => {
+    Cookies.set(COOKIE_NAME, JSON.stringify(config), { expires: COOKIE_EXPIRY });
+  };
 
   if (!metrics) {
-    navigate("/");
     return null;
   }
 
@@ -121,10 +151,8 @@ export const RecommendedConfig = () => {
                   <div className="pt-4">
                     <p className="text-3xl font-bold text-solar-orange mb-2">{estimatedPrice.toLocaleString()}€</p>
                     <Button 
-                      className="w-full bg-solar-orange hover:bg-solar-orange-dark"
-                      onClick={() => {
-                        handleShowQuoteForm();
-                      }}
+                      className="w-full bg-solar-orange hover:bg-solar-orange-dark text-xl"
+                      onClick={handleShowQuoteForm}
                     >
                       Jetzt kaufen
                     </Button>
@@ -151,10 +179,8 @@ export const RecommendedConfig = () => {
                   <div className="pt-4">
                     <p className="text-3xl font-bold text-blue-500 mb-2">ab {Math.round(estimatedPrice / 240).toLocaleString()}€/Monat</p>
                     <Button 
-                      className="w-full bg-blue-500 hover:bg-blue-600"
-                      onClick={() => {
-                        handleShowConsultationForm();
-                      }}
+                      className="w-full bg-blue-500 hover:bg-blue-600 text-xl"
+                      onClick={handleShowConsultationForm}
                     >
                       Finanzierung anfragen
                     </Button>
