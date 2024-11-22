@@ -1,117 +1,89 @@
 import { useEffect, useState } from "react";
-import { Leaf } from "lucide-react";
+import useEmblaCarousel from "embla-carousel-react";
 import { Card } from "@/components/ui/card";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { cn } from "@/lib/utils";
-
-interface PremiumProduct {
-  id: string;
-  name: string;
-  description: string;
-  image_url: string;
-  features: string[];
-  climate_impact: string;
-}
-
-interface SupabaseProduct {
-  id: string;
-  name: string;
-  description: string;
-  image_url: string;
-  features: string[];
-  climate_impact: string;
-  order_number: number;
-}
 
 export const PremiumProductsCarousel = () => {
-  const [products, setProducts] = useState<PremiumProduct[]>([]);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
+  const { data: products } = useQuery({
+    queryKey: ['premium-products'],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('premium_products')
         .select('*')
         .order('order_number');
-      
-      if (error) {
-        console.error('Error fetching products:', error);
-        return;
-      }
+      if (error) throw error;
+      return data;
+    },
+  });
 
-      const transformedData: PremiumProduct[] = (data as SupabaseProduct[]);
-      setProducts(transformedData);
-    };
+  useEffect(() => {
+    if (emblaApi) {
+      emblaApi.on('select', () => {
+        setCurrentIndex(emblaApi.selectedScrollSnap());
+      });
+    }
+  }, [emblaApi]);
 
-    fetchProducts();
-  }, []);
+  const scrollPrev = () => emblaApi?.scrollPrev();
+  const scrollNext = () => emblaApi?.scrollNext();
+
+  if (!products) return null;
 
   return (
-    <section className="py-12">
-      <div className="w-full max-w-7xl mx-auto px-4">
-        <Carousel
-          opts={{
-            loop: true,
-            align: 'center',
-            skipSnaps: false,
-          }}
-          className="relative"
-          onSelect={(api) => {
-            setActiveIndex(api.selectedScrollSnap());
-          }}
-        >
-          <CarouselContent>
-            {products.map((product, index) => (
-              <CarouselItem 
-                key={product.id} 
-                className="md:basis-1/2 lg:basis-1/3 transition-all duration-300"
-              >
-                <div className={cn(
-                  "transition-all duration-500",
-                  index === activeIndex ? "scale-110 z-10" : "scale-90 opacity-70"
-                )}>
-                  <Card className="overflow-hidden hover:shadow-lg transition-shadow m-2">
-                    <div className="aspect-square bg-gradient-to-br from-solar-blue-50 to-white p-8">
-                      <img 
-                        src={product.image_url} 
-                        alt={product.name}
-                        className="w-full h-full object-contain hover:scale-105 transition-transform"
-                      />
-                    </div>
-                    <div className="p-6 space-y-4">
-                      <h3 className="text-xl font-semibold">{product.name}</h3>
-                      <p className="text-gray-600">{product.description}</p>
-                      <div className="bg-green-50 p-3 rounded-lg">
-                        <p className="text-green-700 flex items-center gap-2">
-                          <Leaf className="h-4 w-4" />
-                          {product.climate_impact}
-                        </p>
-                      </div>
-                      <ul className="space-y-2">
-                        {product.features.map((feature, idx) => (
-                          <li key={idx} className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-solar-orange" />
-                            <span>{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </Card>
+    <div className="relative">
+      <div className="overflow-hidden" ref={emblaRef}>
+        <div className="flex">
+          {products.map((product, index) => (
+            <div key={product.id} className="flex-[0_0_100%] min-w-0 sm:flex-[0_0_50%] lg:flex-[0_0_33.33%] pl-4">
+              <Card className="h-full bg-white/80 backdrop-blur">
+                <div className="relative aspect-video">
+                  <img
+                    src={product.image_url}
+                    alt={product.name}
+                    className="absolute inset-0 w-full h-full object-cover rounded-t-lg"
+                  />
                 </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="absolute -left-12 top-1/2 transform -translate-y-1/2" />
-          <CarouselNext className="absolute -right-12 top-1/2 transform -translate-y-1/2" />
-        </Carousel>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold mb-2">{product.name}</h3>
+                  <p className="text-gray-600 mb-4">{product.description}</p>
+                  <div className="space-y-2">
+                    {product.features.map((feature, idx) => (
+                      <div key={idx} className="flex items-center gap-2 text-sm text-gray-600">
+                        <div className="w-1.5 h-1.5 bg-solar-orange rounded-full" />
+                        {feature}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </Card>
+            </div>
+          ))}
+        </div>
       </div>
-    </section>
+
+      <Button
+        variant="outline"
+        size="icon"
+        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur hover:bg-white"
+        onClick={scrollPrev}
+      >
+        <ChevronLeft className="h-4 w-4" />
+      </Button>
+
+      <Button
+        variant="outline"
+        size="icon"
+        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur hover:bg-white"
+        onClick={scrollNext}
+      >
+        <ChevronRight className="h-4 w-4" />
+      </Button>
+    </div>
   );
 };
