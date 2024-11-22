@@ -30,7 +30,9 @@ export const ImageUpload = ({ currentImageUrl, onImageUploaded }: ImageUploadPro
           upsert: false
         });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        throw uploadError;
+      }
 
       const { data: { publicUrl } } = supabase.storage
         .from('product_images')
@@ -43,6 +45,7 @@ export const ImageUpload = ({ currentImageUrl, onImageUploaded }: ImageUploadPro
         description: "Das Produktbild wurde erfolgreich hochgeladen.",
       });
     } catch (error: any) {
+      console.error('Upload error:', error);
       toast({
         title: "Fehler beim Hochladen",
         description: error.message,

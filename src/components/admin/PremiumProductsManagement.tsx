@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { PremiumProductForm } from "./product/PremiumProductForm";
 import { PremiumProductList } from "./product/PremiumProductList";
-import { PremiumProduct } from "./product/types";
+import { PremiumProduct, PremiumProductFormFields } from "./product/types";
 
 export const PremiumProductsManagement = () => {
   const [products, setProducts] = useState<PremiumProduct[]>([]);
@@ -26,22 +26,7 @@ export const PremiumProductsManagement = () => {
       return;
     }
 
-    if (!data) return;
-
-    // Transform the data to ensure it matches our PremiumProduct interface
-    const transformedData: PremiumProduct[] = data.map(item => ({
-      ...item,
-      purchase_options: item.purchase_options || {
-        price: 0,
-        financing: {
-          available: false,
-          min_rate: 0,
-          max_term: 0
-        }
-      }
-    }));
-
-    setProducts(transformedData);
+    setProducts(data || []);
   };
 
   useEffect(() => {
