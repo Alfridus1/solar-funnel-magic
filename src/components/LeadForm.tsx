@@ -25,6 +25,13 @@ export const LeadForm = ({ formType = "quote", onSuccess, metrics, address }: Le
     setIsSubmitting(true);
 
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error("No user found");
+      }
+
       const { error } = await supabase
         .from('leads')
         .insert([{
@@ -33,7 +40,8 @@ export const LeadForm = ({ formType = "quote", onSuccess, metrics, address }: Le
           source: window.location.href,
           status: 'new',
           metrics: metrics || null,
-          address: address || null
+          address: address || null,
+          user_id: user.id // Add user_id to the lead
         }]);
 
       if (error) throw error;

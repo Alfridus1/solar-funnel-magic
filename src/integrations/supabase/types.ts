@@ -329,6 +329,7 @@ export type Database = {
           status: string | null
           type: string
           updated_at: string | null
+          user_id: string | null
         }
         Insert: {
           address?: string | null
@@ -344,6 +345,7 @@ export type Database = {
           status?: string | null
           type: string
           updated_at?: string | null
+          user_id?: string | null
         }
         Update: {
           address?: string | null
@@ -359,6 +361,7 @@ export type Database = {
           status?: string | null
           type?: string
           updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -366,6 +369,13 @@ export type Database = {
             columns: ["affiliate_id"]
             isOneToOne: false
             referencedRelation: "affiliates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
