@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ interface RegistrationOverlayProps {
 }
 
 export const RegistrationOverlay = ({ onComplete }: RegistrationOverlayProps) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -104,6 +106,10 @@ export const RegistrationOverlay = ({ onComplete }: RegistrationOverlayProps) =>
     }
   };
 
+  const handleLogin = () => {
+    navigate("/login");
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
       <Card className="w-full max-w-md p-6 bg-white/95 backdrop-blur shadow-xl animate-fade-up">
@@ -149,10 +155,19 @@ export const RegistrationOverlay = ({ onComplete }: RegistrationOverlayProps) =>
           >
             {isSubmitting ? "Wird gespeichert..." : cooldown ? "Bitte warten..." : "Auswertung ansehen"}
           </Button>
-          <p className="text-xs text-center text-gray-500 mt-4">
+          <p className="text-xs text-center text-gray-500">
             Mit dem Absenden stimmen Sie unseren Datenschutzbestimmungen zu
           </p>
         </form>
+        <div className="mt-6 text-center">
+          <Button
+            variant="link"
+            className="text-solar-orange hover:text-solar-orange-dark"
+            onClick={handleLogin}
+          >
+            Bereits ein Konto? Jetzt einloggen
+          </Button>
+        </div>
       </Card>
     </div>
   );
