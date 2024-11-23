@@ -6,14 +6,16 @@ import { Plus, Sun, Euro, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
+interface LeadMetrics {
+  kWp: number;
+  annualSavings: number;
+  estimatedPrice: number;
+}
+
 interface LeadCalculation {
   id: string;
   created_at: string;
-  metrics: {
-    kWp: number;
-    annualSavings: number;
-    estimatedPrice: number;
-  };
+  metrics: LeadMetrics | null;
 }
 
 export const RequestsOverview = () => {
@@ -44,7 +46,14 @@ export const RequestsOverview = () => {
       return;
     }
 
-    setCalculations(data || []);
+    // Cast the data to match our interface
+    const typedData: LeadCalculation[] = (data || []).map(item => ({
+      id: item.id,
+      created_at: item.created_at,
+      metrics: item.metrics as LeadMetrics
+    }));
+
+    setCalculations(typedData);
   };
 
   const handleNewRequest = () => {
