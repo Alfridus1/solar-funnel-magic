@@ -1,11 +1,12 @@
 import * as React from "react"
 import useEmblaCarousel from "embla-carousel-react"
 import { cn } from "@/lib/utils"
-import { CarouselContext, type CarouselApi } from "./carousel-context"
+import { CarouselContext, type CarouselApi, type CarouselOptions } from "./carousel-context"
 import { CarouselPrevious, CarouselNext } from "./carousel-controls"
+import { useCarousel } from "./carousel-context"
 
 type CarouselProps = {
-  opts?: Parameters<typeof useEmblaCarousel>[0]
+  opts?: CarouselOptions
   plugins?: Parameters<typeof useEmblaCarousel>[1]
   orientation?: "horizontal" | "vertical"
   setApi?: (api: CarouselApi) => void
