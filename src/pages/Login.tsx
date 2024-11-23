@@ -82,13 +82,7 @@ export function Login() {
           }}
           providers={[]}
           theme="light"
-          onError={(error) => {
-            toast({
-              title: "Fehler bei der Anmeldung",
-              description: error.message,
-              variant: "destructive",
-            });
-          }}
+          view="sign_in"
         />
       </Card>
     </div>
