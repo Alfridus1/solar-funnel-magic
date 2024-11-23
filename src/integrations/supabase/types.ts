@@ -589,6 +589,7 @@ export type Database = {
           id: string
           last_name: string
           phone: string
+          role: Database["public"]["Enums"]["user_role"] | null
           updated_at: string | null
         }
         Insert: {
@@ -598,6 +599,7 @@ export type Database = {
           id?: string
           last_name: string
           phone: string
+          role?: Database["public"]["Enums"]["user_role"] | null
           updated_at?: string | null
         }
         Update: {
@@ -607,6 +609,7 @@ export type Database = {
           id?: string
           last_name?: string
           phone?: string
+          role?: Database["public"]["Enums"]["user_role"] | null
           updated_at?: string | null
         }
         Relationships: []
@@ -942,6 +945,30 @@ export type Database = {
           },
         ]
       }
+      roles_permissions: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       smart_m_config: {
         Row: {
           api_url: string
@@ -1213,7 +1240,18 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_role:
+        | "customer"
+        | "sales_employee"
+        | "sales_representative"
+        | "customer_service"
+        | "planning"
+        | "accountant"
+        | "construction_manager"
+        | "installation_manager"
+        | "installer"
+        | "executive"
+        | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
