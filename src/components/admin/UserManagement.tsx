@@ -5,7 +5,6 @@ import { UserDetailsDialog } from "./UserDetailsDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Profile, AffiliateInfo } from "./types/userManagement";
-import { User } from "@supabase/supabase-js";
 
 export const UserManagement = () => {
   const [users, setUsers] = useState<Profile[]>([]);
@@ -16,24 +15,18 @@ export const UserManagement = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const { data: authUsers, error } = await supabase.auth.admin.listUsers();
+      const { data: profiles, error } = await supabase
+        .from('profiles')
+        .select('*');
+
       if (error) {
         toast({
           title: "Fehler beim Laden der Benutzer.",
           description: error.message,
           variant: "destructive",
         });
-      } else if (authUsers?.users) {
-        // Transform auth users to Profile type
-        const profileUsers: Profile[] = authUsers.users.map((user: User) => ({
-          id: user.id,
-          email: user.email || '',
-          first_name: user.user_metadata?.first_name || '',
-          last_name: user.user_metadata?.last_name || '',
-          phone: user.phone || '',
-          created_at: user.created_at
-        }));
-        setUsers(profileUsers);
+      } else if (profiles) {
+        setUsers(profiles);
       }
     };
 
