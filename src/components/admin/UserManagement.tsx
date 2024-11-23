@@ -65,33 +65,24 @@ export const UserManagement = () => {
     await loadAffiliateInfo(profile.id);
   };
 
-  const handleLoginAs = async (profile: Profile) => {
-    // Zuerst die aktuelle Session beenden
-    await supabase.auth.signOut();
-    
-    // Admin Access Token verwenden (muss in der Supabase-Konfiguration eingerichtet sein)
-    const { data, error } = await supabase.auth.admin.generateLink({
-      type: 'magiclink',
-      email: profile.email,
+  const handleSendLoginLink = async (profile: Profile) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(profile.email, {
+      redirectTo: `${window.location.origin}/reset-password`,
     });
 
     if (error) {
       toast({
-        title: "Fehler beim Einloggen",
+        title: "Fehler beim Senden des Login-Links",
         description: error.message,
         variant: "destructive",
       });
       return;
     }
 
-    if (data) {
-      toast({
-        title: "Erfolgreich eingeloggt",
-        description: `Sie sind jetzt als ${profile.first_name} ${profile.last_name} eingeloggt.`,
-      });
-      // Optional: Seite neu laden oder zur Benutzer-Startseite navigieren
-      window.location.href = '/';
-    }
+    toast({
+      title: "Login-Link gesendet",
+      description: `Ein Login-Link wurde an ${profile.email} gesendet.`,
+    });
   };
 
   return (
@@ -134,10 +125,10 @@ export const UserManagement = () => {
                   size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleLoginAs(profile);
+                    handleSendLoginLink(profile);
                   }}
                 >
-                  Einloggen als
+                  Login-Link senden
                 </Button>
               </TableCell>
             </TableRow>
