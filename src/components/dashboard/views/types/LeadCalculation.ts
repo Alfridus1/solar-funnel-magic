@@ -1,11 +1,12 @@
 export interface LeadCalculation {
   id: string;
   created_at: string;
+  address: string | null;
   metrics: {
     kWp: number;
     annualSavings: number;
     estimatedPrice: number;
-    roofArea?: number;
+    roofArea: number;
   } | null;
-  address: string | null;
+  deleted_at?: string | null;
 }

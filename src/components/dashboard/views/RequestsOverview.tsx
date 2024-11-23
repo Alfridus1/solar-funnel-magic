@@ -24,10 +24,10 @@ export const RequestsOverview = () => {
 
     const { data, error } = await supabase
       .from('leads')
-      .select('id, created_at, metrics, address')
+      .select('id, created_at, metrics, address, deleted_at')
       .eq('user_id', user.id)
       .eq('type', 'calculation')
-      .is('deleted_at', null)  // Only get non-deleted calculations
+      .is('deleted_at', null)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -43,6 +43,7 @@ export const RequestsOverview = () => {
       id: item.id,
       created_at: item.created_at,
       address: item.address,
+      deleted_at: item.deleted_at,
       metrics: item.metrics && typeof item.metrics === 'object' && !Array.isArray(item.metrics) 
         ? {
             kWp: Number(item.metrics.kWp) || 0,
@@ -79,7 +80,6 @@ export const RequestsOverview = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Instead of deleting, we'll update with a deleted_at timestamp
       const { error } = await supabase
         .from('leads')
         .update({ deleted_at: new Date().toISOString() })

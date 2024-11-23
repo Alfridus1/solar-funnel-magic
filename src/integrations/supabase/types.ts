@@ -327,6 +327,7 @@ export type Database = {
           calculation_id: string | null
           calculation_url: string | null
           created_at: string | null
+          deleted_at: string | null
           email: string
           id: string
           metrics: Json | null
@@ -345,6 +346,7 @@ export type Database = {
           calculation_id?: string | null
           calculation_url?: string | null
           created_at?: string | null
+          deleted_at?: string | null
           email: string
           id?: string
           metrics?: Json | null
@@ -363,6 +365,7 @@ export type Database = {
           calculation_id?: string | null
           calculation_url?: string | null
           created_at?: string | null
+          deleted_at?: string | null
           email?: string
           id?: string
           metrics?: Json | null
