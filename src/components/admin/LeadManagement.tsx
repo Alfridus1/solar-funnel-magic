@@ -24,6 +24,12 @@ interface Lead {
   created_at: string;
   metrics?: any;
   address?: string;
+  user_id?: string;
+  profile?: {
+    id: string;
+    first_name: string;
+    last_name: string;
+  };
 }
 
 export const LeadManagement = () => {
@@ -37,7 +43,10 @@ export const LeadManagement = () => {
   const loadLeads = async () => {
     const { data, error } = await supabase
       .from('leads')
-      .select('*')
+      .select(`
+        *,
+        profile:profiles(id, first_name, last_name)
+      `)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -90,6 +99,7 @@ export const LeadManagement = () => {
             <TableHead>Telefon</TableHead>
             <TableHead>Typ</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Benutzerprofil</TableHead>
             <TableHead>Aktionen</TableHead>
           </TableRow>
         </TableHeader>
@@ -113,6 +123,17 @@ export const LeadManagement = () => {
                 >
                   {lead.status === 'new' ? 'Neu' : 'Bearbeitet'}
                 </Badge>
+              </TableCell>
+              <TableCell>
+                {lead.profile ? (
+                  <Badge variant="outline" className="bg-green-50">
+                    {`${lead.profile.first_name} ${lead.profile.last_name}`}
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="bg-gray-50">
+                    Kein Profil
+                  </Badge>
+                )}
               </TableCell>
               <TableCell>
                 <div className="flex gap-2">

@@ -28,10 +28,22 @@ export const LeadForm = ({ formType = "quote", onSuccess, metrics, address }: Le
       // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       
-      if (!user) {
-        throw new Error("No user found");
+      // Create or update profile if user is logged in
+      if (user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: user.id,
+            first_name: formData.name.split(' ')[0],
+            last_name: formData.name.split(' ').slice(1).join(' '),
+            email: formData.email,
+            phone: formData.phone,
+          });
+
+        if (profileError) throw profileError;
       }
 
+      // Insert lead with user_id if logged in
       const { error } = await supabase
         .from('leads')
         .insert([{
@@ -41,7 +53,7 @@ export const LeadForm = ({ formType = "quote", onSuccess, metrics, address }: Le
           status: 'new',
           metrics: metrics || null,
           address: address || null,
-          user_id: user.id // Add user_id to the lead
+          user_id: user?.id || null // Link to user if logged in
         }]);
 
       if (error) throw error;
