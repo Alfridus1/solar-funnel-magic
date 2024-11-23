@@ -50,7 +50,7 @@ export const RecommendedConfig = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-solar-blue-50">
       {!isRegistered && <RegistrationOverlay onComplete={() => setIsRegistered(true)} />}
       
       <div className={`relative transition-all duration-300 ${!isRegistered ? 'blur-md' : ''}`}>
