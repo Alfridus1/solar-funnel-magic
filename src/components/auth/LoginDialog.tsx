@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthError } from "@supabase/supabase-js";
 
 interface LoginDialogProps {
   open: boolean;
@@ -35,14 +34,6 @@ export const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
 
     return () => subscription.unsubscribe();
   }, [navigate, onOpenChange, toast]);
-
-  const handleAuthError = (error: AuthError) => {
-    toast({
-      title: "Fehler bei der Anmeldung",
-      description: "Bitte überprüfen Sie Ihre Anmeldedaten und versuchen Sie es erneut.",
-      variant: "destructive",
-    });
-  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -108,7 +99,6 @@ export const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
           providers={[]}
           theme="light"
           view="sign_in"
-          onError={handleAuthError}
         />
       </DialogContent>
     </Dialog>
