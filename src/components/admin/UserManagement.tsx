@@ -18,6 +18,7 @@ export const UserManagement = () => {
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
   const [affiliateInfo, setAffiliateInfo] = useState<AffiliateInfo | null>(null);
   const [emailCooldowns, setEmailCooldowns] = useState<Record<string, number>>({});
+  const [isResettingPasswords, setIsResettingPasswords] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -117,10 +118,40 @@ export const UserManagement = () => {
     });
   };
 
+  const handleResetAllPasswords = async () => {
+    setIsResettingPasswords(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('reset-passwords');
+      
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Passwörter zurückgesetzt",
+        description: "Alle Passwörter wurden auf '123456' zurückgesetzt.",
+      });
+    } catch (error) {
+      toast({
+        title: "Fehler beim Zurücksetzen der Passwörter",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsResettingPasswords(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Benutzer</h2>
+        <Button 
+          onClick={handleResetAllPasswords}
+          disabled={isResettingPasswords}
+        >
+          {isResettingPasswords ? "Wird zurückgesetzt..." : "Alle Passwörter zurücksetzen"}
+        </Button>
       </div>
 
       <Table>
