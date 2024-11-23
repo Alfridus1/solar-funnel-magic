@@ -14,6 +14,7 @@ import { PricingOptions } from "@/components/solar-showcase/components/PricingOp
 import { ConfigSidebar } from "@/components/solar-showcase/components/ConfigSidebar";
 import { loadConfigFromCookie, saveConfigToCookie } from "@/utils/configCookieManager";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 export const RecommendedConfig = () => {
   const location = useLocation();
@@ -22,6 +23,7 @@ export const RecommendedConfig = () => {
   const [formType, setFormType] = useState<"quote" | "consultation" | null>(null);
   const [isRegistered, setIsRegistered] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { toast } = useToast();
   
   const { metrics, address } = location.state || loadConfigFromCookie() || {};
 
@@ -35,12 +37,32 @@ export const RecommendedConfig = () => {
   }, [metrics, address, navigate]);
 
   useEffect(() => {
-    // Check authentication status on mount and when it changes
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setIsAuthenticated(!!session);
       if (session) {
         setIsRegistered(true);
+        // Create lead entry when authenticated user views the page
+        if (metrics) {
+          const { error } = await supabase.from('leads').insert({
+            user_id: session.user.id,
+            type: 'calculation',
+            metrics: metrics,
+            address: address,
+            name: session.user.email || 'Unknown',
+            email: session.user.email || '',
+            phone: '',
+            status: 'new'
+          });
+
+          if (error && error.code !== '23505') { // Ignore unique constraint violations
+            toast({
+              title: "Fehler beim Speichern der Berechnung",
+              description: "Ihre Berechnung konnte nicht gespeichert werden. Bitte versuchen Sie es später erneut.",
+              variant: "destructive",
+            });
+          }
+        }
       }
     };
     
@@ -54,7 +76,7 @@ export const RecommendedConfig = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [metrics, address, toast]);
 
   if (!metrics) {
     return null;

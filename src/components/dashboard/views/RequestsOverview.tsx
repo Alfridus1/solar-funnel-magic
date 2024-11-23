@@ -6,16 +6,19 @@ import { Plus, Sun, Euro, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
+// Move interfaces to a separate types file if the file gets too large
 interface LeadMetrics {
   kWp: number;
   annualSavings: number;
   estimatedPrice: number;
+  roofArea?: number;
 }
 
 interface LeadCalculation {
   id: string;
   created_at: string;
   metrics: LeadMetrics | null;
+  address: string | null;
 }
 
 export const RequestsOverview = () => {
@@ -28,13 +31,14 @@ export const RequestsOverview = () => {
   }, []);
 
   const loadCalculations = async () => {
-    const { data: user } = await supabase.auth.getUser();
-    if (!user.user) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
 
     const { data, error } = await supabase
       .from('leads')
-      .select('id, created_at, metrics')
-      .eq('user_id', user.user.id)
+      .select('id, created_at, metrics, address')
+      .eq('user_id', user.id)
+      .eq('type', 'calculation')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -46,15 +50,16 @@ export const RequestsOverview = () => {
       return;
     }
 
-    // Cast the data to match our interface with type checking and validation
     const typedData: LeadCalculation[] = (data || []).map(item => ({
       id: item.id,
       created_at: item.created_at,
+      address: item.address,
       metrics: item.metrics && typeof item.metrics === 'object' && !Array.isArray(item.metrics) 
         ? {
             kWp: Number(item.metrics.kWp) || 0,
             annualSavings: Number(item.metrics.annualSavings) || 0,
-            estimatedPrice: Number(item.metrics.estimatedPrice) || 0
+            estimatedPrice: Number(item.metrics.estimatedPrice) || 0,
+            roofArea: Number(item.metrics.roofArea) || 0
           }
         : null
     }));
@@ -82,6 +87,11 @@ export const RequestsOverview = () => {
             <CardHeader>
               <CardTitle className="text-lg">
                 Solaranlage vom {new Date(calc.created_at).toLocaleDateString('de-DE')}
+                {calc.address && (
+                  <div className="text-sm text-gray-600 mt-1">
+                    Standort: {calc.address}
+                  </div>
+                )}
               </CardTitle>
             </CardHeader>
             <CardContent>
