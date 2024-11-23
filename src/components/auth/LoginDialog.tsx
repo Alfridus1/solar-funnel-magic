@@ -3,6 +3,8 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface LoginDialogProps {
   open: boolean;
@@ -11,6 +13,18 @@ interface LoginDialogProps {
 
 export const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        onOpenChange(false);
+        navigate("/");
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate, onOpenChange]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

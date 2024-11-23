@@ -11,12 +11,13 @@ export function Login() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if user is already logged in
-    supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
         navigate("/");
       }
     });
+
+    return () => subscription.unsubscribe();
   }, [navigate]);
 
   return (
