@@ -19,6 +19,8 @@ export const RegistrationOverlay = ({ onComplete }: RegistrationOverlayProps) =>
     lastName: "",
     email: "",
     phone: "",
+    password: "",
+    confirmPassword: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cooldown, setCooldown] = useState(false);
@@ -30,6 +32,24 @@ export const RegistrationOverlay = ({ onComplete }: RegistrationOverlayProps) =>
       toast({
         title: "Bitte warten",
         description: "Aus Sicherheitsgründen müssen Sie 15 Sekunden warten, bevor Sie es erneut versuchen können.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: "Passwörter stimmen nicht überein",
+        description: "Bitte überprüfen Sie Ihre Eingabe.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      toast({
+        title: "Passwort zu kurz",
+        description: "Das Passwort muss mindestens 6 Zeichen lang sein.",
         variant: "destructive",
       });
       return;
@@ -64,7 +84,13 @@ export const RegistrationOverlay = ({ onComplete }: RegistrationOverlayProps) =>
         // If no profile exists, create new auth user and profile
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email: formData.email,
-          password: Math.random().toString(36).slice(-8),
+          password: formData.password,
+          options: {
+            data: {
+              first_name: formData.firstName,
+              last_name: formData.lastName,
+            }
+          }
         });
 
         if (authError) {
@@ -87,15 +113,13 @@ export const RegistrationOverlay = ({ onComplete }: RegistrationOverlayProps) =>
           }]);
 
         if (profileError) throw profileError;
-
-        await supabase.auth.signOut();
       }
 
       onComplete();
       
       toast({
         title: "Willkommen!",
-        description: "Ihre Daten wurden erfolgreich gespeichert.",
+        description: "Ihre Daten wurden erfolgreich gespeichert. Sie können sich jetzt mit Ihrer E-Mail und Ihrem Passwort anmelden.",
       });
     } catch (error: any) {
       toast({
@@ -148,6 +172,20 @@ export const RegistrationOverlay = ({ onComplete }: RegistrationOverlayProps) =>
             placeholder="Handynummer"
             value={formData.phone}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+            required
+          />
+          <Input
+            type="password"
+            placeholder="Passwort"
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            required
+          />
+          <Input
+            type="password"
+            placeholder="Passwort bestätigen"
+            value={formData.confirmPassword}
+            onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
             required
           />
           <Button
