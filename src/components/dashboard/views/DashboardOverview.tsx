@@ -3,6 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { SystemOverview } from "./components/SystemOverview";
 import { NewsSection } from "./components/NewsSection";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { CircleUserRound } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export const DashboardOverview = () => {
   const [greeting, setGreeting] = useState("");
@@ -48,9 +51,59 @@ export const DashboardOverview = () => {
     <div className="space-y-6">
       <Card className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/50 dark:to-blue-800/50">
         <CardHeader>
-          <CardTitle className="text-2xl">
-            {greeting} {title} {userFullName}
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-2xl">
+              {greeting} {title} {userFullName}
+            </CardTitle>
+            <TooltipProvider>
+              <div className="flex items-center gap-4">
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Avatar>
+                      <AvatarImage src="https://images.unsplash.com/photo-1649972904349-6e44c42644a7" />
+                      <AvatarFallback>
+                        <CircleUserRound className="h-5 w-5 text-solar-orange" />
+                      </AvatarFallback>
+                    </Avatar>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="font-medium">Ihr Vertriebler</p>
+                    <p className="text-sm text-muted-foreground">Max Mustermann</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Avatar>
+                      <AvatarImage src="https://images.unsplash.com/photo-1519389950473-47ba0277781c" />
+                      <AvatarFallback>
+                        <CircleUserRound className="h-5 w-5 text-solar-orange" />
+                      </AvatarFallback>
+                    </Avatar>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="font-medium">Ihr Bauleiter</p>
+                    <p className="text-sm text-muted-foreground">Thomas Schmidt</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Avatar>
+                      <AvatarImage src="https://images.unsplash.com/photo-1504893524553-b855bce32c67" />
+                      <AvatarFallback>
+                        <CircleUserRound className="h-5 w-5 text-solar-orange" />
+                      </AvatarFallback>
+                    </Avatar>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="font-medium">Ihr Kundendienst</p>
+                    <p className="text-sm text-muted-foreground">Anna Weber</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+            </TooltipProvider>
+          </div>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">
