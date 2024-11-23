@@ -39,7 +39,10 @@ export const RequestsOverview = () => {
       return;
     }
 
-    const typedData: LeadCalculation[] = (data || []).map(item => ({
+    // Filter out any items that might have deleted_at set, as an extra precaution
+    const filteredData = (data || []).filter(item => !item.deleted_at);
+
+    const typedData: LeadCalculation[] = filteredData.map(item => ({
       id: item.id,
       created_at: item.created_at,
       address: item.address,
@@ -88,6 +91,7 @@ export const RequestsOverview = () => {
 
       if (error) throw error;
 
+      // Immediately remove the deleted calculation from the state
       setCalculations(prev => prev.filter(calc => calc.id !== id));
       
       toast({
