@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Sun, Euro, TrendingUp } from "lucide-react";
+import { Plus, Sun, Euro, TrendingUp, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { PDFDownloadButton } from "@/components/solar-showcase/components/PDFDownloadButton";
@@ -83,6 +83,32 @@ export const RequestsOverview = () => {
     }
   };
 
+  const handleDeleteCalculation = async (id: string, event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent triggering the card click
+    
+    const { error } = await supabase
+      .from('leads')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      toast({
+        title: "Fehler beim Löschen",
+        description: "Die Anfrage konnte nicht gelöscht werden.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Anfrage gelöscht",
+      description: "Die Anfrage wurde erfolgreich gelöscht.",
+    });
+
+    // Refresh the calculations list
+    loadCalculations();
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -97,9 +123,9 @@ export const RequestsOverview = () => {
         {calculations.map((calc) => (
           <Card 
             key={calc.id} 
-            className="hover:shadow-lg transition-shadow cursor-pointer"
+            className="hover:shadow-lg transition-shadow"
           >
-            <CardHeader>
+            <CardHeader className="flex flex-row justify-between items-start">
               <CardTitle className="text-lg">
                 Solaranlage vom {new Date(calc.created_at).toLocaleDateString('de-DE')}
                 {calc.address && (
@@ -108,6 +134,14 @@ export const RequestsOverview = () => {
                   </div>
                 )}
               </CardTitle>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                onClick={(e) => handleDeleteCalculation(calc.id, e)}
+              >
+                <Trash2 className="h-5 w-5" />
+              </Button>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
