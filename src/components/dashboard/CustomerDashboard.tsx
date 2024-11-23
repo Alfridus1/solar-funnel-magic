@@ -1,37 +1,40 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CustomerLayout } from "./layout/CustomerLayout";
-import { SolarSystemOverview } from "./views/SolarSystemOverview";
+import { DashboardOverview } from "./views/DashboardOverview";
+import { RequestsOverview } from "./views/RequestsOverview";
+import { ProjectsOverview } from "./views/ProjectsOverview";
+import { ReferralOverview } from "./views/ReferralOverview";
 import { DocumentsOverview } from "./views/DocumentsOverview";
-import { AffiliatesOverview } from "./views/AffiliatesOverview";
-import { WalletOverview } from "./views/WalletOverview";
 import { SettingsOverview } from "./views/SettingsOverview";
 
 export const CustomerDashboard = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const currentTab = location.hash.replace("#", "") || "solar";
+  const currentTab = location.hash.replace("#", "") || "dashboard";
 
   useEffect(() => {
     if (!location.hash) {
-      navigate("#solar", { replace: true });
+      navigate("#dashboard", { replace: true });
     }
   }, [location, navigate]);
 
   const renderContent = () => {
     switch (currentTab) {
-      case "solar":
-        return <SolarSystemOverview />;
+      case "dashboard":
+        return <DashboardOverview />;
+      case "requests":
+        return <RequestsOverview />;
+      case "projects":
+        return <ProjectsOverview />;
+      case "referral":
+        return <ReferralOverview />;
       case "documents":
         return <DocumentsOverview />;
-      case "affiliates":
-        return <AffiliatesOverview />;
-      case "wallet":
-        return <WalletOverview />;
       case "settings":
         return <SettingsOverview />;
       default:
-        return <SolarSystemOverview />;
+        return <DashboardOverview />;
     }
   };
 

@@ -1,37 +1,47 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { 
-  Home,
+  LayoutDashboard,
+  Inbox,
+  LayoutGrid,
+  Award,
   FileText,
-  Users,
-  Wallet,
   Settings,
+  LogOut,
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const menuItems = [
   { 
-    label: "Meine Solaranlage", 
-    icon: Home, 
-    value: "solar" 
+    label: "Dashboard", 
+    icon: LayoutDashboard, 
+    value: "dashboard" 
+  },
+  { 
+    label: "Meine Anfragen", 
+    icon: Inbox, 
+    value: "requests" 
+  },
+  { 
+    label: "Meine Projekte", 
+    icon: LayoutGrid, 
+    value: "projects" 
+  },
+  { 
+    label: "Empfehlungsprogramm", 
+    icon: Award, 
+    value: "referral" 
   },
   { 
     label: "Dokumente", 
     icon: FileText, 
     value: "documents" 
-  },
-  { 
-    label: "Meine Affiliates", 
-    icon: Users, 
-    value: "affiliates" 
-  },
-  { 
-    label: "Wallet", 
-    icon: Wallet, 
-    value: "wallet" 
   },
   { 
     label: "Einstellungen", 
@@ -42,8 +52,23 @@ const menuItems = [
 
 export const CustomerSidebar = () => {
   const location = useLocation();
-  const currentTab = location.hash.replace("#", "") || "solar";
+  const currentTab = location.hash.replace("#", "") || "dashboard";
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({
+        title: "Fehler beim Ausloggen",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+    navigate("/");
+  };
 
   return (
     <div className={cn(
@@ -96,6 +121,19 @@ export const CustomerSidebar = () => {
             </Link>
           );
         })}
+
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+        >
+          <LogOut className="h-5 w-5 mr-3" />
+          <span className={cn(
+            "transition-all duration-300",
+            isCollapsed && "hidden"
+          )}>
+            Ausloggen
+          </span>
+        </button>
       </nav>
     </div>
   );
