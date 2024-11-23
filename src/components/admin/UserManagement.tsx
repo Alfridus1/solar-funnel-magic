@@ -1,20 +1,13 @@
 import { useState, useEffect } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { UserDetailsDialog } from "./UserDetailsDialog";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 import { Profile, AffiliateInfo } from "./types/userManagement";
 
 export const UserManagement = () => {
-  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [users, setUsers] = useState<Profile[]>([]);
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
   const [affiliateInfo, setAffiliateInfo] = useState<AffiliateInfo | null>(null);
   const [emailCooldowns, setEmailCooldowns] = useState<Record<string, number>>({});
@@ -22,100 +15,25 @@ export const UserManagement = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    loadProfiles();
-  }, []);
-
-  const loadProfiles = async () => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      toast({
-        title: "Fehler beim Laden der Benutzer",
-        description: error.message,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setProfiles(data || []);
-  };
-
-  const loadAffiliateInfo = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('affiliates')
-      .select('*')
-      .eq('user_id', userId)
-      .maybeSingle();
-
-    if (error && error.code !== 'PGRST116') {
-      toast({
-        title: "Fehler beim Laden der Affiliate-Informationen",
-        description: error.message,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setAffiliateInfo(data || { referral_code: undefined, referral_count: 0, total_leads: 0 });
-  };
-
-  const handleUserClick = async (profile: Profile) => {
-    setSelectedUser(profile);
-    await loadAffiliateInfo(profile.id);
-  };
-
-  const handleSendLoginLink = async (profile: Profile) => {
-    // Check if email is in cooldown
-    const cooldownTime = emailCooldowns[profile.email];
-    if (cooldownTime && Date.now() < cooldownTime) {
-      const remainingSeconds = Math.ceil((cooldownTime - Date.now()) / 1000);
-      toast({
-        title: "Bitte warten",
-        description: `Sie können in ${remainingSeconds} Sekunden einen neuen Link anfordern.`,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const { error } = await supabase.auth.resetPasswordForEmail(profile.email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
-
-    if (error) {
-      if (error.message.includes('rate_limit')) {
-        // Set cooldown for 60 seconds
-        setEmailCooldowns(prev => ({
-          ...prev,
-          [profile.email]: Date.now() + 60000
-        }));
+    const fetchUsers = async () => {
+      const { data, error } = await supabase.auth.admin.listUsers();
+      if (error) {
         toast({
-          title: "Zu viele Anfragen",
-          description: "Bitte warten Sie 60 Sekunden, bevor Sie einen neuen Link anfordern.",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Fehler beim Senden des Login-Links",
+          title: "Fehler beim Laden der Benutzer.",
           description: error.message,
           variant: "destructive",
         });
+      } else {
+        setUsers(data);
       }
-      return;
-    }
+    };
 
-    // Set cooldown after successful send
-    setEmailCooldowns(prev => ({
-      ...prev,
-      [profile.email]: Date.now() + 60000
-    }));
+    fetchUsers();
+  }, [toast]);
 
-    toast({
-      title: "Login-Link gesendet",
-      description: `Ein Login-Link wurde an ${profile.email} gesendet.`,
-    });
+  const handleUserSelect = (user: Profile) => {
+    setSelectedUser(user);
+    // Fetch affiliate info if necessary
   };
 
   const handleResetAllPasswords = async () => {
@@ -124,17 +42,29 @@ export const UserManagement = () => {
       const { data, error } = await supabase.functions.invoke('reset-passwords');
       
       if (error) {
-        throw error;
+        console.error('Error resetting passwords:', error);
+        throw new Error('Fehler beim Zurücksetzen der Passwörter');
       }
 
-      toast({
-        title: "Passwörter zurückgesetzt",
-        description: "Alle Passwörter wurden auf '123456' zurückgesetzt.",
-      });
+      if (data?.results) {
+        const successCount = data.results.filter((r: any) => r.success).length;
+        const failCount = data.results.filter((r: any) => !r.success).length;
+
+        let description = `${successCount} Passwörter erfolgreich zurückgesetzt.`;
+        if (failCount > 0) {
+          description += ` ${failCount} fehlgeschlagen.`;
+        }
+
+        toast({
+          title: "Passwörter zurückgesetzt",
+          description: description,
+        });
+      }
     } catch (error) {
+      console.error('Reset password error:', error);
       toast({
-        title: "Fehler beim Zurücksetzen der Passwörter",
-        description: error.message,
+        title: "Fehler",
+        description: error.message || "Ein unerwarteter Fehler ist aufgetreten",
         variant: "destructive",
       });
     } finally {
@@ -149,6 +79,8 @@ export const UserManagement = () => {
         <Button 
           onClick={handleResetAllPasswords}
           disabled={isResettingPasswords}
+          variant="outline"
+          className="bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700"
         >
           {isResettingPasswords ? "Wird zurückgesetzt..." : "Alle Passwörter zurücksetzen"}
         </Button>
@@ -160,39 +92,22 @@ export const UserManagement = () => {
             <TableHead>Name</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Telefon</TableHead>
-            <TableHead>Registriert am</TableHead>
             <TableHead>Aktionen</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {profiles.map((profile) => (
-            <TableRow 
-              key={profile.id}
-              className="cursor-pointer hover:bg-gray-50"
-            >
-              <TableCell onClick={() => handleUserClick(profile)}>
-                {`${profile.first_name} ${profile.last_name}`}
-              </TableCell>
-              <TableCell onClick={() => handleUserClick(profile)}>
-                {profile.email}
-              </TableCell>
-              <TableCell onClick={() => handleUserClick(profile)}>
-                {profile.phone}
-              </TableCell>
-              <TableCell onClick={() => handleUserClick(profile)}>
-                {new Date(profile.created_at).toLocaleDateString('de-DE')}
-              </TableCell>
+          {users.map((user) => (
+            <TableRow key={user.id}>
+              <TableCell>{`${user.first_name} ${user.last_name}`}</TableCell>
+              <TableCell>{user.email}</TableCell>
+              <TableCell>{user.phone}</TableCell>
               <TableCell>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleSendLoginLink(profile);
-                  }}
-                  disabled={emailCooldowns[profile.email] && Date.now() < emailCooldowns[profile.email]}
+                  onClick={() => handleUserSelect(user)}
                 >
-                  Login-Link senden
+                  Details
                 </Button>
               </TableCell>
             </TableRow>
@@ -200,11 +115,14 @@ export const UserManagement = () => {
         </TableBody>
       </Table>
 
-      <UserDetailsDialog 
-        user={selectedUser}
-        affiliateInfo={affiliateInfo}
-        onOpenChange={() => setSelectedUser(null)}
-      />
+      {selectedUser && (
+        <UserDetailsDialog
+          user={selectedUser}
+          affiliateInfo={affiliateInfo}
+          open={!!selectedUser}
+          onOpenChange={(open) => !open && setSelectedUser(null)}
+        />
+      )}
     </div>
   );
 };

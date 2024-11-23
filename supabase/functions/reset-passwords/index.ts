@@ -11,6 +11,7 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Create a Supabase client with the service role key
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -22,13 +23,18 @@ Deno.serve(async (req) => {
       }
     )
 
+    // List all users
     const { data: { users }, error: usersError } = await supabaseAdmin.auth.admin.listUsers()
     
     if (usersError) {
       throw usersError
     }
 
+    console.log('Found users:', users.length)
+
+    // Update each user's password
     const updatePromises = users.map(async (user) => {
+      console.log('Updating password for user:', user.email)
       const { error } = await supabaseAdmin.auth.admin.updateUserById(
         user.id,
         { password: '123456' }
@@ -54,6 +60,7 @@ Deno.serve(async (req) => {
     )
 
   } catch (error) {
+    console.error('Error in reset-passwords function:', error)
     return new Response(
       JSON.stringify({
         error: error.message
