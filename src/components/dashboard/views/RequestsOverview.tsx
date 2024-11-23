@@ -83,8 +83,7 @@ export const RequestsOverview = () => {
       const { error } = await supabase
         .from('leads')
         .update({ deleted_at: new Date().toISOString() })
-        .eq('id', id)
-        .eq('user_id', user.id);
+        .eq('id', id);
 
       if (error) throw error;
 
@@ -95,8 +94,7 @@ export const RequestsOverview = () => {
         description: "Die Anfrage wurde erfolgreich gelöscht.",
       });
 
-      // Reload the calculations to ensure we have the latest data
-      await loadCalculations();
+      loadCalculations();
     } catch (error: any) {
       toast({
         title: "Fehler beim Löschen",
