@@ -81,15 +81,18 @@ export const RecommendedConfig = () => {
       <ConfigSidebar />
       
       <div className="flex-1">
-        {!isAuthenticated && (
-          <RegistrationOverlay onComplete={() => setIsAuthenticated(true)} />
-        )}
+        {!isAuthenticated && <RegistrationOverlay onComplete={() => setIsAuthenticated(true)} />}
         
         <div>
           <div className="relative">
             <HeroImage />
-            {showLeadForm && (
-              <LeadFormOverlay formType={formType} />
+            {showLeadForm && formType && (
+              <LeadFormOverlay 
+                formType={formType} 
+                metrics={metrics} 
+                address={address}
+                onClose={() => setShowLeadForm(false)}
+              />
             )}
           </div>
 
