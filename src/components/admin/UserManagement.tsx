@@ -5,26 +5,35 @@ import { UserDetailsDialog } from "./UserDetailsDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Profile, AffiliateInfo } from "./types/userManagement";
+import { User } from "@supabase/supabase-js";
 
 export const UserManagement = () => {
   const [users, setUsers] = useState<Profile[]>([]);
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
   const [affiliateInfo, setAffiliateInfo] = useState<AffiliateInfo | null>(null);
-  const [emailCooldowns, setEmailCooldowns] = useState<Record<string, number>>({});
   const [isResettingPasswords, setIsResettingPasswords] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const { data, error } = await supabase.auth.admin.listUsers();
+      const { data: authUsers, error } = await supabase.auth.admin.listUsers();
       if (error) {
         toast({
           title: "Fehler beim Laden der Benutzer.",
           description: error.message,
           variant: "destructive",
         });
-      } else {
-        setUsers(data);
+      } else if (authUsers?.users) {
+        // Transform auth users to Profile type
+        const profileUsers: Profile[] = authUsers.users.map((user: User) => ({
+          id: user.id,
+          email: user.email || '',
+          first_name: user.user_metadata?.first_name || '',
+          last_name: user.user_metadata?.last_name || '',
+          phone: user.phone || '',
+          created_at: user.created_at
+        }));
+        setUsers(profileUsers);
       }
     };
 
@@ -60,7 +69,7 @@ export const UserManagement = () => {
           description: description,
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Reset password error:', error);
       toast({
         title: "Fehler",
@@ -115,14 +124,11 @@ export const UserManagement = () => {
         </TableBody>
       </Table>
 
-      {selectedUser && (
-        <UserDetailsDialog
-          user={selectedUser}
-          affiliateInfo={affiliateInfo}
-          open={!!selectedUser}
-          onOpenChange={(open) => !open && setSelectedUser(null)}
-        />
-      )}
+      <UserDetailsDialog
+        user={selectedUser}
+        affiliateInfo={affiliateInfo}
+        onOpenChange={(open) => !open && setSelectedUser(null)}
+      />
     </div>
   );
 };
