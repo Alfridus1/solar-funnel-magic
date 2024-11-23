@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { PDFDownloadButton } from "../solar-showcase/components/PDFDownloadButton";
+import { Trash2 } from "lucide-react";
 
 interface Lead {
   id: string;
@@ -47,6 +48,7 @@ export const LeadManagement = () => {
         *,
         profile:profiles(id, first_name, last_name)
       `)
+      .is('deleted_at', null)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -81,6 +83,29 @@ export const LeadManagement = () => {
       title: "Status aktualisiert",
       description: "Der Status wurde erfolgreich aktualisiert.",
     });
+  };
+
+  const handleDeleteLead = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('leads')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setLeads(leads.filter(lead => lead.id !== id));
+      toast({
+        title: "Anfrage gelöscht",
+        description: "Die Anfrage wurde erfolgreich gelöscht.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Fehler beim Löschen",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -150,6 +175,13 @@ export const LeadManagement = () => {
                       address={lead.address}
                     />
                   )}
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDeleteLead(lead.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </TableCell>
             </TableRow>
