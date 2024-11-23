@@ -78,7 +78,7 @@ export const RecommendedConfig = () => {
                   <h3 className="text-2xl font-bold">Potentialanalyse</h3>
                   <div className="group bg-gradient-to-br from-solar-blue-50/50 to-solar-blue-100/30 rounded-xl p-8 shadow-xl backdrop-blur-sm border border-white/50 relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
                     <div className="absolute inset-0 bg-gradient-to-tr from-solar-orange/10 via-solar-blue-100/20 to-transparent opacity-75 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10 group-hover:opacity-20 transition-opacity duration-300" />
+                    <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10 group-hover:opacity-20 transition-opacity duration-300 h-full" />
                     <div className="relative z-10 backdrop-blur-[2px]">
                       <SavingsCalculator yearlyProduction={annualProduction} />
                     </div>
