@@ -4,9 +4,11 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
+import { useToast } from "@/components/ui/use-toast";
 
 export function Login() {
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     // Check if user is already logged in
@@ -80,6 +82,13 @@ export function Login() {
           }}
           providers={[]}
           theme="light"
+          onError={(error) => {
+            toast({
+              title: "Fehler bei der Anmeldung",
+              description: error.message,
+              variant: "destructive",
+            });
+          }}
         />
       </Card>
     </div>

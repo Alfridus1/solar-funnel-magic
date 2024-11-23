@@ -2,6 +2,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 interface LoginDialogProps {
   open: boolean;
@@ -9,6 +10,8 @@ interface LoginDialogProps {
 }
 
 export const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
+  const { toast } = useToast();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -72,6 +75,13 @@ export const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
           }}
           providers={[]}
           theme="light"
+          onError={(error) => {
+            toast({
+              title: "Fehler bei der Anmeldung",
+              description: error.message,
+              variant: "destructive",
+            });
+          }}
         />
       </DialogContent>
     </Dialog>
