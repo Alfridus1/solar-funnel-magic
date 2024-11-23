@@ -21,7 +21,6 @@ export const RecommendedConfig = () => {
   const navigate = useNavigate();
   const [showLeadForm, setShowLeadForm] = useState(false);
   const [formType, setFormType] = useState<"quote" | "consultation" | null>(null);
-  const [isRegistered, setIsRegistered] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { toast } = useToast();
   
@@ -40,10 +39,9 @@ export const RecommendedConfig = () => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setIsAuthenticated(!!session);
-      if (session) {
-        setIsRegistered(true);
+      if (session && metrics) {
         // Only create a new lead if there's no existingLeadId
-        if (metrics && !location.state?.existingLeadId) {
+        if (!location.state?.existingLeadId) {
           const { error } = await supabase.from('leads').insert({
             user_id: session.user.id,
             type: 'calculation',
@@ -70,9 +68,6 @@ export const RecommendedConfig = () => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setIsAuthenticated(!!session);
-      if (session) {
-        setIsRegistered(true);
-      }
     });
 
     return () => subscription.unsubscribe();
@@ -87,11 +82,11 @@ export const RecommendedConfig = () => {
       <ConfigSidebar />
       
       <div className="flex-1">
-        {!isAuthenticated && !isRegistered && (
-          <RegistrationOverlay onComplete={() => setIsRegistered(true)} />
+        {!isAuthenticated && (
+          <RegistrationOverlay onComplete={() => setIsAuthenticated(true)} />
         )}
         
-        <div className={`relative transition-all duration-300 ${!isRegistered ? 'pointer-events-none opacity-50' : ''}`}>
+        <div className={`relative transition-all duration-300 ${!isAuthenticated ? 'pointer-events-none opacity-50' : ''}`}>
           <div className="relative">
             <HeroImage />
             {showLeadForm && (
