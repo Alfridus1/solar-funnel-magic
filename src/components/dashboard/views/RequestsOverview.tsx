@@ -6,20 +6,10 @@ import { Plus, Sun, Euro, TrendingUp, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { PDFDownloadButton } from "@/components/solar-showcase/components/PDFDownloadButton";
-
-interface LeadMetrics {
-  kWp: number;
-  annualSavings: number;
-  estimatedPrice: number;
-  roofArea?: number;
-}
-
-interface LeadCalculation {
-  id: string;
-  created_at: string;
-  metrics: LeadMetrics | null;
-  address: string | null;
-}
+import { LeadCalculation } from "./types/LeadCalculation";
+import { CalculationCard } from "./components/CalculationCard";
+import { EmptyState } from "./components/EmptyState";
+import { PageHeader } from "./components/PageHeader";
 
 export const RequestsOverview = () => {
   const [calculations, setCalculations] = useState<LeadCalculation[]>([]);
@@ -77,14 +67,14 @@ export const RequestsOverview = () => {
         state: {
           metrics: calculation.metrics,
           address: calculation.address,
-          existingLeadId: calculation.id
+          existingLeadId: calculation.id // Pass the existing lead ID
         }
       });
     }
   };
 
   const handleDeleteCalculation = async (id: string, event: React.MouseEvent) => {
-    event.stopPropagation(); // Prevent triggering the card click
+    event.stopPropagation();
     
     const { error } = await supabase
       .from('leads')
@@ -105,101 +95,28 @@ export const RequestsOverview = () => {
       description: "Die Anfrage wurde erfolgreich gelöscht.",
     });
 
-    // Refresh the calculations list
     loadCalculations();
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Meine Anfragen</h1>
-        <Button onClick={handleNewRequest} className="bg-solar-orange hover:bg-solar-orange/90">
-          <Plus className="mr-2 h-4 w-4" />
-          Neue Anfrage
-        </Button>
-      </div>
+      <PageHeader 
+        onNewRequest={handleNewRequest}
+      />
 
       <div className="grid gap-6">
         {calculations.map((calc) => (
-          <Card 
-            key={calc.id} 
-            className="hover:shadow-lg transition-shadow"
-          >
-            <CardHeader className="flex flex-row justify-between items-start">
-              <CardTitle className="text-lg">
-                Solaranlage vom {new Date(calc.created_at).toLocaleDateString('de-DE')}
-                {calc.address && (
-                  <div className="text-sm text-gray-600 mt-1">
-                    Standort: {calc.address}
-                  </div>
-                )}
-              </CardTitle>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                onClick={(e) => handleDeleteCalculation(calc.id, e)}
-              >
-                <Trash2 className="h-5 w-5" />
-              </Button>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="flex items-center space-x-4 p-4 bg-orange-50 rounded-lg">
-                  <Sun className="h-5 w-5 text-solar-orange" />
-                  <div>
-                    <p className="text-sm text-gray-600">Anlagengröße</p>
-                    <p className="font-semibold">{calc.metrics?.kWp || 0} kWp</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-4 p-4 bg-green-50 rounded-lg">
-                  <Euro className="h-5 w-5 text-green-600" />
-                  <div>
-                    <p className="text-sm text-gray-600">Geschätzter Preis</p>
-                    <p className="font-semibold">{calc.metrics?.estimatedPrice?.toLocaleString('de-DE') || 0}€</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-4 p-4 bg-blue-50 rounded-lg">
-                  <TrendingUp className="h-5 w-5 text-blue-600" />
-                  <div>
-                    <p className="text-sm text-gray-600">Jährliche Einsparung</p>
-                    <p className="font-semibold">{calc.metrics?.annualSavings?.toLocaleString('de-DE') || 0}€</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-between items-center mt-4">
-                <Button 
-                  variant="outline" 
-                  onClick={() => handleCalculationClick(calc)}
-                  className="text-solar-orange border-solar-orange hover:bg-solar-orange/10"
-                >
-                  Details anzeigen
-                </Button>
-                
-                {calc.metrics && calc.address && (
-                  <PDFDownloadButton 
-                    metrics={calc.metrics}
-                    address={calc.address}
-                  />
-                )}
-              </div>
-            </CardContent>
-          </Card>
+          <CalculationCard
+            key={calc.id}
+            calculation={calc}
+            onDelete={handleDeleteCalculation}
+            onClick={handleCalculationClick}
+            onDownloadPDF={() => {}}
+          />
         ))}
 
         {calculations.length === 0 && (
-          <Card className="p-6 text-center">
-            <p className="text-gray-600">Sie haben noch keine Anfragen erstellt.</p>
-            <Button 
-              onClick={handleNewRequest} 
-              className="mt-4 bg-solar-orange hover:bg-solar-orange/90"
-            >
-              Erste Anfrage erstellen
-            </Button>
-          </Card>
+          <EmptyState onNewRequest={handleNewRequest} />
         )}
       </div>
     </div>

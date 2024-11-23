@@ -42,8 +42,8 @@ export const RecommendedConfig = () => {
       setIsAuthenticated(!!session);
       if (session) {
         setIsRegistered(true);
-        // Create lead entry when authenticated user views the page
-        if (metrics) {
+        // Only create a new lead if there's no existingLeadId
+        if (metrics && !location.state?.existingLeadId) {
           const { error } = await supabase.from('leads').insert({
             user_id: session.user.id,
             type: 'calculation',
