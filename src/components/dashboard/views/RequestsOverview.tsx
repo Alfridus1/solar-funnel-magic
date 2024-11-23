@@ -74,26 +74,28 @@ export const RequestsOverview = () => {
   const handleDeleteCalculation = async (id: string, event: React.MouseEvent) => {
     event.stopPropagation();
     
-    const { error } = await supabase
-      .from('leads')
-      .delete()
-      .eq('id', id);
+    try {
+      const { error } = await supabase
+        .from('leads')
+        .delete()
+        .eq('id', id);
 
-    if (error) {
+      if (error) throw error;
+
+      toast({
+        title: "Anfrage gelöscht",
+        description: "Die Anfrage wurde erfolgreich gelöscht.",
+      });
+
+      // Update the local state to remove the deleted calculation
+      setCalculations(prev => prev.filter(calc => calc.id !== id));
+    } catch (error: any) {
       toast({
         title: "Fehler beim Löschen",
-        description: "Die Anfrage konnte nicht gelöscht werden.",
+        description: error.message || "Die Anfrage konnte nicht gelöscht werden.",
         variant: "destructive",
       });
-      return;
     }
-
-    toast({
-      title: "Anfrage gelöscht",
-      description: "Die Anfrage wurde erfolgreich gelöscht.",
-    });
-
-    loadCalculations();
   };
 
   return (
