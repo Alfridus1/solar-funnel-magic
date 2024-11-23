@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface LoginFormProps {
   onBack: () => void;
-  onSuccess: () => void;
+  onSuccess?: () => void;
 }
 
 export const LoginForm = ({ onBack, onSuccess }: LoginFormProps) => {
@@ -33,7 +33,7 @@ export const LoginForm = ({ onBack, onSuccess }: LoginFormProps) => {
             },
           }}
           providers={[]}
-          onSuccess={onSuccess}
+          view="sign_in"
           localization={{
             variables: {
               sign_in: {
