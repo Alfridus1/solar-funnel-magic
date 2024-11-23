@@ -8,17 +8,18 @@ interface CalculationCardProps {
   calculation: LeadCalculation;
   onDelete: (id: string, event: React.MouseEvent) => void;
   onClick: (calculation: LeadCalculation) => void;
-  onDownloadPDF: () => void;
 }
 
 export const CalculationCard = ({
   calculation: calc,
   onDelete,
   onClick,
-  onDownloadPDF
 }: CalculationCardProps) => {
   return (
-    <Card className="hover:shadow-lg transition-shadow">
+    <Card 
+      className="hover:shadow-lg transition-shadow cursor-pointer"
+      onClick={() => onClick(calc)}
+    >
       <CardHeader className="flex flex-row justify-between items-start">
         <CardTitle className="text-lg">
           Solaranlage vom {new Date(calc.created_at).toLocaleDateString('de-DE')}
@@ -67,7 +68,10 @@ export const CalculationCard = ({
         <div className="flex justify-between items-center mt-4">
           <Button 
             variant="outline" 
-            onClick={() => onClick(calc)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onClick(calc);
+            }}
             className="text-solar-orange border-solar-orange hover:bg-solar-orange/10"
           >
             Details anzeigen

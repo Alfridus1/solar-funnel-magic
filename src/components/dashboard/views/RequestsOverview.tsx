@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Sun, Euro, TrendingUp, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { PDFDownloadButton } from "@/components/solar-showcase/components/PDFDownloadButton";
-import { LeadCalculation } from "./types/LeadCalculation";
+import type { LeadCalculation } from "./types/LeadCalculation";
 import { CalculationCard } from "./components/CalculationCard";
 import { EmptyState } from "./components/EmptyState";
 import { PageHeader } from "./components/PageHeader";
@@ -67,7 +65,7 @@ export const RequestsOverview = () => {
         state: {
           metrics: calculation.metrics,
           address: calculation.address,
-          existingLeadId: calculation.id // Pass the existing lead ID
+          existingLeadId: calculation.id
         }
       });
     }
@@ -111,7 +109,6 @@ export const RequestsOverview = () => {
             calculation={calc}
             onDelete={handleDeleteCalculation}
             onClick={handleCalculationClick}
-            onDownloadPDF={() => {}}
           />
         ))}
 
