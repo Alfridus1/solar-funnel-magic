@@ -94,6 +94,9 @@ export const RequestsOverview = () => {
         title: "Anfrage gelöscht",
         description: "Die Anfrage wurde erfolgreich gelöscht.",
       });
+
+      // Reload the calculations to ensure we have the latest data
+      await loadCalculations();
     } catch (error: any) {
       toast({
         title: "Fehler beim Löschen",
