@@ -6,9 +6,10 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface LoginFormProps {
   onBack: () => void;
+  onSuccess: () => void;
 }
 
-export const LoginForm = ({ onBack }: LoginFormProps) => {
+export const LoginForm = ({ onBack, onSuccess }: LoginFormProps) => {
   return (
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
       <Card className="w-full max-w-md p-6 bg-white/95 backdrop-blur shadow-xl animate-fade-up">
@@ -32,6 +33,7 @@ export const LoginForm = ({ onBack }: LoginFormProps) => {
             },
           }}
           providers={[]}
+          onSuccess={onSuccess}
           localization={{
             variables: {
               sign_in: {

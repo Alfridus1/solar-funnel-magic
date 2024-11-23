@@ -11,7 +11,7 @@ interface RegistrationOverlayProps {
 export const RegistrationOverlay = ({ onComplete, isAuthenticated }: RegistrationOverlayProps) => {
   const [showLogin, setShowLogin] = useState(false);
 
-  // Wenn der Benutzer bereits eingeloggt ist, zeigen wir das Overlay nicht an
+  // If user is authenticated, don't show the overlay
   if (isAuthenticated) {
     return null;
   }
