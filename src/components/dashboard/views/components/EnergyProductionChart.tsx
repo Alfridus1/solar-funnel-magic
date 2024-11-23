@@ -1,8 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { Loader2 } from "lucide-react";
+
+interface ProductionData {
+  month: string;
+  production: number;
+}
+
+interface LeadMetrics {
+  monthlyProductionHistory?: ProductionData[];
+  [key: string]: any;
+}
 
 export const EnergyProductionChart = () => {
   const { data: productionData, isLoading } = useQuery({
@@ -17,7 +25,8 @@ export const EnergyProductionChart = () => {
         .eq('user_id', user.id)
         .single();
 
-      return lead?.metrics?.monthlyProductionHistory || [];
+      const metrics = lead?.metrics as LeadMetrics | null;
+      return metrics?.monthlyProductionHistory || [];
     }
   });
 

@@ -29,6 +29,11 @@ export const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
           title: "Abgemeldet",
           description: "Sie wurden erfolgreich abgemeldet.",
         });
+      } else if (event === 'USER_UPDATED') {
+        toast({
+          title: "Profil aktualisiert",
+          description: "Ihre Profildaten wurden aktualisiert.",
+        });
       }
     });
 
