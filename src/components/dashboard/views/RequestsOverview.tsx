@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Plus, Sun, Euro, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { PDFDownloadButton } from "@/components/solar-showcase/components/PDFDownloadButton";
 
-// Move interfaces to a separate types file if the file gets too large
 interface LeadMetrics {
   kWp: number;
   annualSavings: number;
@@ -76,7 +76,8 @@ export const RequestsOverview = () => {
       navigate("/recommended-config", {
         state: {
           metrics: calculation.metrics,
-          address: calculation.address
+          address: calculation.address,
+          existingLeadId: calculation.id
         }
       });
     }
@@ -97,7 +98,6 @@ export const RequestsOverview = () => {
           <Card 
             key={calc.id} 
             className="hover:shadow-lg transition-shadow cursor-pointer"
-            onClick={() => handleCalculationClick(calc)}
           >
             <CardHeader>
               <CardTitle className="text-lg">
@@ -134,6 +134,23 @@ export const RequestsOverview = () => {
                     <p className="font-semibold">{calc.metrics?.annualSavings?.toLocaleString('de-DE') || 0}€</p>
                   </div>
                 </div>
+              </div>
+
+              <div className="flex justify-between items-center mt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={() => handleCalculationClick(calc)}
+                  className="text-solar-orange border-solar-orange hover:bg-solar-orange/10"
+                >
+                  Details anzeigen
+                </Button>
+                
+                {calc.metrics && calc.address && (
+                  <PDFDownloadButton 
+                    metrics={calc.metrics}
+                    address={calc.address}
+                  />
+                )}
               </div>
             </CardContent>
           </Card>
