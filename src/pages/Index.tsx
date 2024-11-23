@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useLoadScript } from "@react-google-maps/api";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
@@ -14,6 +14,7 @@ import { useGeolocation } from "@/components/RoofCheck/hooks/useGeolocation";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { LoginDialog } from "@/components/auth/LoginDialog";
+import { supabase } from "@/integrations/supabase/client";
 
 const libraries = ["drawing", "places"];
 
@@ -21,9 +22,27 @@ export function Index() {
   const [address, setAddress] = useState("");
   const [showRoofCheck, setShowRoofCheck] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check authentication status
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsLoggedIn(!!session);
+    };
+    
+    checkAuth();
+
+    // Subscribe to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsLoggedIn(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
@@ -109,10 +128,10 @@ export function Index() {
           </Button>
           <Button 
             variant="outline"
-            onClick={() => setShowLoginDialog(true)}
+            onClick={() => isLoggedIn ? navigate("/dashboard") : setShowLoginDialog(true)}
             className="bg-white hover:bg-solar-orange hover:text-white transition-colors"
           >
-            Login
+            {isLoggedIn ? "Zum Dashboard" : "Login"}
           </Button>
         </div>
         <div className="py-12">
