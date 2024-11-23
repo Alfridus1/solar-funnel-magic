@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 
 export const LeadDetails = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const [lead, setLead] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -13,6 +13,10 @@ export const LeadDetails = () => {
   useEffect(() => {
     const loadLead = async () => {
       try {
+        if (!id) {
+          throw new Error("No lead ID provided");
+        }
+
         const { data, error } = await supabase
           .from("leads")
           .select("*")
@@ -32,9 +36,7 @@ export const LeadDetails = () => {
       }
     };
 
-    if (id) {
-      loadLead();
-    }
+    loadLead();
   }, [id, toast]);
 
   if (loading) {
