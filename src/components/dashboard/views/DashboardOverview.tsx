@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
+import { SystemOverview } from "./components/SystemOverview";
+import { NewsSection } from "./components/NewsSection";
 
 export const DashboardOverview = () => {
   const [greeting, setGreeting] = useState("");
@@ -25,7 +27,6 @@ export const DashboardOverview = () => {
           .single();
 
         if (profile) {
-          // Determine title based on first name ending
           const title = profile.first_name.toLowerCase().endsWith('a') ? 'Frau' : 'Herr';
           setTitle(title);
           setUserFullName(`${profile.last_name}`);
@@ -36,7 +37,6 @@ export const DashboardOverview = () => {
     setGreeting(getTimeBasedGreeting());
     loadUserProfile();
 
-    // Update greeting every minute
     const interval = setInterval(() => {
       setGreeting(getTimeBasedGreeting());
     }, 60000);
@@ -46,15 +46,39 @@ export const DashboardOverview = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Dashboard</h1>
-      <Card>
+      <Card className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/50 dark:to-blue-800/50">
         <CardHeader>
-          <CardTitle>{greeting} {title} {userFullName}</CardTitle>
+          <CardTitle className="text-2xl">
+            {greeting} {title} {userFullName}
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">Willkommen in Ihrem Dashboard</p>
+          <p className="text-muted-foreground">
+            Willkommen in Ihrem persönlichen Solar-Dashboard
+          </p>
         </CardContent>
       </Card>
+
+      <SystemOverview />
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <Card>
+            <CardHeader>
+              <CardTitle>Energieproduktion</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                Hier kommt ein Chart zur Energieproduktion
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <div className="lg:col-span-1">
+          <NewsSection />
+        </div>
+      </div>
     </div>
   );
 };
