@@ -32,7 +32,9 @@ export const LeadDetails = () => {
       }
     };
 
-    loadLead();
+    if (id) {
+      loadLead();
+    }
   }, [id, toast]);
 
   if (loading) {
