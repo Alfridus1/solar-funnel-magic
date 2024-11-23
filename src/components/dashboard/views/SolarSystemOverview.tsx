@@ -30,7 +30,7 @@ export const SolarSystemOverview = () => {
   const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
 
-  const { data: lead, isLoading } = useQuery({
+  const { data: lead, isLoading, error } = useQuery({
     queryKey: ['user-lead'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -41,13 +41,13 @@ export const SolarSystemOverview = () => {
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
+        .limit(1);
 
       if (error) throw error;
+      if (!data || data.length === 0) return null;
       
       // Type assertion and validation
-      const supabaseLead = data as SupabaseLead;
+      const supabaseLead = data[0] as SupabaseLead;
       const metrics = supabaseLead.metrics as LeadMetrics;
       
       // Validate metrics structure
@@ -89,7 +89,7 @@ export const SolarSystemOverview = () => {
     );
   }
 
-  if (!lead) {
+  if (error || !lead) {
     return (
       <Card>
         <CardContent className="p-6">
