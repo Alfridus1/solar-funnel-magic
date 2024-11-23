@@ -46,11 +46,11 @@ export const RequestsOverview = () => {
       return;
     }
 
-    // Cast the data to match our interface
+    // Cast the data to match our interface with type checking
     const typedData: LeadCalculation[] = (data || []).map(item => ({
       id: item.id,
       created_at: item.created_at,
-      metrics: item.metrics as LeadMetrics
+      metrics: item.metrics as LeadMetrics | null
     }));
 
     setCalculations(typedData);
