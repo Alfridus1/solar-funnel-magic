@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { HeroImage } from "@/components/solar-showcase/components/HeroImage";
 import { LeadFormOverlay } from "@/components/solar-showcase/components/LeadFormOverlay";
-import { RegistrationOverlay } from "@/components/solar-showcase/components/RegistrationOverlay";
+import { RegistrationOverlay } from "@/components/solar-showcase/components/registration/RegistrationOverlay";
 import { SystemMetrics } from "@/components/solar-showcase/components/SystemMetrics";
 import { SavingsCalculator } from "@/components/SavingsCalculator";
 import { Testimonials } from "@/components/Testimonials";
@@ -13,6 +13,7 @@ import { PricingCard } from "@/components/solar-showcase/components/PricingCard"
 import { PricingOptions } from "@/components/solar-showcase/components/PricingOptions";
 import { ConfigSidebar } from "@/components/solar-showcase/components/ConfigSidebar";
 import { loadConfigFromCookie, saveConfigToCookie } from "@/utils/configCookieManager";
+import { supabase } from "@/integrations/supabase/client";
 
 export const RecommendedConfig = () => {
   const location = useLocation();
@@ -20,6 +21,7 @@ export const RecommendedConfig = () => {
   const [showLeadForm, setShowLeadForm] = useState(false);
   const [formType, setFormType] = useState<"quote" | "consultation" | null>(null);
   const [isRegistered, setIsRegistered] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   
   const { metrics, address } = location.state || loadConfigFromCookie() || {};
 
@@ -32,33 +34,39 @@ export const RecommendedConfig = () => {
     saveConfigToCookie({ metrics, address });
   }, [metrics, address, navigate]);
 
+  useEffect(() => {
+    // Check authentication status on mount and when it changes
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+      if (session) {
+        setIsRegistered(true);
+      }
+    };
+    
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsAuthenticated(!!session);
+      if (session) {
+        setIsRegistered(true);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   if (!metrics) {
     return null;
   }
-
-  const moduleCount = Math.round(metrics.kWp * 2);
-  const annualProduction = Math.round(metrics.kWp * 950);
-  const estimatedPrice = Math.round(metrics.kWp * 1950);
-
-  const handleShowQuoteForm = () => {
-    setFormType("quote");
-    setShowLeadForm(true);
-  };
-
-  const handleShowConsultationForm = () => {
-    setFormType("consultation");
-    setShowLeadForm(true);
-  };
 
   return (
     <div className="flex min-h-screen bg-solar-blue-50">
       <ConfigSidebar />
       
       <div className="flex-1">
-        {!isRegistered && (
-          <div className="fixed inset-0 z-50">
-            <RegistrationOverlay onComplete={() => setIsRegistered(true)} />
-          </div>
+        {!isAuthenticated && !isRegistered && (
+          <RegistrationOverlay onComplete={() => setIsRegistered(true)} />
         )}
         
         <div className={`relative transition-all duration-300 ${!isRegistered ? 'pointer-events-none opacity-50' : ''}`}>
@@ -73,9 +81,9 @@ export const RecommendedConfig = () => {
             <Card className="max-w-7xl mx-auto mb-12 p-8 bg-white/95 backdrop-blur shadow-lg rounded-xl">
               <div className="mb-8 -mx-8 -mt-8 p-8 bg-gradient-to-br from-solar-orange/5 to-transparent rounded-t-xl">
                 <SystemMetrics
-                  moduleCount={moduleCount}
+                  moduleCount={Math.round(metrics.kWp * 2)}
                   kWp={metrics.kWp}
-                  annualProduction={annualProduction}
+                  annualProduction={Math.round(metrics.kWp * 950)}
                   roofArea={metrics.roofArea}
                 />
               </div>
@@ -88,7 +96,7 @@ export const RecommendedConfig = () => {
                       <div className="absolute inset-0 bg-gradient-to-tr from-solar-orange/10 via-solar-blue-100/20 to-transparent opacity-75 group-hover:opacity-100 transition-opacity duration-300" />
                       <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10 group-hover:opacity-20 transition-opacity duration-300 h-full" />
                       <div className="relative z-10 backdrop-blur-[2px]">
-                        <SavingsCalculator yearlyProduction={annualProduction} />
+                        <SavingsCalculator yearlyProduction={Math.round(metrics.kWp * 950)} />
                       </div>
                       <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-solar-orange/10 rounded-full blur-3xl group-hover:blur-2xl transition-all duration-300" />
                       <div className="absolute -top-20 -left-20 w-40 h-40 bg-solar-blue/20 rounded-full blur-3xl group-hover:blur-2xl transition-all duration-300" />
@@ -98,8 +106,11 @@ export const RecommendedConfig = () => {
                   <div className="space-y-6">
                     <h3 className="text-2xl font-bold">Unverbindliche Preisschätzung</h3>
                     <PricingCard 
-                      estimatedPrice={estimatedPrice} 
-                      onShowLeadForm={handleShowQuoteForm}
+                      estimatedPrice={Math.round(metrics.kWp * 1950)} 
+                      onShowLeadForm={() => {
+                        setFormType("quote");
+                        setShowLeadForm(true);
+                      }}
                       systemSizeKWp={metrics.kWp}
                     />
                   </div>
@@ -120,9 +131,15 @@ export const RecommendedConfig = () => {
               <PremiumProductsCarousel />
 
               <PricingOptions
-                estimatedPrice={estimatedPrice}
-                onShowQuoteForm={handleShowQuoteForm}
-                onShowConsultationForm={handleShowConsultationForm}
+                estimatedPrice={Math.round(metrics.kWp * 1950)}
+                onShowQuoteForm={() => {
+                  setFormType("quote");
+                  setShowLeadForm(true);
+                }}
+                onShowConsultationForm={() => {
+                  setFormType("consultation");
+                  setShowLeadForm(true);
+                }}
               />
             </div>
 
