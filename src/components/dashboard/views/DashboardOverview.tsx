@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SystemOverview } from "./components/SystemOverview";
 import { NewsSection } from "./components/NewsSection";
 import { CircleUserRound } from "lucide-react";
+import { EnergyProductionChart } from "./components/EnergyProductionChart";
 
 export const DashboardOverview = () => {
   const [greeting, setGreeting] = useState("");
@@ -100,9 +101,7 @@ export const DashboardOverview = () => {
               <CardTitle>Energieproduktion</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                Hier kommt ein Chart zur Energieproduktion
-              </div>
+              <EnergyProductionChart />
             </CardContent>
           </Card>
         </div>
