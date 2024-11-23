@@ -71,6 +71,17 @@ export const RequestsOverview = () => {
     navigate("/");
   };
 
+  const handleCalculationClick = (calculation: LeadCalculation) => {
+    if (calculation.metrics) {
+      navigate("/recommended-config", {
+        state: {
+          metrics: calculation.metrics,
+          address: calculation.address
+        }
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -83,7 +94,11 @@ export const RequestsOverview = () => {
 
       <div className="grid gap-6">
         {calculations.map((calc) => (
-          <Card key={calc.id} className="hover:shadow-lg transition-shadow">
+          <Card 
+            key={calc.id} 
+            className="hover:shadow-lg transition-shadow cursor-pointer"
+            onClick={() => handleCalculationClick(calc)}
+          >
             <CardHeader>
               <CardTitle className="text-lg">
                 Solaranlage vom {new Date(calc.created_at).toLocaleDateString('de-DE')}
