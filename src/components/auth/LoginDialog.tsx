@@ -34,11 +34,6 @@ export const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
           title: "Profil aktualisiert",
           description: "Ihre Profildaten wurden aktualisiert.",
         });
-      } else if (event === 'USER_DELETED') {
-        toast({
-          title: "Konto gelöscht",
-          description: "Ihr Konto wurde erfolgreich gelöscht.",
-        });
       } else if (event === 'PASSWORD_RECOVERY') {
         toast({
           title: "Passwort zurückgesetzt",
@@ -49,6 +44,16 @@ export const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
 
     return () => subscription.unsubscribe();
   }, [navigate, onOpenChange, toast]);
+
+  const handleError = (error: Error) => {
+    toast({
+      title: "Fehler bei der Anmeldung",
+      description: error.message === "Invalid login credentials" 
+        ? "Ungültige Anmeldedaten. Bitte überprüfen Sie Ihre E-Mail und Ihr Passwort."
+        : "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
+      variant: "destructive",
+    });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -114,15 +119,7 @@ export const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
           providers={[]}
           theme="light"
           view="sign_in"
-          onError={(error) => {
-            toast({
-              title: "Fehler bei der Anmeldung",
-              description: error.message === "Invalid login credentials" 
-                ? "Ungültige Anmeldedaten. Bitte überprüfen Sie Ihre E-Mail und Ihr Passwort."
-                : "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
-              variant: "destructive",
-            });
-          }}
+          onError={handleError}
         />
       </DialogContent>
     </Dialog>
