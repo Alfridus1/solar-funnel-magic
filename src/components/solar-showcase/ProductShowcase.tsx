@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,8 @@ import { Testimonials } from "@/components/Testimonials";
 import { FAQ } from "@/components/FAQ";
 import { PDFDownloadButton } from "./components/PDFDownloadButton";
 import { PremiumProductsList } from "./components/PremiumProductsList";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 const premiumProducts = [
   {
@@ -18,36 +20,36 @@ const premiumProducts = [
     image: "/lovable-uploads/fe437c08-df76-4ced-92d4-e82b0a6afe5c.png",
     features: ["500W Nennleistung", "21% Wirkungsgrad", "30 Jahre Garantie"]
   },
-    {
-      title: "Smart Wechselrichter",
-      description: "Intelligente Steuerung Ihrer Solaranlage",
-      image: "/lovable-uploads/f2d1edec-2b0f-4af0-9ec8-9e7caf7a8ea7.png",
-      features: ["98.6% Wirkungsgrad", "Integriertes Monitoring", "Smart-Home ready"]
-    },
-    {
-      title: "Hochleistungsspeicher",
-      description: "Maximale Unabhängigkeit durch effiziente Speicherung",
-      image: "/lovable-uploads/2b67e439-3bd1-4ad6-8498-ee34e8f6d45f.png",
-      features: ["15kWh Kapazität", "95% Entladetiefe", "10 Jahre Garantie"]
-    },
-    {
-      title: "Premium Wallbox",
-      description: "Intelligente Ladestation für Ihr E-Auto",
-      image: "/lovable-uploads/b078c6ba-faca-4278-af13-f78ce0cdb4cf.png",
-      features: ["22kW Ladeleistung", "Dynamisches Lastmanagement", "RFID-Zugangskontrolle"]
-    },
-    {
-      title: "Smart Home System",
-      description: "Vernetzte Haussteuerung für maximale Effizienz",
-      image: "/lovable-uploads/230bf2e3-b64a-4f51-bb2f-f246df2597be.png",
-      features: ["Energiemanagement", "App-Steuerung", "KNX-Integration"]
-    },
-    {
-      title: "Wärmepumpe",
-      description: "Effiziente Heizlösung für Ihr Zuhause",
-      image: "/lovable-uploads/03677377-bf21-4a7d-b8a4-c5f6e9b87885.png",
-      features: ["COP bis 5.0", "PV-Optimiert", "Smart Grid Ready"]
-    }
+  {
+    title: "Smart Wechselrichter",
+    description: "Intelligente Steuerung Ihrer Solaranlage",
+    image: "/lovable-uploads/f2d1edec-2b0f-4af0-9ec8-9e7caf7a8ea7.png",
+    features: ["98.6% Wirkungsgrad", "Integriertes Monitoring", "Smart-Home ready"]
+  },
+  {
+    title: "Hochleistungsspeicher",
+    description: "Maximale Unabhängigkeit durch effiziente Speicherung",
+    image: "/lovable-uploads/2b67e439-3bd1-4ad6-8498-ee34e8f6d45f.png",
+    features: ["15kWh Kapazität", "95% Entladetiefe", "10 Jahre Garantie"]
+  },
+  {
+    title: "Premium Wallbox",
+    description: "Intelligente Ladestation für Ihr E-Auto",
+    image: "/lovable-uploads/b078c6ba-faca-4278-af13-f78ce0cdb4cf.png",
+    features: ["22kW Ladeleistung", "Dynamisches Lastmanagement", "RFID-Zugangskontrolle"]
+  },
+  {
+    title: "Smart Home System",
+    description: "Vernetzte Haussteuerung für maximale Effizienz",
+    image: "/lovable-uploads/230bf2e3-b64a-4f51-bb2f-f246df2597be.png",
+    features: ["Energiemanagement", "App-Steuerung", "KNX-Integration"]
+  },
+  {
+    title: "Wärmepumpe",
+    description: "Effiziente Heizlösung für Ihr Zuhause",
+    image: "/lovable-uploads/03677377-bf21-4a7d-b8a4-c5f6e9b87885.png",
+    features: ["COP bis 5.0", "PV-Optimiert", "Smart Grid Ready"]
+  }
 ];
 
 export const ProductShowcase = () => {
@@ -55,8 +57,26 @@ export const ProductShowcase = () => {
   const navigate = useNavigate();
   const [showLeadForm, setShowLeadForm] = useState(false);
   const [formType, setFormType] = useState<"quote" | "consultation" | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { toast } = useToast();
   
   const { metrics, address } = location.state || {};
+
+  useEffect(() => {
+    // Check authentication status on mount and when it changes
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+    };
+    
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   if (!metrics) {
     navigate("/");
@@ -68,8 +88,16 @@ export const ProductShowcase = () => {
   const estimatedPrice = Math.round(metrics.kWp * 1950);
 
   const handleConsultationRequest = () => {
-    setFormType("consultation");
-    setShowLeadForm(true);
+    if (isAuthenticated) {
+      setFormType("consultation");
+      setShowLeadForm(true);
+    } else {
+      toast({
+        title: "Anmeldung erforderlich",
+        description: "Bitte melden Sie sich an oder registrieren Sie sich, um fortzufahren.",
+      });
+      navigate("/login");
+    }
   };
 
   const handleCloseForm = () => {
@@ -81,7 +109,7 @@ export const ProductShowcase = () => {
     <div className="min-h-screen bg-gradient-to-br from-[#F75c03]/5 to-white">
       <div className="relative">
         <HeroImage />
-        {showLeadForm && (
+        {showLeadForm && isAuthenticated && (
           <LeadFormOverlay 
             formType={formType} 
             metrics={metrics} 
