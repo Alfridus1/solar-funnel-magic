@@ -11,6 +11,7 @@ import { FAQ } from "@/components/FAQ";
 import { PremiumProductsCarousel } from "@/components/solar-showcase/components/PremiumProductsCarousel";
 import { PricingCard } from "@/components/solar-showcase/components/PricingCard";
 import { PricingOptions } from "@/components/solar-showcase/components/PricingOptions";
+import { ConfigSidebar } from "@/components/solar-showcase/components/ConfigSidebar";
 import { loadConfigFromCookie, saveConfigToCookie } from "@/utils/configCookieManager";
 
 export const RecommendedConfig = () => {
@@ -50,10 +51,12 @@ export const RecommendedConfig = () => {
   };
 
   return (
-    <div className="min-h-screen bg-solar-blue-50">
-      {!isRegistered && <RegistrationOverlay onComplete={() => setIsRegistered(true)} />}
+    <div className="flex min-h-screen bg-solar-blue-50">
+      <ConfigSidebar />
       
-      <div className={`relative transition-all duration-300 ${!isRegistered ? 'blur-md' : ''}`}>
+      <div className={`relative flex-1 transition-all duration-300 ${!isRegistered ? 'blur-md' : ''}`}>
+        {!isRegistered && <RegistrationOverlay onComplete={() => setIsRegistered(true)} />}
+        
         <div className="relative">
           <HeroImage />
           {showLeadForm && (

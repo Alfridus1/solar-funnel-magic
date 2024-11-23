@@ -1243,7 +1243,7 @@ export type Database = {
       user_role:
         | "customer"
         | "sales_employee"
-        | "sales_representative"
+        | "external_sales"
         | "customer_service"
         | "planning"
         | "accountant"
@@ -1252,6 +1252,8 @@ export type Database = {
         | "installer"
         | "executive"
         | "admin"
+        | "sales_team_leader"
+        | "sales_director"
     }
     CompositeTypes: {
       [_ in never]: never
