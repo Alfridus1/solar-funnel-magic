@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { LeadManagement } from "./components/admin/LeadManagement";
 import { UserManagement } from "./components/admin/UserManagement";
 import { SystemConfigurator } from "./components/SystemConfigurator";
@@ -14,18 +14,16 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/debug" element={<Debug />} />
-          <Route path="/dashboard" element={<CustomerDashboard />} />
-          <Route path="/solar-showcase" element={<ProductShowcase />} />
-          <Route path="/admin/leads" element={<LeadManagement />} />
-          <Route path="/admin/users" element={<UserManagement />} />
-          <Route path="/system-configurator" element={<SystemConfigurator />} />
-          <Route path="/anfrage/:id" element={<LeadDetails />} />
-        </Routes>
-      </Router>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/debug" element={<Debug />} />
+        <Route path="/dashboard" element={<CustomerDashboard />} />
+        <Route path="/solar-showcase" element={<ProductShowcase />} />
+        <Route path="/admin/leads" element={<LeadManagement />} />
+        <Route path="/admin/users" element={<UserManagement />} />
+        <Route path="/system-configurator" element={<SystemConfigurator />} />
+        <Route path="/anfrage/:id" element={<LeadDetails />} />
+      </Routes>
     </QueryClientProvider>
   );
 }
