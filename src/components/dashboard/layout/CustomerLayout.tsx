@@ -28,8 +28,8 @@ export const CustomerLayout = ({ children }: CustomerLayoutProps) => {
                     </Avatar>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p className="font-medium">Ihr Vertriebler</p>
-                    <p className="text-sm text-muted-foreground">Max Mustermann</p>
+                    <p className="font-medium">Ihr Vertriebs-Experte</p>
+                    <p className="text-sm text-muted-foreground">Max Mustermann - Ihr persönlicher Ansprechpartner für alle Fragen rund um Ihre Solaranlage</p>
                   </TooltipContent>
                 </Tooltip>
 
@@ -44,7 +44,7 @@ export const CustomerLayout = ({ children }: CustomerLayoutProps) => {
                   </TooltipTrigger>
                   <TooltipContent>
                     <p className="font-medium">Ihr Bauleiter</p>
-                    <p className="text-sm text-muted-foreground">Thomas Schmidt</p>
+                    <p className="text-sm text-muted-foreground">Thomas Schmidt - Verantwortlich für die professionelle Installation und technische Umsetzung</p>
                   </TooltipContent>
                 </Tooltip>
 
@@ -59,7 +59,7 @@ export const CustomerLayout = ({ children }: CustomerLayoutProps) => {
                   </TooltipTrigger>
                   <TooltipContent>
                     <p className="font-medium">Ihr Kundendienst</p>
-                    <p className="text-sm text-muted-foreground">Anna Weber</p>
+                    <p className="text-sm text-muted-foreground">Anna Weber - Steht Ihnen bei allen Service- und Wartungsfragen zur Seite</p>
                   </TooltipContent>
                 </Tooltip>
               </div>
