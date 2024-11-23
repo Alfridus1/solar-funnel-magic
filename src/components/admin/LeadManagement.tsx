@@ -90,11 +90,14 @@ export const LeadManagement = () => {
       const { error } = await supabase
         .from('leads')
         .update({ deleted_at: new Date().toISOString() })
-        .eq('id', id);
+        .eq('id', id)
+        .select();
 
       if (error) throw error;
 
+      // Update the local state to remove the deleted lead
       setLeads(leads.filter(lead => lead.id !== id));
+      
       toast({
         title: "Anfrage gelöscht",
         description: "Die Anfrage wurde erfolgreich gelöscht.",
