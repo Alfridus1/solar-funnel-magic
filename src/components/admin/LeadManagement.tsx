@@ -89,7 +89,7 @@ export const LeadManagement = () => {
     try {
       const { error } = await supabase
         .from('leads')
-        .delete()
+        .update({ deleted_at: new Date().toISOString() })
         .eq('id', id);
 
       if (error) throw error;
