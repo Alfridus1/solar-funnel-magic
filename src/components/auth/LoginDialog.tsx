@@ -45,16 +45,6 @@ export const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
     return () => subscription.unsubscribe();
   }, [navigate, onOpenChange, toast]);
 
-  const handleError = (error: Error) => {
-    toast({
-      title: "Fehler bei der Anmeldung",
-      description: error.message === "Invalid login credentials" 
-        ? "Ungültige Anmeldedaten. Bitte überprüfen Sie Ihre E-Mail und Ihr Passwort."
-        : "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
-      variant: "destructive",
-    });
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -119,7 +109,6 @@ export const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
           providers={[]}
           theme="light"
           view="sign_in"
-          onError={handleError}
         />
       </DialogContent>
     </Dialog>
