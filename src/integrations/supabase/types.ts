@@ -324,6 +324,8 @@ export type Database = {
         Row: {
           address: string | null
           affiliate_id: string | null
+          calculation_id: string | null
+          calculation_url: string | null
           created_at: string | null
           email: string
           id: string
@@ -340,6 +342,8 @@ export type Database = {
         Insert: {
           address?: string | null
           affiliate_id?: string | null
+          calculation_id?: string | null
+          calculation_url?: string | null
           created_at?: string | null
           email: string
           id?: string
@@ -356,6 +360,8 @@ export type Database = {
         Update: {
           address?: string | null
           affiliate_id?: string | null
+          calculation_id?: string | null
+          calculation_url?: string | null
           created_at?: string | null
           email?: string
           id?: string
