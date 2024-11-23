@@ -40,7 +40,6 @@ export const RecommendedConfig = () => {
       const { data: { session } } = await supabase.auth.getSession();
       setIsAuthenticated(!!session);
       if (session && metrics) {
-        // Only create a new lead if there's no existingLeadId
         if (!location.state?.existingLeadId) {
           const { error } = await supabase.from('leads').insert({
             user_id: session.user.id,
@@ -53,7 +52,7 @@ export const RecommendedConfig = () => {
             status: 'new'
           });
 
-          if (error && error.code !== '23505') { // Ignore unique constraint violations
+          if (error && error.code !== '23505') {
             toast({
               title: "Fehler beim Speichern der Berechnung",
               description: "Ihre Berechnung konnte nicht gespeichert werden. Bitte versuchen Sie es später erneut.",
@@ -86,7 +85,7 @@ export const RecommendedConfig = () => {
           <RegistrationOverlay onComplete={() => setIsAuthenticated(true)} />
         )}
         
-        <div className={`relative transition-all duration-300 ${!isAuthenticated ? 'pointer-events-none opacity-50' : ''}`}>
+        <div>
           <div className="relative">
             <HeroImage />
             {showLeadForm && (
