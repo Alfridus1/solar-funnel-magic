@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { SystemOverview } from "./components/SystemOverview";
 import { NewsSection } from "./components/NewsSection";
+import { CircleUserRound } from "lucide-react";
 
 export const DashboardOverview = () => {
   const [greeting, setGreeting] = useState("");
@@ -60,6 +61,37 @@ export const DashboardOverview = () => {
       </Card>
 
       <SystemOverview />
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Ihr persönliches COPPEN Team</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4">
+            <div className="flex items-center gap-3">
+              <CircleUserRound className="h-8 w-8 text-solar-orange" />
+              <div>
+                <p className="font-medium">Ihr Vertriebler</p>
+                <p className="text-sm text-muted-foreground">Max Mustermann</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <CircleUserRound className="h-8 w-8 text-solar-orange" />
+              <div>
+                <p className="font-medium">Ihr Bauleiter</p>
+                <p className="text-sm text-muted-foreground">Thomas Schmidt</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <CircleUserRound className="h-8 w-8 text-solar-orange" />
+              <div>
+                <p className="font-medium">Ihr Kundendienst</p>
+                <p className="text-sm text-muted-foreground">Anna Weber</p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
