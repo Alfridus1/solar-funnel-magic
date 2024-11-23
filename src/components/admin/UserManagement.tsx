@@ -5,6 +5,7 @@ import { UserDetailsDialog } from "./UserDetailsDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Profile, AffiliateInfo } from "./types/userManagement";
+import { UserTableRow } from "./components/UserTableRow";
 
 export const UserManagement = () => {
   const [users, setUsers] = useState<Profile[]>([]);
@@ -14,28 +15,50 @@ export const UserManagement = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      const { data: profiles, error } = await supabase
-        .from('profiles')
-        .select('*');
-
-      if (error) {
-        toast({
-          title: "Fehler beim Laden der Benutzer.",
-          description: error.message,
-          variant: "destructive",
-        });
-      } else if (profiles) {
-        setUsers(profiles);
-      }
-    };
-
     fetchUsers();
-  }, [toast]);
+  }, []);
+
+  const fetchUsers = async () => {
+    const { data: profiles, error } = await supabase
+      .from('profiles')
+      .select('*');
+
+    if (error) {
+      toast({
+        title: "Fehler beim Laden der Benutzer",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else if (profiles) {
+      setUsers(profiles);
+    }
+  };
 
   const handleUserSelect = (user: Profile) => {
     setSelectedUser(user);
-    // Fetch affiliate info if necessary
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      setUsers(users.filter(user => user.id !== userId));
+      toast({
+        title: "Benutzer gelöscht",
+        description: "Der Benutzer wurde erfolgreich gelöscht.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Fehler beim Löschen",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   const handleResetAllPasswords = async () => {
@@ -44,7 +67,6 @@ export const UserManagement = () => {
       const { data, error } = await supabase.functions.invoke('reset-passwords');
       
       if (error) {
-        console.error('Error resetting passwords:', error);
         throw new Error('Fehler beim Zurücksetzen der Passwörter');
       }
 
@@ -63,7 +85,6 @@ export const UserManagement = () => {
         });
       }
     } catch (error: any) {
-      console.error('Reset password error:', error);
       toast({
         title: "Fehler",
         description: error.message || "Ein unerwarteter Fehler ist aufgetreten",
@@ -99,20 +120,12 @@ export const UserManagement = () => {
         </TableHeader>
         <TableBody>
           {users.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell>{`${user.first_name} ${user.last_name}`}</TableCell>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>{user.phone}</TableCell>
-              <TableCell>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleUserSelect(user)}
-                >
-                  Details
-                </Button>
-              </TableCell>
-            </TableRow>
+            <UserTableRow 
+              key={user.id}
+              user={user}
+              onSelect={handleUserSelect}
+              onDelete={handleDeleteUser}
+            />
           ))}
         </TableBody>
       </Table>
