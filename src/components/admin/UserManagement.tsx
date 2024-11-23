@@ -17,6 +17,7 @@ export const UserManagement = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
   const [affiliateInfo, setAffiliateInfo] = useState<AffiliateInfo | null>(null);
+  const [emailCooldowns, setEmailCooldowns] = useState<Record<string, number>>({});
   const { toast } = useToast();
 
   useEffect(() => {
@@ -66,18 +67,49 @@ export const UserManagement = () => {
   };
 
   const handleSendLoginLink = async (profile: Profile) => {
+    // Check if email is in cooldown
+    const cooldownTime = emailCooldowns[profile.email];
+    if (cooldownTime && Date.now() < cooldownTime) {
+      const remainingSeconds = Math.ceil((cooldownTime - Date.now()) / 1000);
+      toast({
+        title: "Bitte warten",
+        description: `Sie können in ${remainingSeconds} Sekunden einen neuen Link anfordern.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     const { error } = await supabase.auth.resetPasswordForEmail(profile.email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
 
     if (error) {
-      toast({
-        title: "Fehler beim Senden des Login-Links",
-        description: error.message,
-        variant: "destructive",
-      });
+      if (error.message.includes('rate_limit')) {
+        // Set cooldown for 60 seconds
+        setEmailCooldowns(prev => ({
+          ...prev,
+          [profile.email]: Date.now() + 60000
+        }));
+        toast({
+          title: "Zu viele Anfragen",
+          description: "Bitte warten Sie 60 Sekunden, bevor Sie einen neuen Link anfordern.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Fehler beim Senden des Login-Links",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
       return;
     }
+
+    // Set cooldown after successful send
+    setEmailCooldowns(prev => ({
+      ...prev,
+      [profile.email]: Date.now() + 60000
+    }));
 
     toast({
       title: "Login-Link gesendet",
@@ -127,6 +159,7 @@ export const UserManagement = () => {
                     e.stopPropagation();
                     handleSendLoginLink(profile);
                   }}
+                  disabled={emailCooldowns[profile.email] && Date.now() < emailCooldowns[profile.email]}
                 >
                   Login-Link senden
                 </Button>
