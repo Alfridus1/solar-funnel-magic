@@ -65,26 +65,24 @@ export const CalculationCard = ({
           </div>
         </div>
 
-        <div className="flex justify-between items-center mt-4 space-x-4">
-          <div className="flex space-x-2">
-            <Button 
-              variant="outline" 
-              onClick={(e) => {
-                e.stopPropagation();
-                onClick(calc);
-              }}
-              className="text-solar-orange border-solar-orange hover:bg-solar-orange/10"
-            >
-              Details anzeigen
-            </Button>
-            
-            {calc.metrics && calc.address && (
-              <PDFDownloadButton 
-                metrics={calc.metrics}
-                address={calc.address}
-              />
-            )}
-          </div>
+        <div className="flex justify-end items-center mt-4 space-x-2">
+          <Button 
+            variant="outline" 
+            onClick={(e) => {
+              e.stopPropagation();
+              onClick(calc);
+            }}
+            className="text-solar-orange border-solar-orange hover:bg-solar-orange/10"
+          >
+            Details anzeigen
+          </Button>
+          
+          {calc.metrics && calc.address && (
+            <PDFDownloadButton 
+              metrics={calc.metrics}
+              address={calc.address}
+            />
+          )}
         </div>
       </CardContent>
     </Card>
