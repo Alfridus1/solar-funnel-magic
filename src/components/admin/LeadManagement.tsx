@@ -60,7 +60,7 @@ export const LeadManagement = () => {
       return;
     }
 
-    setLeads(data);
+    setLeads(data || []);
   };
 
   const updateLeadStatus = async (id: string, newStatus: string) => {
@@ -78,7 +78,7 @@ export const LeadManagement = () => {
       return;
     }
 
-    loadLeads();
+    await loadLeads();
     toast({
       title: "Status aktualisiert",
       description: "Der Status wurde erfolgreich aktualisiert.",
