@@ -27,6 +27,7 @@ export const RequestsOverview = () => {
       .select('id, created_at, metrics, address')
       .eq('user_id', user.id)
       .eq('type', 'calculation')
+      .is('deleted_at', null)  // Only get non-deleted calculations
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -75,11 +76,15 @@ export const RequestsOverview = () => {
     event.stopPropagation();
     
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Instead of deleting, we'll update with a deleted_at timestamp
       const { error } = await supabase
         .from('leads')
-        .delete()
+        .update({ deleted_at: new Date().toISOString() })
         .eq('id', id)
-        .eq('user_id', (await supabase.auth.getUser()).data.user?.id);
+        .eq('user_id', user.id);
 
       if (error) throw error;
 
