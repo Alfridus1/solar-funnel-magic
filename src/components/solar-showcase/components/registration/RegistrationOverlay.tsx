@@ -1,15 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { LoginForm } from "../LoginForm";
 import { RegistrationForm } from "./RegistrationForm";
+import { RegistrationHeader } from "./RegistrationHeader";
+import { supabase } from "@/integrations/supabase/client";
 
 interface RegistrationOverlayProps {
   onComplete: () => void;
-  isAuthenticated: boolean;
 }
 
-export const RegistrationOverlay = ({ onComplete, isAuthenticated }: RegistrationOverlayProps) => {
+export const RegistrationOverlay = ({ onComplete }: RegistrationOverlayProps) => {
   const [showLogin, setShowLogin] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Check authentication status on mount and when it changes
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+    };
+    
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   // If user is authenticated, don't show the overlay
   if (isAuthenticated) {
@@ -19,21 +37,11 @@ export const RegistrationOverlay = ({ onComplete, isAuthenticated }: Registratio
   return (
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
       <Card className="w-full max-w-md p-6 bg-white/95 backdrop-blur shadow-xl animate-fade-up">
-        <div className="mb-8 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            {showLogin ? "Anmelden" : "Ihre persönliche Solaranalyse"}
-          </h2>
-          <p className="text-gray-600">
-            {showLogin 
-              ? "Melden Sie sich an, um Ihre Solaranalyse zu sehen"
-              : "Geben Sie Ihre Daten ein, um Ihre individuelle Auswertung zu sehen"}
-          </p>
-        </div>
+        <RegistrationHeader showLogin={showLogin} />
 
         {showLogin ? (
           <LoginForm 
             onBack={() => setShowLogin(false)}
-            onSuccess={onComplete}
           />
         ) : (
           <RegistrationForm
