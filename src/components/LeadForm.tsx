@@ -1,128 +1,118 @@
 import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 interface LeadFormProps {
-  formType?: "quote" | "consultation";
-  onSuccess?: () => void;
+  formType: "quote" | "consultation" | null;
   metrics?: any;
   address?: string;
+  onSuccess?: () => void;
 }
 
-export const LeadForm = ({ formType = "quote", onSuccess, metrics, address }: LeadFormProps) => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+export const LeadForm = ({ formType, metrics, address, onSuccess }: LeadFormProps) => {
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    setLoading(true);
+
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const phone = formData.get("phone") as string;
 
     try {
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        throw new Error("No user found");
-      }
+      // Erst den Benutzer erstellen
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password: crypto.randomUUID(), // Generiere ein zufälliges Passwort
+        options: {
+          data: {
+            full_name: name,
+            phone: phone,
+          },
+        },
+      });
 
-      const { error } = await supabase
-        .from('leads')
-        .insert([{
-          ...formData,
-          type: formType,
-          source: window.location.href,
-          status: 'new',
-          metrics: metrics || null,
-          address: address || null,
-          user_id: user.id // Add user_id to the lead
-        }]);
+      if (authError) throw authError;
 
-      if (error) throw error;
+      // Dann den Lead mit der Benutzer-ID speichern
+      const { data: leadData, error: leadError } = await supabase
+        .from("leads")
+        .insert([
+          {
+            name,
+            email,
+            phone,
+            type: formType,
+            metrics,
+            address,
+            user_id: authData.user?.id,
+          },
+        ])
+        .select()
+        .single();
+
+      if (leadError) throw leadError;
 
       toast({
-        title: formType === "quote" 
-          ? "Vielen Dank für Ihre Anfrage!"
-          : "Vielen Dank für Ihre Terminanfrage!",
-        description: formType === "quote"
-          ? "Wir senden Ihnen in Kürze ein individuelles Angebot zu."
-          : "Wir melden uns zeitnah bei Ihnen zur Terminvereinbarung.",
+        title: "Anfrage erfolgreich gesendet",
+        description: "Wir werden uns in Kürze bei Ihnen melden.",
       });
 
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-      });
-
-      if (onSuccess) {
-        onSuccess();
+      // Navigiere zur individuellen Anfrageseite
+      if (leadData) {
+        navigate(`/anfrage/${leadData.id}`);
       }
+
+      onSuccess?.();
     } catch (error: any) {
-      console.error('Error submitting lead:', error);
       toast({
-        title: "Ein Fehler ist aufgetreten",
-        description: "Bitte versuchen Sie es später erneut.",
+        title: "Fehler beim Senden der Anfrage",
+        description: error.message,
         variant: "destructive",
       });
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-md mx-auto">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <Input
-          type="text"
+          name="name"
           placeholder="Ihr Name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           required
           className="w-full"
         />
       </div>
       <div>
         <Input
+          name="email"
           type="email"
-          placeholder="Ihre E-Mail-Adresse"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          placeholder="Ihre E-Mail"
           required
           className="w-full"
         />
       </div>
       <div>
         <Input
+          name="phone"
           type="tel"
           placeholder="Ihre Telefonnummer"
-          value={formData.phone}
-          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
           required
           className="w-full"
         />
       </div>
-      <Button
-        type="submit"
-        className="w-full bg-gradient-to-r from-[#F75c03] to-[#FF8A3D] text-white hover:from-[#FF8A3D] hover:to-[#F75c03]"
-        disabled={isSubmitting}
-      >
-        {isSubmitting 
-          ? "Wird gesendet..." 
-          : formType === "quote"
-            ? "Kostenloses Angebot anfordern"
-            : "Beratungstermin anfragen"
-        }
+      <Button type="submit" className="w-full" disabled={loading}>
+        {loading ? "Wird gesendet..." : "Anfrage senden"}
       </Button>
-      <p className="text-xs text-center text-gray-500 mt-2">
-        Mit dem Absenden stimmen Sie unseren Datenschutzbestimmungen zu
-      </p>
     </form>
   );
 };
