@@ -5,10 +5,10 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  type CarouselApi,
 } from "@/components/ui/carousel";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard } from "./ProductCard";
-import type { CarouselApi } from "@/components/ui/carousel";
 
 interface PremiumProduct {
   id: string;
