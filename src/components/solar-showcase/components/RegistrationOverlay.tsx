@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Auth } from "@supabase/auth-ui-react";
+import { ThemeSupa } from "@supabase/auth-ui-shared";
 
 interface RegistrationOverlayProps {
   onComplete: () => void;
@@ -12,6 +14,7 @@ interface RegistrationOverlayProps {
 
 export const RegistrationOverlay = ({ onComplete }: RegistrationOverlayProps) => {
   const navigate = useNavigate();
+  const [showLogin, setShowLogin] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -106,9 +109,50 @@ export const RegistrationOverlay = ({ onComplete }: RegistrationOverlayProps) =>
     }
   };
 
-  const handleLogin = () => {
-    navigate("/login");
-  };
+  if (showLogin) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <Card className="w-full max-w-md p-6 bg-white/95 backdrop-blur shadow-xl animate-fade-up">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-center">Anmelden</h2>
+            <p className="text-center text-gray-600 mt-2">
+              Melden Sie sich an, um Ihre Solaranalyse zu sehen
+            </p>
+          </div>
+          <Auth 
+            supabaseClient={supabase}
+            appearance={{ 
+              theme: ThemeSupa,
+              variables: {
+                default: {
+                  colors: {
+                    brand: '#F75c03',
+                    brandAccent: '#F75c03',
+                  },
+                },
+              },
+            }}
+            localization={{
+              variables: {
+                sign_in: {
+                  email_label: 'E-Mail',
+                  password_label: 'Passwort',
+                  button_label: 'Anmelden',
+                },
+              },
+            }}
+          />
+          <Button
+            variant="link"
+            className="w-full mt-4 text-solar-orange hover:text-solar-orange-dark"
+            onClick={() => setShowLogin(false)}
+          >
+            Zurück zur Registrierung
+          </Button>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
@@ -163,7 +207,7 @@ export const RegistrationOverlay = ({ onComplete }: RegistrationOverlayProps) =>
           <Button
             variant="link"
             className="text-solar-orange hover:text-solar-orange-dark"
-            onClick={handleLogin}
+            onClick={() => setShowLogin(true)}
           >
             Bereits ein Konto? Jetzt einloggen
           </Button>
