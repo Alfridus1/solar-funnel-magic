@@ -66,11 +66,32 @@ export const UserManagement = () => {
   };
 
   const handleLoginAs = async (profile: Profile) => {
-    toast({
-      title: "Hinweis",
-      description: "Diese Funktion erfordert erweiterte Administratorrechte und ist derzeit nicht verfügbar.",
-      variant: "default",
+    // Zuerst die aktuelle Session beenden
+    await supabase.auth.signOut();
+    
+    // Admin Access Token verwenden (muss in der Supabase-Konfiguration eingerichtet sein)
+    const { data, error } = await supabase.auth.admin.generateLink({
+      type: 'magiclink',
+      email: profile.email,
     });
+
+    if (error) {
+      toast({
+        title: "Fehler beim Einloggen",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (data) {
+      toast({
+        title: "Erfolgreich eingeloggt",
+        description: `Sie sind jetzt als ${profile.first_name} ${profile.last_name} eingeloggt.`,
+      });
+      // Optional: Seite neu laden oder zur Benutzer-Startseite navigieren
+      window.location.href = '/';
+    }
   };
 
   return (
