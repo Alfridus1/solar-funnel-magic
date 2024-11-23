@@ -17,14 +17,23 @@ export const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
+      if (event === 'SIGNED_IN' && session) {
+        toast({
+          title: "Erfolgreich angemeldet",
+          description: "Willkommen zurück!",
+        });
         onOpenChange(false);
         navigate("/");
+      } else if (event === 'USER_DELETED' || event === 'SIGNED_OUT') {
+        toast({
+          title: "Abgemeldet",
+          description: "Sie wurden erfolgreich abgemeldet.",
+        });
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, onOpenChange]);
+  }, [navigate, onOpenChange, toast]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
