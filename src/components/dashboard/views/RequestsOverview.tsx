@@ -78,17 +78,17 @@ export const RequestsOverview = () => {
       const { error } = await supabase
         .from('leads')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .eq('user_id', (await supabase.auth.getUser()).data.user?.id);
 
       if (error) throw error;
 
+      setCalculations(prev => prev.filter(calc => calc.id !== id));
+      
       toast({
         title: "Anfrage gelöscht",
         description: "Die Anfrage wurde erfolgreich gelöscht.",
       });
-
-      // Update the local state to remove the deleted calculation
-      setCalculations(prev => prev.filter(calc => calc.id !== id));
     } catch (error: any) {
       toast({
         title: "Fehler beim Löschen",
