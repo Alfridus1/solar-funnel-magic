@@ -5,8 +5,8 @@ import { SystemConfigurator } from "./components/SystemConfigurator";
 import { CustomerDashboard } from "./components/dashboard/CustomerDashboard";
 import { ProductShowcase } from "./components/solar-showcase/ProductShowcase";
 import { Debug } from "./pages/Debug";
-import LeadDetails from "./pages/LeadDetails"; // Import the new LeadDetails component
-import Index from "./pages/Index";
+import { LeadDetails } from "./pages/LeadDetails";
+import { Index } from "./pages/Index";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const queryClient = new QueryClient();
