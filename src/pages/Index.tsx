@@ -13,12 +13,14 @@ import { TrustIndicators } from "@/components/landing/TrustIndicators";
 import { useGeolocation } from "@/components/RoofCheck/hooks/useGeolocation";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { LoginDialog } from "@/components/auth/LoginDialog";
 
 const libraries = ["drawing", "places"];
 
 export function Index() {
   const [address, setAddress] = useState("");
   const [showRoofCheck, setShowRoofCheck] = useState(false);
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -107,7 +109,7 @@ export function Index() {
           </Button>
           <Button 
             variant="outline"
-            onClick={() => navigate("/login")}
+            onClick={() => setShowLoginDialog(true)}
             className="bg-white hover:bg-solar-orange hover:text-white transition-colors"
           >
             Login
@@ -130,6 +132,11 @@ export function Index() {
           <FinalCTA handleAddressSubmit={handleAddressSubmit} />
         </div>
       </div>
+
+      <LoginDialog 
+        open={showLoginDialog} 
+        onOpenChange={setShowLoginDialog}
+      />
     </div>
   );
 }
