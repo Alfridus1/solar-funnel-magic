@@ -1,4 +1,4 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,33 +13,51 @@ Deno.serve(async (req) => {
   try {
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
     )
 
-    // Get all users
-    const { data: users, error: usersError } = await supabaseAdmin.auth.admin.listUsers()
-    if (usersError) throw usersError
+    const { data: { users }, error: usersError } = await supabaseAdmin.auth.admin.listUsers()
+    
+    if (usersError) {
+      throw usersError
+    }
 
-    // Update each user's password
-    const updatePromises = users.users.map(user => 
-      supabaseAdmin.auth.admin.updateUserById(
+    const updatePromises = users.map(async (user) => {
+      const { error } = await supabaseAdmin.auth.admin.updateUserById(
         user.id,
         { password: '123456' }
       )
-    )
+      if (error) {
+        console.error(`Failed to update user ${user.id}:`, error)
+        return { userId: user.id, success: false, error: error.message }
+      }
+      return { userId: user.id, success: true }
+    })
 
-    await Promise.all(updatePromises)
-
+    const results = await Promise.all(updatePromises)
+    
     return new Response(
-      JSON.stringify({ message: 'All passwords have been reset to 123456' }),
+      JSON.stringify({
+        message: 'Passwords reset successfully',
+        results
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       }
     )
+
   } catch (error) {
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({
+        error: error.message
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
