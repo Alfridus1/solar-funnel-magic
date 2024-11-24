@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { Index } from "@/pages/Index";
 import { Login } from "@/pages/Login";
 import { EmployeeLogin } from "@/pages/EmployeeLogin";
@@ -7,7 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 
 export default function App() {
   return (
-    <Router>
+    <>
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/login" element={<Login />} />
@@ -15,6 +15,6 @@ export default function App() {
         <Route path="/admin/*" element={<AdminDashboard />} />
       </Routes>
       <Toaster />
-    </Router>
+    </>
   );
 }
