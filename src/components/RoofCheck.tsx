@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { calculateRoofArea, calculateSolarMetrics } from "@/utils/roofCalculations";
 import { RoofCheckContent } from "./RoofCheck/RoofCheckContent";
 import { RoofCheckLoading } from "./RoofCheck/RoofCheckLoading";
+import { saveConfigToCookie } from "@/utils/configCookieManager";
 
 const libraries: ("places" | "drawing" | "geometry")[] = ["places", "drawing", "geometry"];
 
@@ -45,18 +46,28 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
       setPaths(paths);
       const totalArea = calculateRoofArea(paths);
       const calculatedMetrics = calculateSolarMetrics(totalArea);
-      setMetrics({
+      const updatedMetrics = {
         ...calculatedMetrics,
         roofArea: totalArea,
         roofDetails
-      });
+      };
+      setMetrics(updatedMetrics);
+      onLog?.("Metrics calculated: " + JSON.stringify(updatedMetrics));
     },
-    []
+    [onLog]
   );
 
   const handleContinue = () => {
     if (paths.length === 0) return;
-    navigate("/recommended-config", {
+    
+    // Save configuration to cookie before navigation
+    saveConfigToCookie({
+      metrics,
+      address,
+    });
+
+    // Navigate to solar showcase with state
+    navigate("/solar-showcase", {
       state: {
         metrics,
         address,
