@@ -40,11 +40,11 @@ export const ShowcaseContent = ({
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-        <Card className="p-4 md:p-6 lg:p-8 bg-white/90 backdrop-blur shadow-lg rounded-2xl">
+        <div className="p-4 md:p-6 lg:p-8 bg-white/90 backdrop-blur shadow-lg rounded-2xl h-full">
           <SavingsCalculator yearlyProduction={Math.round(metrics.kWp * 950)} />
-        </Card>
+        </div>
 
-        <Card className="p-4 md:p-6 lg:p-8 bg-white/90 backdrop-blur shadow-lg rounded-2xl">
+        <div className="p-4 md:p-6 lg:p-8 bg-white/90 backdrop-blur shadow-lg rounded-2xl h-full">
           <div className="space-y-6 lg:space-y-8">
             <div className="bg-solar-orange/10 p-4 md:p-6 rounded-xl">
               <p className="text-lg font-semibold mb-2">Geschätzte Investition:</p>
@@ -73,7 +73,7 @@ export const ShowcaseContent = ({
               </button>
             </div>
           </div>
-        </Card>
+        </div>
       </div>
 
       <PremiumProductsSection onConsultationRequest={onConsultationRequest} />
