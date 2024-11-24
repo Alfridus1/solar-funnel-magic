@@ -10,10 +10,18 @@ import { PremiumProductsSection } from "./PremiumProductsSection";
 import { CallToAction } from "./CallToAction";
 
 interface ShowcaseContentProps {
-  metrics: any;
+  metrics: {
+    kWp: number;
+    moduleCount: number;
+    annualProduction: number;
+    roofArea: number;
+  };
   address: string;
   products: any[];
-  priceSettings: any;
+  priceSettings: {
+    price_per_kwp_min: number;
+    price_per_kwp_max: number;
+  };
   onQuoteRequest: () => void;
   onConsultationRequest: () => void;
   isAuthenticated: boolean;
@@ -28,6 +36,7 @@ export const ShowcaseContent = ({
   onConsultationRequest,
   isAuthenticated
 }: ShowcaseContentProps) => {
+  // Safely calculate prices with null checks
   const estimatedPriceMin = priceSettings ? Math.round(metrics.kWp * priceSettings.price_per_kwp_min) : 0;
   const estimatedPriceMax = priceSettings ? Math.round(metrics.kWp * priceSettings.price_per_kwp_max) : 0;
 
@@ -42,9 +51,9 @@ export const ShowcaseContent = ({
             </div>
 
             <SystemMetrics
-              moduleCount={Math.round(metrics.kWp * 2)}
+              moduleCount={metrics.moduleCount}
               kWp={metrics.kWp}
-              annualProduction={Math.round(metrics.kWp * 950)}
+              annualProduction={metrics.annualProduction}
               roofArea={metrics.roofArea}
             />
 
