@@ -37,9 +37,7 @@ export const Stats = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
         <div className="flex flex-col items-center text-center space-y-2">
           <Award className="h-12 w-12 text-solar-orange mb-2" />
-          <h3 className="text-4xl font-bold text-gray-900">
-            {stats.totalCustomers.toLocaleString('de-DE')}+
-          </h3>
+          <h3 className="text-4xl font-bold text-gray-900">2100+</h3>
           <p className="text-gray-600">Zufriedene Kunden</p>
         </div>
         <div className="flex flex-col items-center text-center space-y-2">
