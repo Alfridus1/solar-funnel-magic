@@ -23,7 +23,6 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
     roofDetails: []
   });
   const navigate = useNavigate();
-
   const { isLoaded, loadError } = useGoogleMaps();
 
   const handleRoofOutlineComplete = useCallback(

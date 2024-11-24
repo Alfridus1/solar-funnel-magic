@@ -60,7 +60,7 @@ export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
       
       const roofDetails = allPaths.map((_, index) => ({
         roofId: `roof-${index + 1}`,
-        moduleCount: 0 // Dies wird später in RoofAreaCalculator berechnet
+        moduleCount: 0
       }));
       
       onComplete?.(allPaths, roofDetails);
