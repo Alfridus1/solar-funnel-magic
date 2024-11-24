@@ -1,16 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { Ruler, Home, Sun, ArrowRight, Calculator } from "lucide-react";
+import { Ruler, Home, Sun } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 
 interface RoofAreaCalculatorProps {
   polygons: google.maps.Polygon[];
 }
 
-// Durchschnittliche Sonnenstunden pro Monat in Deutschland
 const MONTHLY_SUN_HOURS = {
   Jan: 44,
   Feb: 73,
@@ -87,27 +85,6 @@ export const RoofAreaCalculator = ({ polygons }: RoofAreaCalculatorProps) => {
       transition={{ duration: 0.5 }}
       className="mt-6 space-y-6 px-4 sm:px-0"
     >
-      <div className="flex justify-center">
-        <motion.div
-          animate={{
-            scale: [1, 1.02, 1],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        >
-          <Button 
-            onClick={handleContinue}
-            className="w-full sm:w-auto bg-solar-orange hover:bg-solar-orange-600 text-base sm:text-lg py-4 sm:py-6 px-4 sm:px-8 shadow-lg hover:shadow-xl transition-all duration-300"
-          >
-            Weiter zur Analyse
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
-        </motion.div>
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="p-4 sm:p-6 bg-gradient-to-br from-solar-blue-50 to-white">
           <div className="flex items-center space-x-4">
@@ -147,25 +124,8 @@ export const RoofAreaCalculator = ({ polygons }: RoofAreaCalculatorProps) => {
       </div>
 
       <Card className="p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 space-y-4 sm:space-y-0">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
           <h3 className="text-lg font-semibold">Geschätzter Jahresverlauf</h3>
-          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-            <Button 
-              onClick={handleContinue}
-              className="w-full sm:w-auto bg-solar-orange hover:bg-solar-orange-600"
-            >
-              Weiter zur Analyse
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-            <Button 
-              onClick={handleContinue}
-              variant="outline"
-              className="w-full sm:w-auto border-solar-orange text-solar-orange hover:bg-solar-orange/10"
-            >
-              Kostenlose Beratung
-              <Calculator className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
         </div>
         <div className="h-[200px] mt-4">
           <ResponsiveContainer width="100%" height="100%">
