@@ -20,13 +20,17 @@ export const EnergyProductionChart = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { data: lead } = await supabase
+      const { data: leads, error } = await supabase
         .from('leads')
         .select('metrics')
         .eq('user_id', user.id)
-        .single();
+        .eq('type', 'calculation')
+        .order('created_at', { ascending: false })
+        .limit(1);
 
-      const metrics = lead?.metrics as LeadMetrics | null;
+      if (error) throw error;
+      
+      const metrics = leads?.[0]?.metrics as LeadMetrics | null;
       return metrics?.monthlyProductionHistory || [];
     }
   });
