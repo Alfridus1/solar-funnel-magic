@@ -3,7 +3,6 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Home } from "lucide-react";
 import { Autocomplete } from "@react-google-maps/api";
-import { libraries } from "@/hooks/useGoogleMaps";
 
 interface HeroSectionProps {
   address: string;
