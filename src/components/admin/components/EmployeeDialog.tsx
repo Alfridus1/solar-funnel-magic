@@ -62,18 +62,11 @@ export const EmployeeDialog = ({
 
   const onSubmit = async (data: EmployeeFormData) => {
     try {
+      let profileId;
+
+      // First handle the profile
       if (employee) {
-        // Update existing employee
-        const { error: employeeError } = await supabase
-          .from('employees')
-          .update({
-            role: data.role,
-          })
-          .eq('id', employee.id);
-
-        if (employeeError) throw employeeError;
-
-        // Update profile
+        // Update existing profile
         const { error: profileError } = await supabase
           .from('profiles')
           .update({
@@ -81,43 +74,46 @@ export const EmployeeDialog = ({
             last_name: data.last_name,
             email: data.email,
             phone: data.phone,
+            role: data.role,
           })
           .eq('id', employee.profile_id);
 
         if (profileError) throw profileError;
+        profileId = employee.profile_id;
       } else {
-        // Check if profile with email already exists
-        const { data: existingProfile, error: checkError } = await supabase
+        // Create new profile
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .select('id, email')
-          .eq('email', data.email)
+          .insert({
+            first_name: data.first_name,
+            last_name: data.last_name,
+            email: data.email,
+            phone: data.phone,
+            role: data.role,
+          })
+          .select()
           .single();
 
-        if (checkError && checkError.code !== 'PGRST116') throw checkError;
+        if (profileError) throw profileError;
+        profileId = profileData.id;
+      }
 
-        let profileId;
-        
-        if (existingProfile) {
-          profileId = existingProfile.id;
-        } else {
-          // Create new profile
-          const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .insert({
-              first_name: data.first_name,
-              last_name: data.last_name,
-              email: data.email,
-              phone: data.phone,
-              role: data.role,
-            })
-            .select()
-            .single();
+      // Then handle the employee
+      if (employee) {
+        // Update existing employee
+        const { error: employeeError } = await supabase
+          .from('employees')
+          .update({
+            role: data.role,
+            email: data.email,
+            first_name: data.first_name,
+            last_name: data.last_name,
+          })
+          .eq('id', employee.id);
 
-          if (profileError) throw profileError;
-          profileId = profileData.id;
-        }
-
-        // Create employee
+        if (employeeError) throw employeeError;
+      } else {
+        // Create new employee
         const { error: employeeError } = await supabase
           .from('employees')
           .insert({
