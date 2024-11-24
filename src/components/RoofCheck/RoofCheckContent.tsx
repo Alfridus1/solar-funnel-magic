@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { RoofDesigner } from "@/components/roof/RoofDesigner";
 import { RoofMetrics } from "@/components/roof/RoofMetrics";
 import { ProgressBar } from "@/components/ProgressBar";
@@ -18,12 +20,18 @@ export const RoofCheckContent = ({
   metrics,
   onLog
 }: RoofCheckContentProps) => {
+  const [isDrawingEnabled, setIsDrawingEnabled] = useState(false);
+
   const steps = [
     { title: "Adresse", description: "Ihre Adresse" },
     { title: "Dach vermessen", description: "Zeichnen Sie Ihr Dach" },
     { title: "Potenzialanalyse", description: "Ihre Solaranlage" },
     { title: "Unverbindliches Angebot", description: "Mit Vor-Ort Termin" }
   ];
+
+  const handleRoofComplete = (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number; kWp: number }[]) => {
+    handleRoofOutlineComplete(paths, roofDetails);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-8">
@@ -32,17 +40,26 @@ export const RoofCheckContent = ({
         
         <Card className="max-w-5xl mx-auto p-6">
           <div className="space-y-6">
-            <div>
+            <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold mb-2">Zeichnen Sie Ihr Dach ein</h1>
-              <p className="text-gray-600 mb-4">
-                Klicken Sie auf die Ecken Ihres Daches, um die Fläche einzuzeichnen
-              </p>
+              <Button 
+                onClick={() => setIsDrawingEnabled(true)}
+                className="bg-blue-600 hover:bg-blue-700"
+                disabled={isDrawingEnabled}
+              >
+                Dach einzeichnen
+              </Button>
             </div>
+            <p className="text-gray-600 mb-4">
+              Klicken Sie auf die Ecken Ihres Daches, um die Fläche einzuzeichnen
+            </p>
 
-            <RoofDesigner 
-              onComplete={handleRoofOutlineComplete} 
-              address={address}
-            />
+            {isDrawingEnabled && (
+              <RoofDesigner 
+                onComplete={handleRoofComplete} 
+                address={address}
+              />
+            )}
 
             {paths.length > 0 && (
               <RoofMetrics {...metrics} />
