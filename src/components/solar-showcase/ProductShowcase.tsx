@@ -12,6 +12,7 @@ import { PDFDownloadButton } from "./components/PDFDownloadButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useQuery } from "@tanstack/react-query";
+import { Product } from "@/components/configurator/types";
 
 export const ProductShowcase = () => {
   const location = useLocation();
@@ -23,8 +24,8 @@ export const ProductShowcase = () => {
   
   const { metrics, address } = location.state || {};
 
-  // Fetch products from solar_products table
-  const { data: products = [] } = useQuery({
+  // Fetch products from solar_products table with proper type assertion
+  const { data: products = [] } = useQuery<Product[]>({
     queryKey: ['solar-products'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -33,7 +34,13 @@ export const ProductShowcase = () => {
         .order('name');
       
       if (error) throw error;
-      return data;
+
+      // Transform the data to ensure it matches our Product type
+      return data.map(item => ({
+        ...item,
+        category: item.category as 'module' | 'inverter' | 'battery',
+        specs: typeof item.specs === 'string' ? JSON.parse(item.specs) : item.specs
+      }));
     }
   });
 
@@ -139,9 +146,9 @@ export const ProductShowcase = () => {
                     <div className="p-6 space-y-4">
                       <h3 className="text-xl font-semibold">{product.name}</h3>
                       <div className="text-sm text-gray-600">
-                        {product.category === 'module' && `${product.specs.watts}W`}
-                        {product.category === 'battery' && `${product.specs.capacity}kWh`}
-                        {product.category === 'inverter' && `${product.specs.power}kW`}
+                        {product.category === 'module' && product.specs.watts && `${product.specs.watts}W`}
+                        {product.category === 'battery' && product.specs.capacity && `${product.specs.capacity}kWh`}
+                        {product.category === 'inverter' && product.specs.power && `${product.specs.power}kW`}
                       </div>
                       <div className="font-semibold">{product.price}€</div>
                       <Button 
