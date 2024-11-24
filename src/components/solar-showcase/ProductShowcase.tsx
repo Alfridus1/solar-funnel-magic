@@ -1,22 +1,13 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
-import { HeroImage } from "./components/HeroImage";
-import { SystemMetrics } from "./components/SystemMetrics";
-import { SavingsCalculator } from "@/components/SavingsCalculator";
-import { SavingsMetrics } from "./components/SavingsMetrics";
-import { Testimonials } from "@/components/Testimonials";
-import { FAQ } from "@/components/FAQ";
-import { PDFDownloadButton } from "./components/PDFDownloadButton";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { Benefits } from "@/components/Benefits";
-import { PremiumProductsSection } from "./components/PremiumProductsSection";
-import { CallToAction } from "./components/CallToAction";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ShowcaseHeader } from "./components/ShowcaseHeader";
+import { ShowcaseContent } from "./components/ShowcaseContent";
 import { RegistrationOverlay } from "./components/registration/RegistrationOverlay";
-import { useQuery } from "@tanstack/react-query";
 import type { Product } from "@/components/configurator/types";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
 
@@ -81,12 +72,7 @@ export const ProductShowcase = () => {
     return () => subscription.unsubscribe();
   }, [navigate, metrics]);
 
-  if (!metrics) {
-    return null;
-  }
-
-  const estimatedPriceMin = priceSettings ? Math.round(metrics.kWp * priceSettings.price_per_kwp_min) : 0;
-  const estimatedPriceMax = priceSettings ? Math.round(metrics.kWp * priceSettings.price_per_kwp_max) : 0;
+  if (!metrics) return null;
 
   const handleQuoteRequest = () => {
     if (!isAuthenticated) {
@@ -115,80 +101,16 @@ export const ProductShowcase = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-gradient-to-br from-solar-blue-50 to-white">
-        <HeroImage />
-
-        <div className="container mx-auto px-4 py-8 space-y-16">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <Card className="p-8 bg-white/90 backdrop-blur shadow-lg rounded-2xl">
-              <div className="space-y-8">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                  <h1 className="text-2xl font-bold text-gray-900">Ihre Solar-Analyse</h1>
-                  <PDFDownloadButton metrics={metrics} address={address} />
-                </div>
-
-                <SystemMetrics
-                  moduleCount={Math.round(metrics.kWp * 2)}
-                  kWp={metrics.kWp}
-                  annualProduction={Math.round(metrics.kWp * 950)}
-                  roofArea={metrics.roofArea}
-                />
-
-                <SavingsCalculator yearlyProduction={Math.round(metrics.kWp * 950)} />
-              </div>
-            </Card>
-
-            <Card className="p-8 bg-white/90 backdrop-blur shadow-lg rounded-2xl">
-              <div className="space-y-8">
-                <h2 className="text-2xl font-bold text-gray-900">Unser Rundum-Sorglos-Paket</h2>
-                
-                <div className="space-y-6">
-                  <p className="text-lg text-gray-700">
-                    Ihre Solaranlage mit {metrics.kWp.toFixed(1)} kWp Leistung
-                  </p>
-                  <div className="bg-solar-orange/10 p-6 rounded-xl">
-                    <p className="text-lg font-semibold mb-2">Geschätzte Investition:</p>
-                    <p className="text-3xl font-bold text-solar-orange">
-                      {(priceSettings?.price_per_kwp_min * metrics.kWp).toLocaleString()}€ - {(priceSettings?.price_per_kwp_max * metrics.kWp).toLocaleString()}€
-                    </p>
-                    <p className="text-sm text-gray-600 mt-2">
-                      Komplettpreis inkl. MwSt.
-                    </p>
-                  </div>
-
-                  <Benefits />
-
-                  <div className="flex gap-4">
-                    <button
-                      onClick={() => handleQuoteRequest()}
-                      className="flex-1 bg-solar-orange text-white px-6 py-3 rounded-lg hover:bg-solar-orange/90 transition-colors"
-                    >
-                      Angebot anfordern
-                    </button>
-                    <button
-                      onClick={() => handleConsultationRequest()}
-                      className="flex-1 border border-solar-orange text-solar-orange px-6 py-3 rounded-lg hover:bg-solar-orange/10 transition-colors"
-                    >
-                      Beratungstermin
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          <PremiumProductsSection onConsultationRequest={handleConsultationRequest} />
-
-          <CallToAction 
-            onQuoteRequest={handleQuoteRequest}
-            onConsultationRequest={handleConsultationRequest}
-          />
-
-          <div className="max-w-4xl mx-auto space-y-16">
-            <Testimonials />
-            <FAQ />
-          </div>
-        </div>
-
+        <ShowcaseHeader />
+        <ShowcaseContent 
+          metrics={metrics}
+          address={address}
+          products={products}
+          priceSettings={priceSettings}
+          onQuoteRequest={handleQuoteRequest}
+          onConsultationRequest={handleConsultationRequest}
+          isAuthenticated={isAuthenticated}
+        />
         {!isAuthenticated && showLeadForm && (
           <RegistrationOverlay 
             onComplete={() => setIsAuthenticated(true)} 
