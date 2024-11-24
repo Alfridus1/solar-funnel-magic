@@ -36,7 +36,6 @@ export const ShowcaseContent = ({
   onConsultationRequest,
   isAuthenticated
 }: ShowcaseContentProps) => {
-  // Safely calculate prices with null checks
   const estimatedPriceMin = priceSettings ? Math.round(metrics.kWp * priceSettings.price_per_kwp_min) : 0;
   const estimatedPriceMax = priceSettings ? Math.round(metrics.kWp * priceSettings.price_per_kwp_max) : 0;
 
