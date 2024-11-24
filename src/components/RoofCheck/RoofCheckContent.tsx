@@ -22,8 +22,6 @@ export const RoofCheckContent = ({
   metrics,
   onLog
 }: RoofCheckContentProps) => {
-  const [isDrawingEnabled, setIsDrawingEnabled] = useState(false);
-
   const steps = [
     { title: "Adresse", description: "Ihre Adresse" },
     { title: "Dach vermessen", description: "Zeichnen Sie Ihr Dach" },
@@ -40,34 +38,23 @@ export const RoofCheckContent = ({
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold mb-2">Zeichnen Sie Ihr Dach ein</h1>
-              <div className="flex gap-4">
+              {paths.length > 0 && (
                 <Button 
-                  onClick={() => setIsDrawingEnabled(true)}
-                  className="bg-blue-600 hover:bg-blue-700"
-                  disabled={isDrawingEnabled}
+                  onClick={handleFinish}
+                  className="bg-solar-orange hover:bg-solar-orange/90"
                 >
-                  Dach einzeichnen
+                  Weiter zur Analyse
                 </Button>
-                {paths.length > 0 && (
-                  <Button 
-                    onClick={handleFinish}
-                    className="bg-solar-orange hover:bg-solar-orange/90"
-                  >
-                    Weiter zur Analyse
-                  </Button>
-                )}
-              </div>
+              )}
             </div>
             <p className="text-gray-600 mb-4">
               Klicken Sie auf die Ecken Ihres Daches, um die Fläche einzuzeichnen. Sie können mehrere Dachflächen hinzufügen.
             </p>
 
-            {isDrawingEnabled && (
-              <RoofDesigner 
-                onComplete={handleRoofOutlineComplete} 
-                address={address}
-              />
-            )}
+            <RoofDesigner 
+              onComplete={handleRoofOutlineComplete} 
+              address={address}
+            />
 
             {paths.length > 0 && (
               <RoofMetrics {...metrics} />
