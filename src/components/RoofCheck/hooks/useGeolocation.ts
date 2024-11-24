@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useLoadScript } from "@react-google-maps/api";
+import { useGoogleMaps } from "@/hooks/useGoogleMaps";
 
 interface UseGeolocationProps {
   onSuccess: (address: string) => void;
@@ -8,10 +8,7 @@ interface UseGeolocationProps {
 }
 
 export const useGeolocation = ({ onSuccess, onError, toast }: UseGeolocationProps) => {
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-    libraries: ["places"],
-  });
+  const { isLoaded, loadError } = useGoogleMaps();
 
   const reverseGeocode = async (lat: number, lng: number) => {
     if (!isLoaded) {
@@ -36,7 +33,6 @@ export const useGeolocation = ({ onSuccess, onError, toast }: UseGeolocationProp
         throw new Error("Keine Adresse gefunden");
       }
 
-      // Suche nach der genauesten Adresse
       const address = response.results.find(result => 
         result.types.includes('street_address') ||
         result.types.includes('premise')

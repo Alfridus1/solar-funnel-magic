@@ -1,13 +1,11 @@
 import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useLoadScript } from "@react-google-maps/api";
 import { Card } from "@/components/ui/card";
 import { calculateRoofArea, calculateSolarMetrics } from "@/utils/roofCalculations";
 import { RoofCheckContent } from "./RoofCheck/RoofCheckContent";
 import { RoofCheckLoading } from "./RoofCheck/RoofCheckLoading";
 import { saveConfigToCookie } from "@/utils/configCookieManager";
-
-const libraries: ("places" | "drawing" | "geometry")[] = ["places", "drawing", "geometry"];
+import { useGoogleMaps } from "@/hooks/useGoogleMaps";
 
 interface RoofCheckProps {
   address: string;
@@ -26,10 +24,7 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
   });
   const navigate = useNavigate();
 
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-    libraries,
-  });
+  const { isLoaded, loadError } = useGoogleMaps();
 
   const handleRoofOutlineComplete = useCallback(
     (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number; kWp: number }[]) => {
@@ -48,13 +43,11 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
   );
 
   const handleFinish = useCallback(() => {
-    // Save configuration to cookie
     saveConfigToCookie({
       metrics,
       address,
     });
 
-    // Navigate to solar showcase with metrics
     navigate("/solar-showcase", {
       state: {
         metrics,
