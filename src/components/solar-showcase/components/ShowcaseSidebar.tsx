@@ -58,8 +58,8 @@ export const ShowcaseSidebar = () => {
       <div className="lg:hidden fixed top-4 left-4 z-50">
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <Menu className="h-6 w-6" />
+            <Button variant="ghost" size="icon" className="bg-white hover:bg-gray-50">
+              <Menu className="h-6 w-6 text-black" />
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-64 p-0">
@@ -101,13 +101,13 @@ export const ShowcaseSidebar = () => {
         <Button
           variant="ghost"
           size="icon"
-          className="absolute -right-4 top-6 h-8 w-8 rounded-full border-2 border-blue-500 bg-white shadow-lg hover:bg-blue-50 transition-colors z-10"
+          className="absolute -right-4 top-6 h-8 w-8 rounded-full bg-white hover:bg-gray-50 border border-gray-200 shadow-sm"
           onClick={() => setIsCollapsed(!isCollapsed)}
         >
           {isCollapsed ? (
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4 text-black" />
           ) : (
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4 text-black" />
           )}
         </Button>
 
