@@ -102,7 +102,7 @@ export const ShowcaseSidebar = () => {
           variant="ghost"
           size="icon"
           className={cn(
-            "absolute -right-10 top-6 h-8 w-8 rounded-full border shadow-sm transition-colors",
+            "absolute -right-3 top-6 h-8 w-8 rounded-full border shadow-sm transition-colors",
             "bg-white hover:bg-gray-50 border-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-700",
             "dark:text-white text-black"
           )}
