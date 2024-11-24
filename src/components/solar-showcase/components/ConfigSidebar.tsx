@@ -13,6 +13,9 @@ import {
   ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const menuItems = [
   { 
@@ -49,10 +52,25 @@ const menuItems = [
 
 export const ConfigSidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({
+        title: "Fehler beim Ausloggen",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+    navigate("/");
+  };
 
   return (
     <div className={cn(
-      "relative bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 h-screen",
+      "relative bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300",
       isCollapsed ? "w-20" : "w-64"
     )}>
       <Button
@@ -98,7 +116,7 @@ export const ConfigSidebar = () => {
         })}
 
         <button
-          onClick={() => {/* Add logout logic here */}}
+          onClick={handleLogout}
           className="flex w-full items-center px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
         >
           <LogOut className="h-5 w-5 mr-3" />
