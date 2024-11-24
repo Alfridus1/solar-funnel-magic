@@ -33,6 +33,13 @@ export const ShowcaseContent = ({
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8 lg:space-y-16">
+      <SystemMetrics
+        moduleCount={Math.round(metrics.kWp * 2)}
+        kWp={metrics.kWp}
+        annualProduction={Math.round(metrics.kWp * 950)}
+        roofArea={metrics.roofArea}
+      />
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
         <Card className="p-4 md:p-6 lg:p-8 bg-white/90 backdrop-blur shadow-lg rounded-2xl">
           <div className="space-y-6 lg:space-y-8">
@@ -40,13 +47,6 @@ export const ShowcaseContent = ({
               <h1 className="text-xl md:text-2xl font-bold text-gray-900">Ihre Solar-Analyse</h1>
               <PDFDownloadButton metrics={metrics} address={address} />
             </div>
-
-            <SystemMetrics
-              moduleCount={Math.round(metrics.kWp * 2)}
-              kWp={metrics.kWp}
-              annualProduction={Math.round(metrics.kWp * 950)}
-              roofArea={metrics.roofArea}
-            />
 
             <SavingsCalculator yearlyProduction={Math.round(metrics.kWp * 950)} />
           </div>
