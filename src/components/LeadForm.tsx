@@ -27,25 +27,8 @@ export const LeadForm = ({ formType = "quote", onSuccess, metrics, address }: Le
     try {
       // Get current user
       const { data: { user } } = await supabase.auth.getUser();
-
-      // Create lead first
-      const { error: leadError } = await supabase
-        .from('leads')
-        .insert([{
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          type: formType,
-          source: window.location.href,
-          status: 'new',
-          metrics: metrics || null,
-          address: address || null,
-          user_id: user?.id || null
-        }]);
-
-      if (leadError) throw leadError;
-
-      // If user is logged in, create or update their profile
+      
+      // Create or update profile if user is logged in
       if (user) {
         const { error: profileError } = await supabase
           .from('profiles')
@@ -55,12 +38,25 @@ export const LeadForm = ({ formType = "quote", onSuccess, metrics, address }: Le
             last_name: formData.name.split(' ').slice(1).join(' '),
             email: formData.email,
             phone: formData.phone,
-          }, {
-            onConflict: 'id'
           });
 
         if (profileError) throw profileError;
       }
+
+      // Insert lead with user_id if logged in
+      const { error } = await supabase
+        .from('leads')
+        .insert([{
+          ...formData,
+          type: formType,
+          source: window.location.href,
+          status: 'new',
+          metrics: metrics || null,
+          address: address || null,
+          user_id: user?.id || null // Link to user if logged in
+        }]);
+
+      if (error) throw error;
 
       toast({
         title: formType === "quote" 
