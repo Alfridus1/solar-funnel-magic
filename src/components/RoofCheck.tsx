@@ -61,6 +61,7 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
         metrics,
         address,
       },
+      replace: true // Add this to replace the current route instead of adding to history
     });
   };
 
