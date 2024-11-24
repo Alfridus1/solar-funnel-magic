@@ -1,4 +1,3 @@
-import { SystemMetrics } from "./components/SystemMetrics";
 import { ShowcaseHeader } from "./components/ShowcaseHeader";
 import { HeroImage } from "./components/HeroImage";
 import { ShowcaseContent } from "./components/ShowcaseContent";
@@ -22,12 +21,6 @@ export const ProductShowcase = () => {
       <ShowcaseHeader />
       <div className="relative">
         <HeroImage />
-        <SystemMetrics 
-          moduleCount={defaultMetrics.moduleCount}
-          kWp={defaultMetrics.kWp}
-          annualProduction={defaultMetrics.annualProduction}
-          roofArea={defaultMetrics.roofArea}
-        />
         <ShowcaseContent 
           metrics={defaultMetrics}
           address="Sample Address"
