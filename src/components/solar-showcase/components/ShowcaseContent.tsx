@@ -16,6 +16,7 @@ import { SystemVisualizer } from "./SystemVisualizer";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { Product } from "@/components/configurator/types";
 
 export const ShowcaseContent = () => {
   const [activeFeature, setActiveFeature] = useState("solar");
@@ -30,7 +31,26 @@ export const ShowcaseContent = () => {
         .select('*');
       
       if (error) throw error;
-      return data || [];
+      
+      // Convert and validate the data to match Product type
+      return (data || []).map(item => {
+        // Ensure category is one of the allowed values
+        const category = ['module', 'inverter', 'battery'].includes(item.category) 
+          ? (item.category as "module" | "inverter" | "battery")
+          : "module"; // Default to module if invalid category
+
+        return {
+          id: item.id,
+          name: item.name,
+          category,
+          price: item.price,
+          specs: item.specs,
+          image_url: item.image_url,
+          datasheet_url: item.datasheet_url,
+          created_at: item.created_at,
+          updated_at: item.updated_at
+        } as Product;
+      });
     }
   });
 
