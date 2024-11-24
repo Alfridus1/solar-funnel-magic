@@ -55,10 +55,6 @@ export default function App() {
         />
         <Route path="/solar-showcase" element={<ProductShowcase />} />
         <Route path="/affiliate" element={<AffiliateLanding />} />
-        <Route 
-          path="/recommended-config" 
-          element={<Navigate to="/solar-showcase" replace />} 
-        />
       </Routes>
       <Toaster />
     </>

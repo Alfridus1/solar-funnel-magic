@@ -2,7 +2,6 @@ import { Card } from "@/components/ui/card";
 import { RoofDesigner } from "@/components/roof/RoofDesigner";
 import { RoofMetrics } from "@/components/roof/RoofMetrics";
 import { ProgressBar } from "@/components/ProgressBar";
-import { useNavigate } from "react-router-dom";
 
 interface RoofCheckContentProps {
   address: string;
@@ -19,19 +18,12 @@ export const RoofCheckContent = ({
   metrics,
   onLog
 }: RoofCheckContentProps) => {
-  const navigate = useNavigate();
   const steps = [
     { title: "Adresse", description: "Ihre Adresse" },
     { title: "Dach vermessen", description: "Zeichnen Sie Ihr Dach" },
     { title: "Potenzialanalyse", description: "Ihre Solaranlage" },
     { title: "Unverbindliches Angebot", description: "Mit Vor-Ort Termin" }
   ];
-
-  const handleComplete = (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number; kWp: number }[]) => {
-    handleRoofOutlineComplete(paths, roofDetails);
-    // Navigate to ProductShowcase with metrics and address
-    navigate('/solar-showcase', { state: { metrics, address } });
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-8">
@@ -48,7 +40,7 @@ export const RoofCheckContent = ({
             </div>
 
             <RoofDesigner 
-              onComplete={handleComplete} 
+              onComplete={handleRoofOutlineComplete} 
               address={address}
             />
 

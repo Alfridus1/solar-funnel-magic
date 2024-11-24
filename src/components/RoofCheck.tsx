@@ -16,18 +16,9 @@ interface RoofCheckProps {
   onLog?: (message: string) => void;
 }
 
-interface Metrics {
-  monthlyProduction: number;
-  annualSavings: number;
-  roofArea: number;
-  possiblePanels: number;
-  kWp: number;
-  roofDetails: { roofId: string; moduleCount: number; kWp: number }[];
-}
-
 export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
   const [paths, setPaths] = useState<google.maps.LatLng[][]>([]);
-  const [metrics, setMetrics] = useState<Metrics>({
+  const [metrics, setMetrics] = useState({
     monthlyProduction: 0,
     annualSavings: 0,
     roofArea: 0,
@@ -59,7 +50,7 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
       const calculatedMetrics = calculateSolarMetrics(totalArea);
       const updatedMetrics = {
         ...calculatedMetrics,
-        roofArea: Math.round(totalArea * 100) / 100, // Runden auf 2 Nachkommastellen
+        roofArea: Math.round(totalArea * 100) / 100,
         roofDetails
       };
       setMetrics(updatedMetrics);
@@ -71,23 +62,7 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
         address,
       });
 
-      // Prüfen ob der Nutzer eingeloggt ist
-      if (!isAuthenticated) {
-        toast({
-          title: "Anmeldung erforderlich",
-          description: "Bitte melden Sie sich an oder erstellen Sie einen Account, um Ihre persönliche Auswertung zu sehen.",
-        });
-        navigate("/login", {
-          state: {
-            returnTo: "/solar-showcase",
-            metrics: updatedMetrics,
-            address,
-          }
-        });
-        return;
-      }
-
-      // Wenn eingeloggt, direkt zur Auswertung
+      // Navigate to showcase with metrics
       navigate("/solar-showcase", {
         state: {
           metrics: updatedMetrics,
@@ -95,7 +70,7 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
         },
       });
     },
-    [onLog, navigate, address, isAuthenticated, toast]
+    [onLog, navigate, address]
   );
 
   if (loadError) {
