@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Sun, Battery, Euro, Home, TrendingUp } from "lucide-react";
+import { Sun, Battery, Euro, Home, TrendingUp, CheckCircle } from "lucide-react";
 
 interface SavingsCalculatorProps {
   yearlyProduction: number;
@@ -11,11 +11,10 @@ interface SavingsCalculatorProps {
 export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) => {
   const [electricityPrice, setElectricityPrice] = useState(0.40);
   const [yearlyConsumption, setYearlyConsumption] = useState(4000);
-  const SELF_CONSUMPTION_RATE = 0.90; // 90% Eigenverbrauch
-  const FEED_IN_RATE = 0.09; // 9 Cent Einspeisevergütung
-  const SYSTEM_COST_PER_KWP = 1950; // Durchschnittlicher Anlagenpreis pro kWp
+  const SELF_CONSUMPTION_RATE = 0.90;
+  const FEED_IN_RATE = 0.09;
+  const SYSTEM_COST_PER_KWP = 1950;
   
-  // Calculate system size in kWp (assuming 950kWh/kWp yearly production)
   const systemKWp = yearlyProduction / 950;
   
   // Determine battery size based on system size
@@ -46,50 +45,93 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
   const roiYears = Math.round((estimatedSystemCost / totalYearlySavings) * 10) / 10;
   
   const thirtyYearSavings = totalYearlySavings * 30;
-
+  
   return (
     <div className="space-y-6">
-      <Card className="p-6">
-        <div className="flex justify-between items-center mb-6">
-          <span className="text-gray-700">Jährliche Produktion:</span>
-          <div className="text-right">
-            <span className="font-semibold text-2xl text-solar-orange">{yearlyProduction.toLocaleString()} kWh</span>
-          </div>
-        </div>
-        
-        <div className="space-y-6">
-          <div className="space-y-4">
-            <div className="flex justify-between">
-              <Label htmlFor="consumption">Jahresverbrauch</Label>
-              <span className="font-medium text-solar-orange">{yearlyConsumption.toLocaleString()} kWh</span>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card className="p-6">
+          <div className="flex justify-between items-center mb-6">
+            <span className="text-gray-700">Jährliche Produktion:</span>
+            <div className="text-right">
+              <span className="font-semibold text-2xl text-solar-orange">{yearlyProduction.toLocaleString()} kWh</span>
             </div>
-            <Slider
-              id="consumption"
-              min={2000}
-              max={15000}
-              step={100}
-              value={[yearlyConsumption]}
-              onValueChange={(value) => setYearlyConsumption(value[0])}
-              className="w-full"
-            />
           </div>
-
-          <div className="space-y-4">
-            <div className="flex justify-between">
-              <Label htmlFor="electricity-price">Strompreis</Label>
-              <span className="font-medium text-solar-orange">{electricityPrice.toFixed(2)}€/kWh</span>
+          
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <div className="flex justify-between">
+                <Label htmlFor="consumption">Jahresverbrauch</Label>
+                <span className="font-medium text-solar-orange">{yearlyConsumption.toLocaleString()} kWh</span>
+              </div>
+              <Slider
+                id="consumption"
+                min={2000}
+                max={15000}
+                step={100}
+                value={[yearlyConsumption]}
+                onValueChange={(value) => setYearlyConsumption(value[0])}
+                className="w-full"
+              />
             </div>
-            <Slider
-              id="electricity-price"
-              min={0.20}
-              max={0.60}
-              step={0.01}
-              value={[electricityPrice]}
-              onValueChange={(value) => setElectricityPrice(value[0])}
-              className="w-full"
-            />
-          </div>
 
+            <div className="space-y-4">
+              <div className="flex justify-between">
+                <Label htmlFor="electricity-price">Strompreis</Label>
+                <span className="font-medium text-solar-orange">{electricityPrice.toFixed(2)}€/kWh</span>
+              </div>
+              <Slider
+                id="electricity-price"
+                min={0.20}
+                max={0.60}
+                step={0.01}
+                value={[electricityPrice]}
+                onValueChange={(value) => setElectricityPrice(value[0])}
+                className="w-full"
+              />
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-6 bg-gradient-to-br from-solar-orange/5 to-white">
+          <h3 className="text-xl font-semibold mb-6">Unsere Leistungen im Überblick</h3>
+          <div className="space-y-4">
+            <div className="flex items-start gap-3">
+              <CheckCircle className="h-5 w-5 text-solar-orange flex-shrink-0 mt-1" />
+              <div>
+                <p className="font-medium">Neuer Zählerschrank</p>
+                <p className="text-sm text-gray-600">Installation eines modernen Zählerschranks nach aktuellen Standards</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <CheckCircle className="h-5 w-5 text-solar-orange flex-shrink-0 mt-1" />
+              <div>
+                <p className="font-medium">Komplette DC Installation</p>
+                <p className="text-sm text-gray-600">Professionelle Montage der Solarmodule und Verkabelung</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <CheckCircle className="h-5 w-5 text-solar-orange flex-shrink-0 mt-1" />
+              <div>
+                <p className="font-medium">AC Installation & Inbetriebnahme</p>
+                <p className="text-sm text-gray-600">Fachgerechte Installation des Wechselrichters und Systemaktivierung</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <CheckCircle className="h-5 w-5 text-solar-orange flex-shrink-0 mt-1" />
+              <div>
+                <p className="font-medium">Behördengänge & Bürokratie</p>
+                <p className="text-sm text-gray-600">Wir kümmern uns um alle Anmeldungen und Genehmigungen</p>
+              </div>
+            </div>
+          </div>
+          <div className="mt-6 pt-6 border-t">
+            <p className="text-sm text-gray-600 mb-2">Preisindikation für Ihre Anlage:</p>
+            <p className="text-2xl font-bold text-solar-orange">{estimatedSystemCost.toLocaleString()}€ - {Math.round(estimatedSystemCost * 1.2).toLocaleString()}€</p>
+          </div>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
               <div className="flex items-center gap-3 mb-2">
@@ -144,8 +186,7 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
               <span className="text-2xl font-bold text-blue-600">{thirtyYearSavings.toLocaleString()}€</span>
             </div>
           </div>
-        </div>
-      </Card>
+      </div>
     </div>
   );
 };
