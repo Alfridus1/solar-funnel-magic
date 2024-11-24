@@ -31,12 +31,11 @@ export const LoginDialog = ({ open, onOpenChange, metrics, address }: LoginDialo
         });
         onOpenChange(false);
         
-        // If metrics exist, navigate to showcase, otherwise to dashboard
-        if (metrics) {
-          navigate("/solar-showcase", { state: { metrics, address } });
-        } else {
-          navigate("/dashboard");
-        }
+        // Always navigate to solar-showcase with metrics and address if they exist
+        navigate("/solar-showcase", { 
+          state: metrics && address ? { metrics, address } : undefined,
+          replace: true 
+        });
       }
     });
 

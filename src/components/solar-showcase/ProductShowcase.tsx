@@ -22,7 +22,8 @@ export const ProductShowcase = () => {
   const { metrics, address } = location.state || {};
 
   useEffect(() => {
-    if (!metrics) {
+    // Only redirect if there are no metrics in the state
+    if (!location.state || !metrics) {
       navigate("/");
       return;
     }
@@ -39,7 +40,7 @@ export const ProductShowcase = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, metrics]);
+  }, [navigate, metrics, location.state]);
 
   const { data: products = [] } = useQuery({
     queryKey: ['solar-products'],
