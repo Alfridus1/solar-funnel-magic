@@ -37,19 +37,27 @@ export const UserDetailsDialog = ({ user, affiliateInfo, onOpenChange }: UserDet
     if (!user?.email) return;
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: user.email,
-        password: 'admin123' // This is temporary and will be changed by the user on first login
+      // First, invoke the reset-password function to set a temporary password
+      const { error: resetError } = await supabase.functions.invoke('reset-password', {
+        body: { email: user.email }
       });
 
-      if (error) throw error;
+      if (resetError) throw resetError;
+
+      // Then attempt to sign in with the temporary password
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: '123456' // This matches the password set in the reset-password function
+      });
+
+      if (signInError) throw signInError;
 
       toast({
         title: "Erfolgreich eingeloggt",
         description: `Sie sind jetzt als ${user.email} eingeloggt.`,
       });
 
-      // Redirect to the main page or dashboard
+      // Redirect to the main page
       window.location.href = '/';
     } catch (error: any) {
       toast({

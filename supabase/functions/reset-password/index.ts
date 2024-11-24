@@ -6,12 +6,17 @@ const corsHeaders = {
 }
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
+    const { email } = await req.json()
+
+    if (!email) {
+      throw new Error('Email is required')
+    }
+
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -31,7 +36,7 @@ Deno.serve(async (req) => {
       throw getUserError
     }
 
-    const user = users.find(u => u.email === 'frank1@coppen.de')
+    const user = users.find(u => u.email === email)
     if (!user) {
       console.error('User not found')
       throw new Error('User not found')
