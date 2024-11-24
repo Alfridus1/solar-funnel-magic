@@ -2,6 +2,8 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface LoginFormProps {
   onBack: () => void;
@@ -10,6 +12,43 @@ interface LoginFormProps {
 }
 
 export const LoginForm = ({ onBack, metrics, address }: LoginFormProps) => {
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user && metrics && address) {
+        try {
+          // Create a new lead for the logged-in user
+          const { error: leadError } = await supabase
+            .from('leads')
+            .insert([{
+              name: `${session.user.user_metadata.first_name || ''} ${session.user.user_metadata.last_name || ''}`,
+              email: session.user.email,
+              phone: '',
+              type: 'solar_analysis',
+              metrics,
+              address,
+              user_id: session.user.id,
+              calculation_id: crypto.randomUUID(),
+              status: 'new'
+            }]);
+
+          if (leadError) throw leadError;
+        } catch (error: any) {
+          toast({
+            title: "Fehler beim Speichern der Analyse",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [metrics, address, toast]);
+
   return (
     <div>
       <Auth 

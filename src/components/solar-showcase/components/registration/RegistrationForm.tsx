@@ -27,6 +27,7 @@ export const RegistrationForm = ({ onComplete, onShowLogin, metrics, address }: 
     setIsSubmitting(true);
 
     try {
+      // Sign up the user
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -40,6 +41,7 @@ export const RegistrationForm = ({ onComplete, onShowLogin, metrics, address }: 
 
       if (authError) throw authError;
 
+      // Create profile
       const { error: profileError } = await supabase
         .from('profiles')
         .insert([{
@@ -52,7 +54,7 @@ export const RegistrationForm = ({ onComplete, onShowLogin, metrics, address }: 
 
       if (profileError) throw profileError;
 
-      // Create a lead with the metrics data
+      // Create a lead with the metrics data and link it to the user's profile
       if (metrics && address) {
         const { error: leadError } = await supabase
           .from('leads')
@@ -63,7 +65,9 @@ export const RegistrationForm = ({ onComplete, onShowLogin, metrics, address }: 
             type: 'solar_analysis',
             metrics,
             address,
-            user_id: authData.user?.id
+            user_id: authData.user?.id,
+            calculation_id: crypto.randomUUID(), // Generate a unique ID for the calculation
+            status: 'new'
           }]);
 
         if (leadError) throw leadError;
