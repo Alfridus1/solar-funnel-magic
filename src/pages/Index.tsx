@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { useLoadScript } from "@react-google-maps/api";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { RoofCheck } from "@/components/RoofCheck";
@@ -15,8 +14,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { LoginDialog } from "@/components/auth/LoginDialog";
 import { supabase } from "@/integrations/supabase/client";
-
-const libraries = ["drawing", "places"];
+import { useGoogleMaps } from "@/hooks/useGoogleMaps";
 
 export function Index() {
   const [address, setAddress] = useState("");
@@ -27,6 +25,7 @@ export function Index() {
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { isLoaded, loadError } = useGoogleMaps();
 
   // Store referral code in localStorage when the page loads
   useEffect(() => {
@@ -52,11 +51,6 @@ export function Index() {
 
     return () => subscription.unsubscribe();
   }, []);
-
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-    libraries: libraries as ["drawing", "places"],
-  });
 
   const onGeolocationSuccess = (formattedAddress: string) => {
     setAddress(formattedAddress);
