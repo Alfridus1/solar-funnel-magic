@@ -41,123 +41,93 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
   const thirtyYearSavings = totalYearlySavings * 30;
   
   return (
-    <div className="space-y-6 p-6 bg-solar-blue-100 rounded-2xl h-full">
-      <div className="space-y-6">
-        <div className="space-y-4">
-          <div className="flex flex-col space-y-2">
-            <Label htmlFor="consumption" className="text-lg font-medium">Jahresverbrauch</Label>
-            <span className="text-xl font-semibold text-blue-600">{yearlyConsumption.toLocaleString()} kWh</span>
-          </div>
-          <Slider
-            id="consumption"
-            min={2000}
-            max={15000}
-            step={100}
-            value={[yearlyConsumption]}
-            onValueChange={(value) => setYearlyConsumption(value[0])}
-            className="w-full"
-          />
-        </div>
-
-        <div className="space-y-4">
-          <div className="flex flex-col space-y-2">
-            <Label htmlFor="electricity-price" className="text-lg font-medium">Strompreis</Label>
-            <span className="text-xl font-semibold text-blue-600">{electricityPrice.toFixed(2)}€/kWh</span>
-          </div>
-          <Slider
-            id="electricity-price"
-            min={0.20}
-            max={0.60}
-            step={0.01}
-            value={[electricityPrice]}
-            onValueChange={(value) => setElectricityPrice(value[0])}
-            className="w-full"
-          />
-        </div>
+    <div className="space-y-6">
+      <h1 className="text-4xl font-bold text-center">
+        Ihre Solaranlage
+      </h1>
+      
+      <div className="grid md:grid-cols-3 gap-6">
+        {[
+          {
+            icon: Sun,
+            value: `${systemKWp} kWp`,
+            label: "Anlagenleistung",
+            color: "text-amber-500",
+            bgColor: "bg-amber-50",
+          },
+          {
+            icon: Battery,
+            value: `${yearlyProduction.toLocaleString()} kWh`,
+            label: "Jährliche Produktion",
+            color: "text-emerald-500",
+            bgColor: "bg-emerald-50",
+          },
+          {
+            icon: TrendingUp,
+            value: `${monthlySavings}€`,
+            label: "Monatliche Ersparnis",
+            color: "text-blue-500",
+            bgColor: "bg-blue-50",
+          },
+        ].map((metric, index) => (
+          <Card key={index} className={`p-6 transition-shadow hover:shadow-lg ${metric.bgColor} border-none`}>
+            <metric.icon className={`h-8 w-8 mb-4 ${metric.color}`} />
+            <div className="space-y-1">
+              <p className="text-3xl font-bold">{metric.value}</p>
+              <p className="text-gray-600">{metric.label}</p>
+            </div>
+          </Card>
+        ))}
       </div>
 
       <div className="space-y-4">
-        <Card className="p-6 bg-white/90 backdrop-blur">
-          <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-blue-100">
-                <Battery className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Speichergröße</p>
-                <p className="text-xl font-semibold">{batterySize} kWh</p>
-              </div>
+        <Card className="p-6 bg-gradient-to-br from-solar-blue-50 to-white">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-blue-100 rounded-xl">
+              <Euro className="h-6 w-6 text-blue-600" />
             </div>
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-green-100">
-                <Sun className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Eigenverbrauch</p>
-                <p className="text-xl font-semibold">{Math.round(selfConsumedEnergy).toLocaleString()} kWh</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-orange-100">
-                <Home className="h-6 w-6 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Netzeinspeisung</p>
-                <p className="text-xl font-semibold">{Math.round(feedInEnergy).toLocaleString()} kWh</p>
-              </div>
+            <div>
+              <span className="text-gray-600 font-medium">Monatliche Ersparnis</span>
+              <p className="text-2xl font-bold text-blue-600">{monthlySavings}€</p>
             </div>
           </div>
         </Card>
 
-        <div className="space-y-4">
-          <Card className="p-6 bg-gradient-to-br from-blue-50 to-white">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-100 rounded-xl">
-                <Euro className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <span className="text-gray-600 font-medium">Monatliche Ersparnis</span>
-                <p className="text-2xl font-bold text-blue-600">{monthlySavings}€</p>
-              </div>
+        <Card className="p-6 bg-gradient-to-br from-green-50 to-white">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-green-100 rounded-xl">
+              <Battery className="h-6 w-6 text-green-600" />
             </div>
-          </Card>
+            <div>
+              <span className="text-gray-600 font-medium">Jährliche Ersparnis</span>
+              <p className="text-2xl font-bold text-green-600">{totalYearlySavings}€</p>
+            </div>
+          </div>
+        </Card>
 
-          <Card className="p-6 bg-gradient-to-br from-green-50 to-white">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-100 rounded-xl">
-                <Battery className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <span className="text-gray-600 font-medium">Jährliche Ersparnis</span>
-                <p className="text-2xl font-bold text-green-600">{totalYearlySavings}€</p>
-              </div>
+        <Card className="p-6 bg-gradient-to-br from-orange-50 to-white">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-orange-100 rounded-xl">
+              <TrendingUp className="h-6 w-6 text-orange-600" />
             </div>
-          </Card>
+            <div>
+              <span className="text-gray-600 font-medium">Amortisationszeit</span>
+              <p className="text-2xl font-bold text-orange-600">{roiYears} Jahre</p>
+            </div>
+          </div>
+        </Card>
 
-          <Card className="p-6 bg-gradient-to-br from-orange-50 to-white">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-orange-100 rounded-xl">
-                <TrendingUp className="h-6 w-6 text-orange-600" />
-              </div>
-              <div>
-                <span className="text-gray-600 font-medium">Amortisationszeit</span>
-                <p className="text-2xl font-bold text-orange-600">{roiYears} Jahre</p>
-              </div>
+        <Card className="p-6 bg-gradient-to-br from-purple-50 to-white">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-purple-100 rounded-xl">
+              <Home className="h-6 w-6 text-purple-600" />
             </div>
-          </Card>
-
-          <Card className="p-6 bg-gradient-to-br from-purple-50 to-white">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-purple-100 rounded-xl">
-                <Home className="h-6 w-6 text-purple-600" />
-              </div>
-              <div>
-                <span className="text-gray-600 font-medium">30 Jahre Ersparnis</span>
-                <p className="text-2xl font-bold text-purple-600">{thirtyYearSavings.toLocaleString()}€</p>
-              </div>
+            <div>
+              <span className="text-gray-600 font-medium">30 Jahre Ersparnis</span>
+              <p className="text-2xl font-bold text-purple-600">{thirtyYearSavings.toLocaleString()}€</p>
             </div>
-          </Card>
-        </div>
+          </div>
+        </Card>
       </div>
     </div>
   );
