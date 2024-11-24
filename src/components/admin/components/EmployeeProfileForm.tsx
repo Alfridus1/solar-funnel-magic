@@ -1,13 +1,14 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
+import { BasicInfoFields } from "./employee-profile/BasicInfoFields";
+import { CompensationFields } from "./employee-profile/CompensationFields";
+import { WorkScheduleFields } from "./employee-profile/WorkScheduleFields";
 
 const employeeProfileSchema = z.object({
   address: z.string().min(1, "Adresse wird benötigt"),
@@ -20,7 +21,7 @@ const employeeProfileSchema = z.object({
   has_company_car: z.boolean(),
 });
 
-type EmployeeProfileData = z.infer<typeof employeeProfileSchema>;
+export type EmployeeProfileData = z.infer<typeof employeeProfileSchema>;
 
 interface EmployeeProfileFormProps {
   employeeId: string;
@@ -77,127 +78,10 @@ export const EmployeeProfileForm = ({ employeeId, initialData }: EmployeeProfile
   return (
     <Card className="p-6">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="address"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Adresse</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="location"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Standort</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="iban"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>IBAN</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="base_salary"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Fixgehalt</FormLabel>
-                <FormControl>
-                  <Input {...field} type="number" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="commission_enabled"
-            render={({ field }) => (
-              <FormItem className="flex items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <FormLabel>Provision</FormLabel>
-                </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="vacation_days"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Urlaubstage</FormLabel>
-                <FormControl>
-                  <Input {...field} type="number" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="hours_per_month"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Arbeitsstunden pro Monat</FormLabel>
-                <FormControl>
-                  <Input {...field} type="number" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="has_company_car"
-            render={({ field }) => (
-              <FormItem className="flex items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <FormLabel>Firmenfahrzeug</FormLabel>
-                </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <BasicInfoFields form={form} />
+          <CompensationFields form={form} />
+          <WorkScheduleFields form={form} />
           <Button type="submit" className="w-full">Speichern</Button>
         </form>
       </Form>
