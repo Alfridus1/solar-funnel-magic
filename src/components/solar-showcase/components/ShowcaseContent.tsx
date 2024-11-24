@@ -7,7 +7,17 @@ import { ClimateEffects } from "./ClimateEffects";
 import { CallToAction } from "./CallToAction";
 
 interface ShowcaseContentProps {
-  metrics: any;
+  metrics: {
+    kWp: number;
+    yearlyProduction: number;
+    annualSavings: number;
+    roofArea: number;
+    annualProduction: number;
+    monthlySavings: number;
+    yearlySavings: number;
+    roiYears: number;
+    initialYearlySavings: number;
+  };
   address: string;
   products: any[];
   priceSettings: any;
@@ -22,19 +32,29 @@ export const ShowcaseContent = ({
   products,
   priceSettings,
   isAuthenticated,
-  onQuoteRequest,
-  onConsultationRequest
+  onQuoteRequest = () => {},
+  onConsultationRequest = () => {},
 }: ShowcaseContentProps) => {
   return (
     <div className="container mx-auto px-4 py-8 space-y-12">
-      <SolarMetrics metrics={metrics} address={address} />
-      <SystemVisualizer metrics={metrics} />
-      <ProductGrid products={products} />
-      <PricingOptions metrics={metrics} priceSettings={priceSettings} />
-      <PremiumProductsSection />
-      <ClimateEffects metrics={metrics} />
+      <SolarMetrics 
+        kWp={metrics.kWp}
+        yearlyProduction={metrics.yearlyProduction}
+        annualSavings={metrics.annualSavings}
+      />
+      <SystemVisualizer activeFeature="solar" />
+      <ProductGrid 
+        products={products} 
+        onConsultationRequest={onConsultationRequest}
+      />
+      <PricingOptions 
+        estimatedPrice={priceSettings?.price_per_kwp_min * metrics.kWp || 0}
+        onShowQuoteForm={onQuoteRequest}
+        onShowConsultationForm={onConsultationRequest}
+      />
+      <PremiumProductsSection onConsultationRequest={onConsultationRequest} />
+      <ClimateEffects annualProduction={metrics.annualProduction} />
       <CallToAction 
-        isAuthenticated={isAuthenticated} 
         onQuoteRequest={onQuoteRequest}
         onConsultationRequest={onConsultationRequest}
       />
