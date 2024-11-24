@@ -26,17 +26,15 @@ export const LoginDialog = ({ open, onOpenChange, metrics, address }: LoginDialo
         });
         onOpenChange(false);
         
-        // Wenn metrics vorhanden sind, zur Auswertung navigieren
-        if (metrics) {
-          navigate("/solar-showcase", { state: { metrics, address } });
-        } else {
-          navigate("/");
+        // Nur zur Landing Page navigieren, wenn keine Metrics vorhanden sind
+        if (!metrics) {
+          navigate("/dashboard");
         }
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, onOpenChange, toast, metrics, address]);
+  }, [navigate, onOpenChange, toast, metrics]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

@@ -80,8 +80,6 @@ export const ProductShowcase = () => {
     setFormType("consultation");
   };
 
-  if (!metrics) return null;
-
   return (
     <QueryClientProvider client={queryClient}>
       <ShowcaseLayout>
