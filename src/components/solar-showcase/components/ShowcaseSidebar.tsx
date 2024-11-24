@@ -21,37 +21,37 @@ const menuItems = [
     label: "Dashboard", 
     icon: LayoutDashboard, 
     value: "dashboard",
-    path: "/solar-showcase#dashboard"
+    path: "/dashboard#dashboard"
   },
   { 
     label: "Meine Anfragen", 
     icon: Inbox, 
     value: "requests",
-    path: "/solar-showcase#requests"
+    path: "/dashboard#requests"
   },
   { 
     label: "Meine Projekte", 
     icon: LayoutGrid, 
     value: "projects",
-    path: "/solar-showcase#projects"
+    path: "/dashboard#projects"
   },
   { 
     label: "Empfehlungsprogramm", 
     icon: Award, 
     value: "referral",
-    path: "/solar-showcase#referral"
+    path: "/dashboard#referral"
   },
   { 
     label: "Dokumente", 
     icon: FileText, 
     value: "documents",
-    path: "/solar-showcase#documents"
+    path: "/dashboard#documents"
   },
   { 
     label: "Einstellungen", 
     icon: Settings, 
     value: "settings",
-    path: "/solar-showcase#settings"
+    path: "/dashboard#settings"
   },
 ];
 
