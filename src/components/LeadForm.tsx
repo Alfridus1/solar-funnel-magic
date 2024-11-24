@@ -30,28 +30,17 @@ export const LeadForm = ({ formType = "quote", onSuccess, metrics, address }: Le
       
       // Create or update profile if user is logged in
       if (user) {
-        // Check if profile exists
-        const { data: existingProfiles, error: profileQueryError } = await supabase
+        const { error: profileError } = await supabase
           .from('profiles')
-          .select('id, email')
-          .eq('email', formData.email);
+          .upsert({
+            id: user.id,
+            first_name: formData.name.split(' ')[0],
+            last_name: formData.name.split(' ').slice(1).join(' '),
+            email: formData.email,
+            phone: formData.phone,
+          });
 
-        if (profileQueryError) throw profileQueryError;
-
-        // If no profile exists or multiple profiles exist, create/update using user.id
-        if (!existingProfiles || existingProfiles.length === 0) {
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .upsert({
-              id: user.id,
-              first_name: formData.name.split(' ')[0],
-              last_name: formData.name.split(' ').slice(1).join(' '),
-              email: formData.email,
-              phone: formData.phone,
-            });
-
-          if (profileError) throw profileError;
-        }
+        if (profileError) throw profileError;
       }
 
       // Insert lead with user_id if logged in
