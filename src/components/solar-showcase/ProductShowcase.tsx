@@ -20,10 +20,19 @@ export const ProductShowcase = () => {
   const { toast } = useToast();
   
   // Try to get metrics and address from location state or localStorage
-  const metrics = location.state?.metrics || JSON.parse(localStorage.getItem('solarMetrics') || 'null');
+  const metricsFromStorage = localStorage.getItem('solarMetrics');
+  const metrics = location.state?.metrics || (metricsFromStorage ? JSON.parse(metricsFromStorage) : null);
   const address = location.state?.address || localStorage.getItem('solarAddress');
 
   useEffect(() => {
+    // Store metrics in localStorage if they come from location state
+    if (location.state?.metrics) {
+      localStorage.setItem('solarMetrics', JSON.stringify(location.state.metrics));
+    }
+    if (location.state?.address) {
+      localStorage.setItem('solarAddress', location.state.address);
+    }
+
     // Only redirect if there are no metrics in both state and localStorage
     if (!metrics) {
       toast({
@@ -47,7 +56,7 @@ export const ProductShowcase = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, metrics, toast]);
+  }, [navigate, metrics, location.state, toast]);
 
   const { data: products = [] } = useQuery({
     queryKey: ['solar-products'],
