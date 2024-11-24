@@ -2,23 +2,37 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { SystemConfigurator } from "@/components/SystemConfigurator";
 import { Card } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ProgressBar";
-import { loadConfigFromCookie } from "@/utils/configCookieManager";
+import { loadConfigFromCookie, saveConfigToCookie } from "@/utils/configCookieManager";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useEffect } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 export const RecommendedConfig = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  
+  // Try to load config from location state first, then from cookie
   const configData = location.state || loadConfigFromCookie();
   const { metrics, address } = configData || {};
 
   useEffect(() => {
-    // If no metrics are available, redirect to home
+    // If we have valid config data from location state, save it to cookie
+    if (location.state?.metrics && location.state?.address) {
+      saveConfigToCookie(location.state);
+    }
+
+    // If no metrics are available at all, redirect to home and show message
     if (!metrics) {
+      toast({
+        title: "Keine Konfigurationsdaten gefunden",
+        description: "Bitte starten Sie erneut mit der Dachvermessung.",
+        variant: "destructive",
+      });
       navigate("/");
     }
-  }, [metrics, navigate]);
+  }, [metrics, navigate, location.state, toast]);
 
   const steps = [
     { title: "Adresse", description: "Ihre Adresse" },
