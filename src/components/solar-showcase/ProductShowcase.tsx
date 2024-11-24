@@ -44,22 +44,21 @@ export const ProductShowcase = () => {
           if (!profile) throw new Error('Profile not found');
 
           const calculationId = uuidv4();
-          const { error } = await supabase
+          const { error: leadError } = await supabase
             .from('leads')
             .insert({
-              user_id: session.user.id,
+              name: `${profile.first_name} ${profile.last_name}`,
+              email: profile.email,
+              phone: profile.phone,
               type: 'solar_analysis',
               metrics,
               address,
+              user_id: session.user.id,
               calculation_id: calculationId,
-              status: 'new',
-              // Add required fields from profile
-              name: `${profile.first_name} ${profile.last_name}`,
-              email: profile.email,
-              phone: profile.phone
+              status: 'new'
             });
 
-          if (error) throw error;
+          if (leadError) throw leadError;
 
           toast({
             title: "Anfrage gespeichert",
@@ -69,7 +68,7 @@ export const ProductShowcase = () => {
           console.error('Error saving calculation:', error);
           toast({
             title: "Fehler beim Speichern",
-            description: "Ihre Anfrage konnte nicht gespeichert werden.",
+            description: error.message,
             variant: "destructive",
           });
         }
