@@ -101,13 +101,17 @@ export const ShowcaseSidebar = () => {
         <Button
           variant="ghost"
           size="icon"
-          className="absolute -right-6 top-6 h-8 w-8 rounded-full bg-white hover:bg-gray-50 border border-gray-200 shadow-sm"
+          className={cn(
+            "absolute -right-10 top-6 h-8 w-8 rounded-full border shadow-sm transition-colors",
+            "bg-white hover:bg-gray-50 border-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-700",
+            "dark:text-white text-black"
+          )}
           onClick={() => setIsCollapsed(!isCollapsed)}
         >
           {isCollapsed ? (
-            <ChevronRight className="h-4 w-4 text-black" />
+            <ChevronRight className="h-4 w-4" />
           ) : (
-            <ChevronLeft className="h-4 w-4 text-black" />
+            <ChevronLeft className="h-4 w-4" />
           )}
         </Button>
 
