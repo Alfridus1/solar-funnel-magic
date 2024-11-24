@@ -64,7 +64,15 @@ export const EmployeeDialog = ({
     try {
       let profileId;
 
-      // First handle the profile
+      // Check if a profile with this email already exists
+      const { data: existingProfile, error: checkError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', data.email)
+        .single();
+
+      if (checkError && checkError.code !== 'PGRST116') throw checkError;
+
       if (employee) {
         // Update existing profile
         const { error: profileError } = await supabase
@@ -81,24 +89,29 @@ export const EmployeeDialog = ({
         if (profileError) throw profileError;
         profileId = employee.profile_id;
       } else {
-        // Create new profile
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            first_name: data.first_name,
-            last_name: data.last_name,
-            email: data.email,
-            phone: data.phone,
-            role: data.role,
-          })
-          .select()
-          .single();
+        if (existingProfile) {
+          // Use existing profile
+          profileId = existingProfile.id;
+        } else {
+          // Create new profile
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .insert({
+              first_name: data.first_name,
+              last_name: data.last_name,
+              email: data.email,
+              phone: data.phone,
+              role: data.role,
+            })
+            .select()
+            .single();
 
-        if (profileError) throw profileError;
-        profileId = profileData.id;
+          if (profileError) throw profileError;
+          profileId = profileData.id;
+        }
       }
 
-      // Then handle the employee
+      // Handle employee record
       if (employee) {
         // Update existing employee
         const { error: employeeError } = await supabase
