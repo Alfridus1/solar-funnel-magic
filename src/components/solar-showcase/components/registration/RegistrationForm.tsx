@@ -7,9 +7,11 @@ import { supabase } from "@/integrations/supabase/client";
 interface RegistrationFormProps {
   onComplete: () => void;
   onShowLogin: () => void;
+  metrics: any;
+  address: string;
 }
 
-export const RegistrationForm = ({ onComplete, onShowLogin }: RegistrationFormProps) => {
+export const RegistrationForm = ({ onComplete, onShowLogin, metrics, address }: RegistrationFormProps) => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -49,6 +51,23 @@ export const RegistrationForm = ({ onComplete, onShowLogin }: RegistrationFormPr
         }]);
 
       if (profileError) throw profileError;
+
+      // Create a lead with the metrics data
+      if (metrics && address) {
+        const { error: leadError } = await supabase
+          .from('leads')
+          .insert([{
+            name: `${formData.firstName} ${formData.lastName}`,
+            email: formData.email,
+            phone: formData.phone,
+            type: 'solar_analysis',
+            metrics,
+            address,
+            user_id: authData.user?.id
+          }]);
+
+        if (leadError) throw leadError;
+      }
 
       onComplete();
       

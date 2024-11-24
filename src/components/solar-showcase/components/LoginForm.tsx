@@ -7,9 +7,11 @@ import { supabase } from "@/integrations/supabase/client";
 interface LoginFormProps {
   onBack: () => void;
   onSuccess?: () => void;
+  metrics: any;
+  address: string;
 }
 
-export const LoginForm = ({ onBack, onSuccess }: LoginFormProps) => {
+export const LoginForm = ({ onBack, onSuccess, metrics, address }: LoginFormProps) => {
   return (
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
       <Card className="w-full max-w-md p-6 bg-white/95 backdrop-blur shadow-xl animate-fade-up">

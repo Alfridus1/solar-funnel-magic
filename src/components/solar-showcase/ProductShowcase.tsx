@@ -76,7 +76,6 @@ export const ProductShowcase = () => {
       setFormType("quote");
       setShowLeadForm(true);
     } else {
-      // Handle authenticated quote request
       toast({
         title: "Angebot angefordert",
         description: "Wir werden uns in Kürze bei Ihnen melden.",
@@ -89,7 +88,6 @@ export const ProductShowcase = () => {
       setFormType("consultation");
       setShowLeadForm(true);
     } else {
-      // Handle authenticated consultation request
       toast({
         title: "Beratung angefordert",
         description: "Wir werden uns in Kürze bei Ihnen melden.",
