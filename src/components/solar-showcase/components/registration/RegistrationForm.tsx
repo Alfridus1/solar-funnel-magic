@@ -16,41 +16,12 @@ export const RegistrationForm = ({ onComplete, onShowLogin }: RegistrationFormPr
     email: "",
     phone: "",
     password: "",
-    confirmPassword: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [cooldown, setCooldown] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (cooldown) {
-      toast({
-        title: "Bitte warten",
-        description: "Aus Sicherheitsgründen müssen Sie 15 Sekunden warten, bevor Sie es erneut versuchen können.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "Passwörter stimmen nicht überein",
-        description: "Bitte überprüfen Sie Ihre Eingabe.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      toast({
-        title: "Passwort zu kurz",
-        description: "Das Passwort muss mindestens 6 Zeichen lang sein.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
@@ -65,14 +36,7 @@ export const RegistrationForm = ({ onComplete, onShowLogin }: RegistrationFormPr
         }
       });
 
-      if (authError) {
-        if (authError.status === 429) {
-          setCooldown(true);
-          setTimeout(() => setCooldown(false), 15000);
-          throw new Error("Bitte warten Sie 15 Sekunden, bevor Sie es erneut versuchen.");
-        }
-        throw authError;
-      }
+      if (authError) throw authError;
 
       const { error: profileError } = await supabase
         .from('profiles')
@@ -90,7 +54,7 @@ export const RegistrationForm = ({ onComplete, onShowLogin }: RegistrationFormPr
       
       toast({
         title: "Willkommen!",
-        description: "Ihre Daten wurden erfolgreich gespeichert. Sie können sich jetzt mit Ihrer E-Mail und Ihrem Passwort anmelden.",
+        description: "Ihre Daten wurden erfolgreich gespeichert.",
       });
     } catch (error: any) {
       toast({
@@ -140,19 +104,12 @@ export const RegistrationForm = ({ onComplete, onShowLogin }: RegistrationFormPr
         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
         required
       />
-      <Input
-        type="password"
-        placeholder="Passwort bestätigen"
-        value={formData.confirmPassword}
-        onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-        required
-      />
       <Button
         type="submit"
         className="w-full bg-gradient-to-r from-solar-orange to-solar-orange-light hover:from-solar-orange-light hover:to-solar-orange text-white text-lg py-6"
-        disabled={isSubmitting || cooldown}
+        disabled={isSubmitting}
       >
-        {isSubmitting ? "Wird gespeichert..." : cooldown ? "Bitte warten..." : "Auswertung ansehen"}
+        {isSubmitting ? "Wird gespeichert..." : "Auswertung ansehen"}
       </Button>
       <p className="text-xs text-center text-gray-500">
         Mit dem Absenden stimmen Sie unseren Datenschutzbestimmungen zu

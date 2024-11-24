@@ -4,9 +4,9 @@ interface RegistrationHeaderProps {
 
 export const RegistrationHeader = ({ showLogin }: RegistrationHeaderProps) => {
   return (
-    <div className="mb-8 text-center">
+    <div className="mb-6 text-center">
       <h2 className="text-2xl font-bold text-gray-900 mb-2">
-        {showLogin ? "Anmelden" : "Ihre persönliche Solaranalyse"}
+        {showLogin ? "Willkommen zurück" : "Ihre persönliche Solaranalyse"}
       </h2>
       <p className="text-gray-600">
         {showLogin 
