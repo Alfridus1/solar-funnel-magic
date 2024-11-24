@@ -1,7 +1,7 @@
-import { useLoadScript } from "@react-google-maps/api";
+import { useLoadScript, Libraries } from "@react-google-maps/api";
 
 // Define libraries once to ensure consistency across the application
-export const libraries = ["places", "drawing", "geometry"] as const;
+const libraries: Libraries = ["places", "drawing", "geometry"];
 
 export const useGoogleMaps = () => {
   return useLoadScript({

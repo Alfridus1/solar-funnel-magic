@@ -22,7 +22,6 @@ export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
   const [polygons, setPolygons] = useState<google.maps.Polygon[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
   const { toast } = useToast();
-
   const { isLoaded, loadError } = useGoogleMaps();
 
   const onLoad = useCallback((map: google.maps.Map) => {
