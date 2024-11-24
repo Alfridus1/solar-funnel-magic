@@ -7,6 +7,7 @@ import { ShowcaseHeader } from "./components/ShowcaseHeader";
 import { ShowcaseContent } from "./components/ShowcaseContent";
 import { RegistrationOverlay } from "./components/registration/RegistrationOverlay";
 import { ShowcaseLayout } from "./components/ShowcaseLayout";
+import { LeadFormOverlay } from "./components/LeadFormOverlay";
 import type { Product } from "@/components/configurator/types";
 
 const queryClient = new QueryClient();
@@ -15,6 +16,7 @@ export const ProductShowcase = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [formType, setFormType] = useState<"quote" | "consultation" | null>(null);
   const { toast } = useToast();
   
   const { metrics, address } = location.state || {};
@@ -70,6 +72,14 @@ export const ProductShowcase = () => {
     }
   });
 
+  const handleQuoteRequest = () => {
+    setFormType("quote");
+  };
+
+  const handleConsultationRequest = () => {
+    setFormType("consultation");
+  };
+
   if (!metrics) return null;
 
   return (
@@ -84,6 +94,8 @@ export const ProductShowcase = () => {
               products={products}
               priceSettings={priceSettings}
               isAuthenticated={isAuthenticated}
+              onQuoteRequest={handleQuoteRequest}
+              onConsultationRequest={handleConsultationRequest}
             />
           </div>
           
@@ -92,6 +104,15 @@ export const ProductShowcase = () => {
               onComplete={() => setIsAuthenticated(true)}
               metrics={metrics}
               address={address}
+            />
+          )}
+
+          {formType && (
+            <LeadFormOverlay
+              formType={formType}
+              metrics={metrics}
+              address={address}
+              onClose={() => setFormType(null)}
             />
           )}
         </div>
