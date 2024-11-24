@@ -43,23 +43,23 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
       };
       setMetrics(updatedMetrics);
       onLog?.("Metrics calculated: " + JSON.stringify(updatedMetrics));
-      
-      // Save configuration to cookie
-      saveConfigToCookie({
-        metrics: updatedMetrics,
-        address,
-      });
-
-      // Navigate directly to solar showcase with metrics
-      navigate("/solar-showcase", {
-        state: {
-          metrics: updatedMetrics,
-          address,
-        },
-      });
     },
-    [onLog, navigate, address]
+    [onLog]
   );
+
+  const handleViewAnalysis = () => {
+    saveConfigToCookie({
+      metrics,
+      address,
+    });
+
+    navigate("/solar-showcase", {
+      state: {
+        metrics,
+        address,
+      },
+    });
+  };
 
   if (loadError) {
     return (
@@ -79,6 +79,7 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
     <RoofCheckContent
       address={address}
       handleRoofOutlineComplete={handleRoofOutlineComplete}
+      handleViewAnalysis={handleViewAnalysis}
       paths={paths}
       metrics={metrics}
       onLog={onLog}
