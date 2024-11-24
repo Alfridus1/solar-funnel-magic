@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ShowcaseHeader } from "./components/ShowcaseHeader";
 import { ShowcaseContent } from "./components/ShowcaseContent";
 import { RegistrationOverlay } from "./components/registration/RegistrationOverlay";
+import { ShowcaseLayout } from "./components/ShowcaseLayout";
 import type { Product } from "@/components/configurator/types";
 
 const queryClient = new QueryClient();
@@ -100,25 +100,27 @@ export const ProductShowcase = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen bg-gradient-to-br from-solar-blue-50 to-white">
-        <ShowcaseHeader />
-        <ShowcaseContent 
-          metrics={metrics}
-          address={address}
-          products={products}
-          priceSettings={priceSettings}
-          onQuoteRequest={handleQuoteRequest}
-          onConsultationRequest={handleConsultationRequest}
-          isAuthenticated={isAuthenticated}
-        />
-        {!isAuthenticated && showLeadForm && (
-          <RegistrationOverlay 
-            onComplete={() => setIsAuthenticated(true)} 
+      <ShowcaseLayout>
+        <div className="min-h-screen">
+          <ShowcaseHeader />
+          <ShowcaseContent 
             metrics={metrics}
             address={address}
+            products={products}
+            priceSettings={priceSettings}
+            onQuoteRequest={handleQuoteRequest}
+            onConsultationRequest={handleConsultationRequest}
+            isAuthenticated={isAuthenticated}
           />
-        )}
-      </div>
+          {!isAuthenticated && showLeadForm && (
+            <RegistrationOverlay 
+              onComplete={() => setIsAuthenticated(true)} 
+              metrics={metrics}
+              address={address}
+            />
+          )}
+        </div>
+      </ShowcaseLayout>
     </QueryClientProvider>
   );
 };
