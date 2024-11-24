@@ -1,24 +1,40 @@
 import { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import { Button } from "@/components/ui/button";
 
-export function Login() {
+export function EmployeeLogin() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        toast({
-          title: "Erfolgreich angemeldet",
-          description: "Willkommen zurück!",
-        });
-        navigate("/");
+        // Überprüfen, ob der Benutzer ein Mitarbeiter ist
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profile?.role && profile.role !== 'customer') {
+          toast({
+            title: "Erfolgreich angemeldet",
+            description: "Willkommen im Mitarbeiterbereich!",
+          });
+          navigate("/admin");
+        } else {
+          // Wenn kein Mitarbeiter, ausloggen und Fehlermeldung anzeigen
+          await supabase.auth.signOut();
+          toast({
+            title: "Zugriff verweigert",
+            description: "Sie haben keine Berechtigung für den Mitarbeiterbereich.",
+            variant: "destructive",
+          });
+        }
       }
     });
 
@@ -30,10 +46,10 @@ export function Login() {
       <Card className="w-full max-w-md p-6 bg-white/95 backdrop-blur shadow-xl">
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Willkommen zurück
+            Mitarbeiter-Login
           </h1>
           <p className="text-gray-600">
-            Melden Sie sich an, um Ihre Solaranlage zu verwalten
+            Bitte melden Sie sich mit Ihren Mitarbeiterdaten an
           </p>
         </div>
         
@@ -64,18 +80,8 @@ export function Login() {
                 password_label: 'Passwort',
                 button_label: 'Anmelden',
                 loading_button_label: 'Anmeldung läuft...',
-                link_text: 'Noch kein Konto? Jetzt registrieren',
                 email_input_placeholder: 'Ihre E-Mail Adresse',
                 password_input_placeholder: 'Ihr Passwort',
-              },
-              sign_up: {
-                email_label: 'E-Mail Adresse',
-                password_label: 'Passwort',
-                button_label: 'Registrieren',
-                loading_button_label: 'Registrierung läuft...',
-                link_text: 'Bereits ein Konto? Jetzt anmelden',
-                email_input_placeholder: 'Ihre E-Mail Adresse',
-                password_input_placeholder: 'Wählen Sie ein sicheres Passwort',
               },
               forgotten_password: {
                 link_text: 'Passwort vergessen?',
@@ -87,18 +93,8 @@ export function Login() {
             },
           }}
           providers={[]}
-          theme="light"
           view="sign_in"
         />
-
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">Sind Sie Mitarbeiter?</p>
-          <Link to="/employee-login">
-            <Button variant="link" className="mt-2">
-              Zum Mitarbeiter-Login
-            </Button>
-          </Link>
-        </div>
       </Card>
     </div>
   );
