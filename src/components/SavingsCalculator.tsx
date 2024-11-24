@@ -131,61 +131,59 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-solar-orange/10 rounded-lg">
-                  <Euro className="h-5 w-5 text-solar-orange" />
-                </div>
-                <span className="text-gray-600">Monatliche Ersparnis</span>
-              </div>
-              <span className="text-2xl font-bold text-solar-orange">{monthlySavings}€</span>
-              <div className="mt-2 text-sm text-gray-500">
-                <div>Eigenverbrauch: {Math.round(selfConsumedEnergy)} kWh</div>
-                <div>Einspeisung: {Math.round(feedInEnergy)} kWh</div>
-                <div>Speichergröße: {batterySize} kWh</div>
-              </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-solar-orange/10 rounded-lg">
+              <Euro className="h-5 w-5 text-solar-orange" />
             </div>
-
-            <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-solar-orange/10 rounded-lg">
-                  <Battery className="h-5 w-5 text-solar-orange" />
-                </div>
-                <span className="text-gray-600">Jährliche Ersparnis</span>
-              </div>
-              <span className="text-2xl font-bold text-solar-orange">{totalYearlySavings}€</span>
-              <div className="mt-2 text-sm text-gray-500">
-                <div>Durch Eigenverbrauch: {yearlySavingsSelfConsumption}€</div>
-                <div>Durch Einspeisung: {yearlySavingsFeedIn}€</div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <TrendingUp className="h-5 w-5 text-green-600" />
-                </div>
-                <span className="text-gray-600">Return on Investment</span>
-              </div>
-              <span className="text-2xl font-bold text-green-600">{roiYears} Jahre</span>
-              <div className="mt-2 text-sm text-gray-500">
-                <div>Anlagenkosten: {estimatedSystemCost.toLocaleString()}€</div>
-                <div>Jährliche Rendite: {Math.round((1 / roiYears) * 100)}%</div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Home className="h-5 w-5 text-blue-600" />
-                </div>
-                <span className="text-gray-600">30 Jahre Ersparnis</span>
-              </div>
-              <span className="text-2xl font-bold text-blue-600">{thirtyYearSavings.toLocaleString()}€</span>
-            </div>
+            <span className="text-gray-600">Monatliche Ersparnis</span>
           </div>
+          <span className="text-2xl font-bold text-solar-orange">{monthlySavings}€</span>
+          <div className="mt-2 text-sm text-gray-500">
+            <div>Eigenverbrauch: {Math.round(selfConsumedEnergy)} kWh</div>
+            <div>Einspeisung: {Math.round(feedInEnergy)} kWh</div>
+            <div>Speichergröße: {batterySize} kWh</div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-solar-orange/10 rounded-lg">
+              <Battery className="h-5 w-5 text-solar-orange" />
+            </div>
+            <span className="text-gray-600">Jährliche Ersparnis</span>
+          </div>
+          <span className="text-2xl font-bold text-solar-orange">{totalYearlySavings}€</span>
+          <div className="mt-2 text-sm text-gray-500">
+            <div>Durch Eigenverbrauch: {yearlySavingsSelfConsumption}€</div>
+            <div>Durch Einspeisung: {yearlySavingsFeedIn}€</div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-green-100 rounded-lg">
+              <TrendingUp className="h-5 w-5 text-green-600" />
+            </div>
+            <span className="text-gray-600">Return on Investment</span>
+          </div>
+          <span className="text-2xl font-bold text-green-600">{roiYears} Jahre</span>
+          <div className="mt-2 text-sm text-gray-500">
+            <div>Anlagenkosten: {estimatedSystemCost.toLocaleString()}€</div>
+            <div>Jährliche Rendite: {Math.round((1 / roiYears) * 100)}%</div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <Home className="h-5 w-5 text-blue-600" />
+            </div>
+            <span className="text-gray-600">30 Jahre Ersparnis</span>
+          </div>
+          <span className="text-2xl font-bold text-blue-600">{thirtyYearSavings.toLocaleString()}€</span>
+        </div>
       </div>
     </div>
   );
