@@ -14,6 +14,8 @@ import { Benefits } from "@/components/Benefits";
 import { PremiumProductsSection } from "./components/PremiumProductsSection";
 import { CallToAction } from "./components/CallToAction";
 import { RegistrationOverlay } from "./components/registration/RegistrationOverlay";
+import { useQuery } from "@tanstack/react-query";
+import type { Product } from "@/components/configurator/types";
 
 export const ProductShowcase = () => {
   const location = useLocation();
@@ -193,3 +195,4 @@ export const ProductShowcase = () => {
     </div>
   );
 };
+
