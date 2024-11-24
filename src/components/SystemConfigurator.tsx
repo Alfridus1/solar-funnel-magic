@@ -4,21 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { ConsumptionInput } from "./configurator/ConsumptionInput";
 import { ProductList } from "./configurator/ProductList";
 import { SystemSummary } from "./configurator/SystemSummary";
-import { ConfigurationSummary } from "./configurator/ConfigurationSummary";
 import type { Product, SystemConfig } from "./configurator/types";
 
-interface SystemConfiguratorProps {
-  initialMetrics?: {
-    monthlyProduction: number;
-    annualSavings: number;
-    roofArea: number;
-    possiblePanels: number;
-    kWp: number;
-  };
-  address?: string;
-}
-
-export const SystemConfigurator = ({ initialMetrics, address }: SystemConfiguratorProps) => {
+export const SystemConfigurator = () => {
   const [yearlyConsumption, setYearlyConsumption] = useState(4000);
   const [products, setProducts] = useState<Product[]>([]);
   const [systemConfig, setSystemConfig] = useState<SystemConfig>({
@@ -31,11 +19,11 @@ export const SystemConfigurator = ({ initialMetrics, address }: SystemConfigurat
 
   useEffect(() => {
     loadProducts();
-    if (initialMetrics) {
-      const estimatedConsumption = Math.round(initialMetrics.monthlyProduction * 12);
-      setYearlyConsumption(estimatedConsumption);
-    }
-  }, [initialMetrics]);
+  }, []);
+
+  useEffect(() => {
+    calculateAutarky();
+  }, [systemConfig, yearlyConsumption]);
 
   const loadProducts = async () => {
     const { data: productsData, error } = await supabase
@@ -61,14 +49,19 @@ export const SystemConfigurator = ({ initialMetrics, address }: SystemConfigurat
   };
 
   const calculateAutarky = () => {
+    // Calculate total kWp (500W = 0.5 kWp per module)
     const totalKWp = systemConfig.modules.reduce((sum, module) => 
       sum + ((module.specs.watts || 0) / 1000), 0);
     
+    // Calculate yearly production (kWp * 950 kWh/kWp)
     const yearlyProduction = totalKWp * 950;
+    
+    // Calculate daily values
     const dailyConsumption = yearlyConsumption / 365;
     const batteryCapacity = systemConfig.battery?.specs.capacity || 0;
     const batteryContribution = Math.min(batteryCapacity * 0.8, dailyConsumption * 0.5);
     
+    // Calculate final autarky percentage
     const autarkyValue = Math.min(100, 
       ((yearlyProduction + (batteryContribution * 365)) / yearlyConsumption) * 100
     );
@@ -99,9 +92,6 @@ export const SystemConfigurator = ({ initialMetrics, address }: SystemConfigurat
       title: "Produkt hinzugefügt",
       description: `${product.name} wurde zum System hinzugefügt.`,
     });
-
-    // Recalculate autarky whenever a product is added
-    setTimeout(calculateAutarky, 0);
   };
 
   const removeModule = (index: number) => {
@@ -109,8 +99,6 @@ export const SystemConfigurator = ({ initialMetrics, address }: SystemConfigurat
       ...prev,
       modules: prev.modules.filter((_, i) => i !== index)
     }));
-    // Recalculate autarky whenever a module is removed
-    setTimeout(calculateAutarky, 0);
   };
 
   const getTotalPrice = () => {
@@ -121,17 +109,13 @@ export const SystemConfigurator = ({ initialMetrics, address }: SystemConfigurat
   };
 
   return (
-    <div className="space-y-6">
-      {initialMetrics && address && (
-        <ConfigurationSummary metrics={initialMetrics} address={address} />
-      )}
-      
+    <div className="space-y-6 p-4">
       <ConsumptionInput 
         yearlyConsumption={yearlyConsumption}
         onChange={setYearlyConsumption}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <ProductList 
           products={products}
           onAddProduct={addProduct}

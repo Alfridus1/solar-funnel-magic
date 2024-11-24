@@ -47,7 +47,7 @@ export const RoofCheckContent = ({
             />
 
             {paths.length > 0 && (
-              <RoofMetrics {...metrics} onContinue={handleContinue} />
+              <RoofMetrics {...metrics} />
             )}
           </div>
         </Card>

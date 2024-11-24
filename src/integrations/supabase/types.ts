@@ -212,7 +212,6 @@ export type Database = {
           id: string
           last_name: string
           personio_id: string | null
-          profile_id: string | null
           role: string
           team_id: string | null
           updated_at: string | null
@@ -224,7 +223,6 @@ export type Database = {
           id?: string
           last_name: string
           personio_id?: string | null
-          profile_id?: string | null
           role: string
           team_id?: string | null
           updated_at?: string | null
@@ -236,19 +234,11 @@ export type Database = {
           id?: string
           last_name?: string
           personio_id?: string | null
-          profile_id?: string | null
           role?: string
           team_id?: string | null
           updated_at?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "employees_profile_id_fkey"
-            columns: ["profile_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "employees_team_id_fkey"
             columns: ["team_id"]

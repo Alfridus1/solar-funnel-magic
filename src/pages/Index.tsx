@@ -126,24 +126,14 @@ export function Index() {
           >
             Affiliate werden
           </Button>
-          <div className="flex gap-2">
-            <Button 
-              variant="outline"
-              onClick={() => navigate("/employee-login")}
-              className="bg-white hover:bg-solar-orange hover:text-white transition-colors"
-            >
-              Mitarbeiter-Login
-            </Button>
-            <Button 
-              variant="outline"
-              onClick={() => isLoggedIn ? navigate("/dashboard") : setShowLoginDialog(true)}
-              className="bg-white hover:bg-solar-orange hover:text-white transition-colors"
-            >
-              {isLoggedIn ? "Zum Dashboard" : "Login"}
-            </Button>
-          </div>
+          <Button 
+            variant="outline"
+            onClick={() => isLoggedIn ? navigate("/dashboard") : setShowLoginDialog(true)}
+            className="bg-white hover:bg-solar-orange hover:text-white transition-colors"
+          >
+            {isLoggedIn ? "Zum Dashboard" : "Login"}
+          </Button>
         </div>
-        
         <div className="py-12">
           <HeroSection
             address={address}

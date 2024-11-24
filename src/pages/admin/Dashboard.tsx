@@ -8,7 +8,6 @@ import { ProductManagement } from "@/components/admin/ProductManagement";
 import { PremiumProductsManagement } from "@/components/admin/PremiumProductsManagement";
 import { SystemSettings } from "@/components/admin/SystemSettings";
 import { AffiliateManagement } from "@/components/admin/AffiliateManagement";
-import { EmployeeManagement } from "@/components/admin/EmployeeManagement";
 
 export const AdminDashboard = () => {
   const location = useLocation();
@@ -31,8 +30,6 @@ export const AdminDashboard = () => {
         return <UserManagement />;
       case "affiliates":
         return <AffiliateManagement />;
-      case "employees":
-        return <EmployeeManagement />;
       case "products":
         return <ProductManagement />;
       case "premium":
