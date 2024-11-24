@@ -8,7 +8,7 @@ export const employeeFormSchema = z.object({
   role: z.enum([
     "customer",
     "sales_employee",
-    "external_sales",
+    "external_sales", 
     "customer_service",
     "planning",
     "accountant",
@@ -23,11 +23,11 @@ export const employeeFormSchema = z.object({
   address: z.string().optional(),
   location: z.string().optional(),
   iban: z.string().optional(),
-  base_salary: z.number().optional(),
-  commission_enabled: z.boolean().optional(),
-  vacation_days: z.number().optional(),
-  hours_per_month: z.number().optional(),
-  has_company_car: z.boolean().optional(),
+  base_salary: z.number().min(0).default(0),
+  commission_enabled: z.boolean().default(false),
+  vacation_days: z.number().min(0).default(30),
+  hours_per_month: z.number().min(0).default(160),
+  has_company_car: z.boolean().default(false),
 });
 
 export type EmployeeFormData = z.infer<typeof employeeFormSchema>;

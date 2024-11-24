@@ -143,6 +143,9 @@ export const EmployeeDialog = ({
         vacation_days: data.vacation_days,
         hours_per_month: data.hours_per_month,
         has_company_car: data.has_company_car,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
       };
 
       if (employee) {
