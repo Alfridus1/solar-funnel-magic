@@ -34,8 +34,8 @@ export const EmployeeDialog = ({
       first_name: employee.profiles.first_name,
       last_name: employee.profiles.last_name,
       email: employee.profiles.email,
-      role: employee.role as EmployeeFormData["role"],
       phone: employee.profiles.phone || "",
+      role: employee.role as EmployeeFormData["role"],
       address: employee.address || "",
       location: employee.location || "",
       iban: employee.iban || "",
@@ -48,8 +48,8 @@ export const EmployeeDialog = ({
       first_name: "",
       last_name: "",
       email: "",
-      role: "employee" as EmployeeFormData["role"],
       phone: "",
+      role: "employee" as EmployeeFormData["role"],
       address: "",
       location: "",
       iban: "",
@@ -102,20 +102,19 @@ export const EmployeeDialog = ({
         if (authError) throw authError;
 
         // Create profile
-        const { data: profile, error: profileError } = await supabase
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .insert({
             first_name: data.first_name,
             last_name: data.last_name,
             email: data.email,
             phone: data.phone,
-            role: data.role,
           })
           .select()
           .single();
 
         if (profileError) throw profileError;
-        profileId = profile.id;
+        profileId = profileData.id;
       } else {
         // Update existing profile
         const { error: profileError } = await supabase

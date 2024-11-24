@@ -4,10 +4,11 @@ export const employeeFormSchema = z.object({
   first_name: z.string().min(1, "Vorname wird benötigt"),
   last_name: z.string().min(1, "Nachname wird benötigt"),
   email: z.string().email("Ungültige Email-Adresse"),
+  phone: z.string().optional(),
   role: z.enum([
     "customer",
     "sales_employee",
-    "external_sales", 
+    "external_sales",
     "customer_service",
     "planning",
     "accountant",
@@ -19,7 +20,6 @@ export const employeeFormSchema = z.object({
     "sales_team_leader",
     "sales_director"
   ]),
-  phone: z.string().optional(),
   address: z.string().optional(),
   location: z.string().optional(),
   iban: z.string().optional(),
