@@ -63,7 +63,7 @@ export const RequestsOverview = () => {
 
   const handleCalculationClick = (calculation: LeadCalculation) => {
     if (calculation.metrics) {
-      navigate("/recommended-config", {
+      navigate("/solar-showcase", {
         state: {
           metrics: calculation.metrics,
           address: calculation.address,
