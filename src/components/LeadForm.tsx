@@ -27,7 +27,7 @@ export const LeadForm = ({ formType = "quote", onSuccess, metrics, address }: Le
     try {
       // Get current user
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       // Create lead first
       const { error: leadError } = await supabase
         .from('leads')
@@ -45,7 +45,7 @@ export const LeadForm = ({ formType = "quote", onSuccess, metrics, address }: Le
 
       if (leadError) throw leadError;
 
-      // If user is logged in, update their profile
+      // If user is logged in, create or update their profile
       if (user) {
         const { error: profileError } = await supabase
           .from('profiles')
