@@ -8,7 +8,6 @@ interface RoofCheckContentProps {
   handleRoofOutlineComplete: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number; kWp: number }[]) => void;
   paths: google.maps.LatLng[][];
   metrics: any;
-  handleContinue: () => void;
   onLog?: (message: string) => void;
 }
 
@@ -17,7 +16,6 @@ export const RoofCheckContent = ({
   handleRoofOutlineComplete,
   paths,
   metrics,
-  handleContinue,
   onLog
 }: RoofCheckContentProps) => {
   const steps = [
@@ -47,7 +45,7 @@ export const RoofCheckContent = ({
             />
 
             {paths.length > 0 && (
-              <RoofMetrics {...metrics} onContinue={handleContinue} />
+              <RoofMetrics {...metrics} />
             )}
           </div>
         </Card>
