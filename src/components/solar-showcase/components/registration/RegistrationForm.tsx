@@ -7,8 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 interface RegistrationFormProps {
   onComplete: () => void;
   onShowLogin: () => void;
-  metrics: any;
-  address: string;
+  metrics?: any;
+  address?: string;
 }
 
 export const RegistrationForm = ({ onComplete, onShowLogin, metrics, address }: RegistrationFormProps) => {
@@ -57,6 +57,23 @@ export const RegistrationForm = ({ onComplete, onShowLogin, metrics, address }: 
     setIsSubmitting(true);
 
     try {
+      // Get referral code from localStorage if it exists
+      const referralCode = localStorage.getItem('referralCode');
+      
+      // If there's a referral code, get the affiliate's ID
+      let affiliateId: string | null = null;
+      if (referralCode) {
+        const { data: affiliate } = await supabase
+          .from('affiliates')
+          .select('id')
+          .eq('referral_code', referralCode)
+          .single();
+        
+        if (affiliate) {
+          affiliateId = affiliate.id;
+        }
+      }
+
       // Sign up the user
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
@@ -72,7 +89,7 @@ export const RegistrationForm = ({ onComplete, onShowLogin, metrics, address }: 
       if (authError) throw authError;
 
       // Parse the address
-      const addressDetails = parseAddress(address);
+      const addressDetails = parseAddress(address || '');
 
       // Create profile with address information
       const { error: profileError } = await supabase
@@ -83,7 +100,7 @@ export const RegistrationForm = ({ onComplete, onShowLogin, metrics, address }: 
           last_name: formData.lastName,
           email: formData.email,
           phone: formData.phone,
-          ...addressDetails // Include parsed address details
+          ...addressDetails
         }]);
 
       if (profileError) throw profileError;
@@ -100,12 +117,16 @@ export const RegistrationForm = ({ onComplete, onShowLogin, metrics, address }: 
             metrics,
             address,
             user_id: authData.user?.id,
+            affiliate_id: affiliateId, // Add the affiliate ID if it exists
             calculation_id: crypto.randomUUID(),
             status: 'new'
           }]);
 
         if (leadError) throw leadError;
       }
+
+      // Clear the referral code from localStorage after successful registration
+      localStorage.removeItem('referralCode');
 
       onComplete();
       

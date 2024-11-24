@@ -12,7 +12,7 @@ import { FinalCTA } from "@/components/landing/FinalCTA";
 import { TrustIndicators } from "@/components/landing/TrustIndicators";
 import { useGeolocation } from "@/components/RoofCheck/hooks/useGeolocation";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { LoginDialog } from "@/components/auth/LoginDialog";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -23,9 +23,18 @@ export function Index() {
   const [showRoofCheck, setShowRoofCheck] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [searchParams] = useSearchParams();
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Store referral code in localStorage when the page loads
+  useEffect(() => {
+    const refCode = searchParams.get('ref');
+    if (refCode) {
+      localStorage.setItem('referralCode', refCode);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     // Check authentication status
