@@ -22,6 +22,36 @@ export const RegistrationForm = ({ onComplete, onShowLogin, metrics, address }: 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
+  const parseAddress = (fullAddress: string) => {
+    try {
+      // Extract street, house number, postal code, and city from the address string
+      const parts = fullAddress.split(',').map(part => part.trim());
+      const streetParts = parts[0].split(' ');
+      const houseNumber = streetParts.pop() || '';
+      const street = streetParts.join(' ');
+      
+      // Try to extract postal code and city from the second part
+      const locationParts = parts[1]?.split(' ') || [];
+      const postalCode = locationParts[0];
+      const city = locationParts.slice(1).join(' ');
+
+      return {
+        street,
+        house_number: houseNumber,
+        postal_code: postalCode,
+        city
+      };
+    } catch (error) {
+      console.error('Error parsing address:', error);
+      return {
+        street: '',
+        house_number: '',
+        postal_code: '',
+        city: ''
+      };
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -41,7 +71,10 @@ export const RegistrationForm = ({ onComplete, onShowLogin, metrics, address }: 
 
       if (authError) throw authError;
 
-      // Create profile
+      // Parse the address
+      const addressDetails = parseAddress(address);
+
+      // Create profile with address information
       const { error: profileError } = await supabase
         .from('profiles')
         .insert([{
@@ -50,6 +83,7 @@ export const RegistrationForm = ({ onComplete, onShowLogin, metrics, address }: 
           last_name: formData.lastName,
           email: formData.email,
           phone: formData.phone,
+          ...addressDetails // Include parsed address details
         }]);
 
       if (profileError) throw profileError;
@@ -66,7 +100,7 @@ export const RegistrationForm = ({ onComplete, onShowLogin, metrics, address }: 
             metrics,
             address,
             user_id: authData.user?.id,
-            calculation_id: crypto.randomUUID(), // Generate a unique ID for the calculation
+            calculation_id: crypto.randomUUID(),
             status: 'new'
           }]);
 
