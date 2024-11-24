@@ -1,5 +1,5 @@
-import { ReactNode, useState } from "react";
-import { ShowcaseSidebar } from "./ShowcaseSidebar";
+import { ReactNode } from "react";
+import { SharedLayout } from "@/components/layout/SharedLayout";
 
 interface ShowcaseLayoutProps {
   children: ReactNode;
@@ -7,11 +7,8 @@ interface ShowcaseLayoutProps {
 
 export const ShowcaseLayout = ({ children }: ShowcaseLayoutProps) => {
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-solar-blue-50 to-white">
-      <ShowcaseSidebar />
-      <main className="flex-1 overflow-y-auto">
-        {children}
-      </main>
-    </div>
+    <SharedLayout>
+      {children}
+    </SharedLayout>
   );
 };
