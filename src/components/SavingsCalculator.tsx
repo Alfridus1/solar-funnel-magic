@@ -47,21 +47,21 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
   const thirtyYearSavings = totalYearlySavings * 30;
   
   return (
-    <div className="space-y-6 w-full md:w-1/2">
-      <div className="grid grid-cols-1 gap-6">
-        <Card className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <span className="text-gray-700">Jährliche Produktion:</span>
+    <div className="w-full xl:w-3/4 mx-auto space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <Card className="p-8 bg-white shadow-lg rounded-xl border-2 border-gray-100">
+          <div className="flex justify-between items-center mb-8">
+            <span className="text-lg font-medium text-gray-700">Jährliche Produktion:</span>
             <div className="text-right">
-              <span className="font-semibold text-2xl text-solar-orange">{yearlyProduction.toLocaleString()} kWh</span>
+              <span className="font-bold text-3xl text-solar-orange">{yearlyProduction.toLocaleString()} kWh</span>
             </div>
           </div>
           
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div className="space-y-4">
               <div className="flex justify-between">
-                <Label htmlFor="consumption">Jahresverbrauch</Label>
-                <span className="font-medium text-solar-orange">{yearlyConsumption.toLocaleString()} kWh</span>
+                <Label htmlFor="consumption" className="text-base">Jahresverbrauch</Label>
+                <span className="font-semibold text-lg text-solar-orange">{yearlyConsumption.toLocaleString()} kWh</span>
               </div>
               <Slider
                 id="consumption"
@@ -76,8 +76,8 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
 
             <div className="space-y-4">
               <div className="flex justify-between">
-                <Label htmlFor="electricity-price">Strompreis</Label>
-                <span className="font-medium text-solar-orange">{electricityPrice.toFixed(2)}€/kWh</span>
+                <Label htmlFor="electricity-price" className="text-base">Strompreis</Label>
+                <span className="font-semibold text-lg text-solar-orange">{electricityPrice.toFixed(2)}€/kWh</span>
               </div>
               <Slider
                 id="electricity-price"
@@ -92,98 +92,98 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
           </div>
         </Card>
 
-        <Card className="p-6 bg-gradient-to-br from-solar-orange/5 to-white">
-          <h3 className="text-xl font-semibold mb-6">Unsere Leistungen im Überblick</h3>
-          <div className="space-y-4">
-            <div className="flex items-start gap-3">
-              <CheckCircle className="h-5 w-5 text-solar-orange flex-shrink-0 mt-1" />
+        <Card className="p-8 bg-gradient-to-br from-solar-orange/5 via-white to-solar-blue-50 shadow-lg rounded-xl border-2 border-gray-100">
+          <h3 className="text-2xl font-bold mb-8 text-gray-800">Unsere Leistungen im Überblick</h3>
+          <div className="space-y-6">
+            <div className="flex items-start gap-4">
+              <CheckCircle className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
               <div>
-                <p className="font-medium">Neuer Zählerschrank</p>
-                <p className="text-sm text-gray-600">Installation eines modernen Zählerschranks nach aktuellen Standards</p>
+                <p className="font-semibold text-gray-800">Neuer Zählerschrank</p>
+                <p className="text-gray-600">Installation eines modernen Zählerschranks nach aktuellen Standards</p>
               </div>
             </div>
-            <div className="flex items-start gap-3">
-              <CheckCircle className="h-5 w-5 text-solar-orange flex-shrink-0 mt-1" />
+            <div className="flex items-start gap-4">
+              <CheckCircle className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
               <div>
-                <p className="font-medium">Komplette DC Installation</p>
-                <p className="text-sm text-gray-600">Professionelle Montage der Solarmodule und Verkabelung</p>
+                <p className="font-semibold text-gray-800">Komplette DC Installation</p>
+                <p className="text-gray-600">Professionelle Montage der Solarmodule und Verkabelung</p>
               </div>
             </div>
-            <div className="flex items-start gap-3">
-              <CheckCircle className="h-5 w-5 text-solar-orange flex-shrink-0 mt-1" />
+            <div className="flex items-start gap-4">
+              <CheckCircle className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
               <div>
-                <p className="font-medium">AC Installation & Inbetriebnahme</p>
-                <p className="text-sm text-gray-600">Fachgerechte Installation des Wechselrichters und Systemaktivierung</p>
+                <p className="font-semibold text-gray-800">AC Installation & Inbetriebnahme</p>
+                <p className="text-gray-600">Fachgerechte Installation des Wechselrichters und Systemaktivierung</p>
               </div>
             </div>
-            <div className="flex items-start gap-3">
-              <CheckCircle className="h-5 w-5 text-solar-orange flex-shrink-0 mt-1" />
+            <div className="flex items-start gap-4">
+              <CheckCircle className="h-6 w-6 text-solar-orange flex-shrink-0 mt-1" />
               <div>
-                <p className="font-medium">Behördengänge & Bürokratie</p>
-                <p className="text-sm text-gray-600">Wir kümmern uns um alle Anmeldungen und Genehmigungen</p>
+                <p className="font-semibold text-gray-800">Behördengänge & Bürokratie</p>
+                <p className="text-gray-600">Wir kümmern uns um alle Anmeldungen und Genehmigungen</p>
               </div>
             </div>
           </div>
-          <div className="mt-6 pt-6 border-t">
-            <p className="text-sm text-gray-600 mb-2">Preisindikation für Ihre Anlage:</p>
-            <p className="text-2xl font-bold text-solar-orange">{estimatedSystemCost.toLocaleString()}€ - {Math.round(estimatedSystemCost * 1.2).toLocaleString()}€</p>
+          <div className="mt-8 pt-6 border-t border-gray-200">
+            <p className="text-gray-600 mb-2">Preisindikation für Ihre Anlage:</p>
+            <p className="text-3xl font-bold text-solar-orange">{estimatedSystemCost.toLocaleString()}€ - {Math.round(estimatedSystemCost * 1.2).toLocaleString()}€</p>
           </div>
         </Card>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-solar-orange/10 rounded-lg">
-              <Euro className="h-5 w-5 text-solar-orange" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="p-6 hover:shadow-lg transition-shadow duration-200 bg-gradient-to-br from-white to-gray-50">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-3 bg-solar-orange/10 rounded-xl">
+              <Euro className="h-6 w-6 text-solar-orange" />
             </div>
-            <span className="text-gray-600">Monatliche Ersparnis</span>
+            <span className="text-gray-600 font-medium">Monatliche Ersparnis</span>
           </div>
-          <span className="text-2xl font-bold text-solar-orange">{monthlySavings}€</span>
-          <div className="mt-2 text-sm text-gray-500">
+          <span className="text-3xl font-bold text-solar-orange">{monthlySavings}€</span>
+          <div className="mt-4 space-y-1 text-sm text-gray-500">
             <div>Eigenverbrauch: {Math.round(selfConsumedEnergy)} kWh</div>
             <div>Einspeisung: {Math.round(feedInEnergy)} kWh</div>
             <div>Speichergröße: {batterySize} kWh</div>
           </div>
-        </div>
+        </Card>
 
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-solar-orange/10 rounded-lg">
-              <Battery className="h-5 w-5 text-solar-orange" />
+        <Card className="p-6 hover:shadow-lg transition-shadow duration-200 bg-gradient-to-br from-white to-gray-50">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-3 bg-solar-orange/10 rounded-xl">
+              <Battery className="h-6 w-6 text-solar-orange" />
             </div>
-            <span className="text-gray-600">Jährliche Ersparnis</span>
+            <span className="text-gray-600 font-medium">Jährliche Ersparnis</span>
           </div>
-          <span className="text-2xl font-bold text-solar-orange">{totalYearlySavings}€</span>
-          <div className="mt-2 text-sm text-gray-500">
+          <span className="text-3xl font-bold text-solar-orange">{totalYearlySavings}€</span>
+          <div className="mt-4 space-y-1 text-sm text-gray-500">
             <div>Durch Eigenverbrauch: {yearlySavingsSelfConsumption}€</div>
             <div>Durch Einspeisung: {yearlySavingsFeedIn}€</div>
           </div>
-        </div>
+        </Card>
 
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <TrendingUp className="h-5 w-5 text-green-600" />
+        <Card className="p-6 hover:shadow-lg transition-shadow duration-200 bg-gradient-to-br from-white to-green-50">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-3 bg-green-100 rounded-xl">
+              <TrendingUp className="h-6 w-6 text-green-600" />
             </div>
-            <span className="text-gray-600">Return on Investment</span>
+            <span className="text-gray-600 font-medium">Return on Investment</span>
           </div>
-          <span className="text-2xl font-bold text-green-600">{roiYears} Jahre</span>
-          <div className="mt-2 text-sm text-gray-500">
+          <span className="text-3xl font-bold text-green-600">{roiYears} Jahre</span>
+          <div className="mt-4 space-y-1 text-sm text-gray-500">
             <div>Anlagenkosten: {estimatedSystemCost.toLocaleString()}€</div>
             <div>Jährliche Rendite: {Math.round((1 / roiYears) * 100)}%</div>
           </div>
-        </div>
+        </Card>
 
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Home className="h-5 w-5 text-blue-600" />
+        <Card className="p-6 hover:shadow-lg transition-shadow duration-200 bg-gradient-to-br from-white to-blue-50">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-3 bg-blue-100 rounded-xl">
+              <Home className="h-6 w-6 text-blue-600" />
             </div>
-            <span className="text-gray-600">30 Jahre Ersparnis</span>
+            <span className="text-gray-600 font-medium">30 Jahre Ersparnis</span>
           </div>
-          <span className="text-2xl font-bold text-blue-600">{thirtyYearSavings.toLocaleString()}€</span>
-        </div>
+          <span className="text-3xl font-bold text-blue-600">{thirtyYearSavings.toLocaleString()}€</span>
+        </Card>
       </div>
     </div>
   );
