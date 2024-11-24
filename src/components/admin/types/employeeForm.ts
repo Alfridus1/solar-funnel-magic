@@ -22,4 +22,16 @@ export const employeeFormSchema = z.object({
   phone: z.string().min(1, "Telefonnummer wird benötigt"),
 });
 
+export const employeeProfileSchema = z.object({
+  address: z.string().min(1, "Adresse wird benötigt"),
+  location: z.string().min(1, "Standort wird benötigt"),
+  iban: z.string().min(1, "IBAN wird benötigt"),
+  base_salary: z.string().min(1, "Fixgehalt wird benötigt"),
+  commission_enabled: z.boolean(),
+  vacation_days: z.string().min(1, "Urlaubstage werden benötigt"),
+  hours_per_month: z.string().min(1, "Arbeitsstunden pro Monat werden benötigt"),
+  has_company_car: z.boolean(),
+});
+
 export type EmployeeFormData = z.infer<typeof employeeFormSchema>;
+export type EmployeeProfileData = z.infer<typeof employeeProfileSchema>;
