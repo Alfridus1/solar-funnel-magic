@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { HeroImage } from "./components/HeroImage";
 import { SystemMetrics } from "./components/SystemMetrics";
 import { SavingsCalculator } from "@/components/SavingsCalculator";
+import { SavingsMetrics } from "./components/SavingsMetrics";
 import { Testimonials } from "@/components/Testimonials";
 import { FAQ } from "@/components/FAQ";
 import { PDFDownloadButton } from "./components/PDFDownloadButton";
@@ -113,7 +114,6 @@ export const ProductShowcase = () => {
       <HeroImage />
 
       <div className="container mx-auto px-4 py-8 space-y-16">
-        {/* Analysis Card */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <Card className="p-8 bg-white/90 backdrop-blur shadow-lg rounded-2xl">
             <div className="space-y-8">
@@ -129,13 +129,10 @@ export const ProductShowcase = () => {
                 roofArea={metrics.roofArea}
               />
 
-              <div className="grid grid-cols-2 gap-4 sm:gap-8">
-                <SavingsCalculator yearlyProduction={Math.round(metrics.kWp * 950)} />
-              </div>
+              <SavingsCalculator yearlyProduction={Math.round(metrics.kWp * 950)} />
             </div>
           </Card>
 
-          {/* New Price Estimation Card */}
           <Card className="p-8 bg-white/90 backdrop-blur shadow-lg rounded-2xl">
             <div className="space-y-8">
               <h2 className="text-2xl font-bold text-gray-900">Unser Rundum-Sorglos-Paket</h2>
