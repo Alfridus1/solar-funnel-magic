@@ -19,42 +19,50 @@ const menuItems = [
   { 
     label: "Übersicht", 
     icon: LayoutDashboard, 
-    value: "overview" 
+    value: "overview",
+    path: "/admin#overview"
   },
   { 
     label: "Anfragen", 
     icon: MessageSquare, 
-    value: "leads" 
+    value: "leads",
+    path: "/admin#leads"
   },
   { 
     label: "Benutzer", 
     icon: Users, 
-    value: "users" 
+    value: "users",
+    path: "/admin#users"
   },
   { 
     label: "Affiliates", 
     icon: UserPlus, 
-    value: "affiliates" 
+    value: "affiliates",
+    path: "/admin#affiliates"
   },
   { 
     label: "Mitarbeiter", 
     icon: UserCog, 
-    value: "employees" 
+    value: "employees",
+    path: "/admin#employees"
   },
   { 
     label: "Produkte", 
     icon: Package, 
-    value: "products" 
+    value: "products",
+    path: "/admin#products"
   },
   { 
     label: "Premium", 
     icon: Crown, 
-    value: "premium" 
+    value: "premium",
+    path: "/admin#premium"
   },
   { 
     label: "Einstellungen", 
     icon: Settings, 
-    value: "settings" 
+    value: "settings",
+    path: "/admin#settings"
   },
 ];
 
@@ -96,7 +104,7 @@ export const AdminSidebar = () => {
           return (
             <Link
               key={item.value}
-              to={`#${item.value}`}
+              to={item.path}
               className={cn(
                 "flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                 currentTab === item.value
