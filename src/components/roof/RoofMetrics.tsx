@@ -72,7 +72,7 @@ export const RoofMetrics = ({
           onClick={onContinue}
           className="bg-solar-orange hover:bg-solar-orange-600 text-lg py-6 px-8 shadow-lg hover:shadow-xl transition-all duration-300"
         >
-          Jetzt Ihre Einsparungen erfahren
+          Weiter zur Analyse
           <ArrowRight className="ml-2 h-5 w-5" />
         </Button>
       </div>

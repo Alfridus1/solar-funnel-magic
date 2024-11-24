@@ -87,7 +87,6 @@ export const RoofAreaCalculator = ({ polygons }: RoofAreaCalculatorProps) => {
       transition={{ duration: 0.5 }}
       className="mt-6 space-y-6 px-4 sm:px-0"
     >
-      {/* Oberer Button */}
       <div className="flex justify-center">
         <motion.div
           animate={{
@@ -103,7 +102,7 @@ export const RoofAreaCalculator = ({ polygons }: RoofAreaCalculatorProps) => {
             onClick={handleContinue}
             className="w-full sm:w-auto bg-solar-orange hover:bg-solar-orange-600 text-base sm:text-lg py-4 sm:py-6 px-4 sm:px-8 shadow-lg hover:shadow-xl transition-all duration-300"
           >
-            Jetzt Ihre Einsparungen erfahren
+            Weiter zur Analyse
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </motion.div>
@@ -155,7 +154,7 @@ export const RoofAreaCalculator = ({ polygons }: RoofAreaCalculatorProps) => {
               onClick={handleContinue}
               className="w-full sm:w-auto bg-solar-orange hover:bg-solar-orange-600"
             >
-              Jetzt Ihre Einsparungen erfahren
+              Weiter zur Analyse
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
             <Button 
