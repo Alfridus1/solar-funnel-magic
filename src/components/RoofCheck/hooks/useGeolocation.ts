@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { useLoadScript } from "@react-google-maps/api";
 
 interface UseGeolocationProps {
   onSuccess: (address: string) => void;
@@ -7,7 +8,22 @@ interface UseGeolocationProps {
 }
 
 export const useGeolocation = ({ onSuccess, onError, toast }: UseGeolocationProps) => {
+  const { isLoaded, loadError } = useLoadScript({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    libraries: ["places"],
+  });
+
   const reverseGeocode = async (lat: number, lng: number) => {
+    if (!isLoaded) {
+      onError("Google Maps API wird geladen...");
+      return;
+    }
+
+    if (loadError) {
+      onError("Fehler beim Laden der Google Maps API");
+      return;
+    }
+
     const geocoder = new google.maps.Geocoder();
     try {
       const response = await geocoder.geocode({
@@ -34,6 +50,16 @@ export const useGeolocation = ({ onSuccess, onError, toast }: UseGeolocationProp
   };
 
   const handleGeolocation = useCallback(() => {
+    if (!isLoaded) {
+      onError("Google Maps API wird geladen...");
+      return;
+    }
+
+    if (loadError) {
+      onError("Fehler beim Laden der Google Maps API");
+      return;
+    }
+
     if (!navigator.geolocation) {
       onError("Ihr Browser unterstützt keine Standorterkennung.");
       return;
@@ -70,7 +96,7 @@ export const useGeolocation = ({ onSuccess, onError, toast }: UseGeolocationProp
         }
       );
     });
-  }, [onSuccess, onError, toast]);
+  }, [isLoaded, loadError, onSuccess, onError, toast]);
 
-  return { handleGeolocation };
+  return { handleGeolocation, isLoaded, loadError };
 };
