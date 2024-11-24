@@ -9,7 +9,8 @@ import {
   Settings,
   LogOut,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  User
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -42,6 +43,11 @@ const menuItems = [
     label: "Dokumente", 
     icon: FileText, 
     value: "documents" 
+  },
+  {
+    label: "Mein Profil",
+    icon: User,
+    value: "profile"
   },
   { 
     label: "Einstellungen", 

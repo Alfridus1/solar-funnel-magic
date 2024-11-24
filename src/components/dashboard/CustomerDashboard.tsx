@@ -7,6 +7,7 @@ import { ProjectsOverview } from "./views/ProjectsOverview";
 import { ReferralOverview } from "./views/ReferralOverview";
 import { DocumentsOverview } from "./views/DocumentsOverview";
 import { SettingsOverview } from "./views/SettingsOverview";
+import { ProfileOverview } from "./views/ProfileOverview";
 
 export const CustomerDashboard = () => {
   const location = useLocation();
@@ -31,6 +32,8 @@ export const CustomerDashboard = () => {
         return <ReferralOverview />;
       case "documents":
         return <DocumentsOverview />;
+      case "profile":
+        return <ProfileOverview />;
       case "settings":
         return <SettingsOverview />;
       default:
