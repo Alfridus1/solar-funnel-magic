@@ -16,6 +16,9 @@ import { CallToAction } from "./components/CallToAction";
 import { RegistrationOverlay } from "./components/registration/RegistrationOverlay";
 import { useQuery } from "@tanstack/react-query";
 import type { Product } from "@/components/configurator/types";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 export const ProductShowcase = () => {
   const location = useLocation();
@@ -110,89 +113,90 @@ export const ProductShowcase = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-solar-blue-50 to-white">
-      <HeroImage />
+    <QueryClientProvider client={queryClient}>
+      <div className="min-h-screen bg-gradient-to-br from-solar-blue-50 to-white">
+        <HeroImage />
 
-      <div className="container mx-auto px-4 py-8 space-y-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card className="p-8 bg-white/90 backdrop-blur shadow-lg rounded-2xl">
-            <div className="space-y-8">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <h1 className="text-2xl font-bold text-gray-900">Ihre Solar-Analyse</h1>
-                <PDFDownloadButton metrics={metrics} address={address} />
-              </div>
-
-              <SystemMetrics
-                moduleCount={Math.round(metrics.kWp * 2)}
-                kWp={metrics.kWp}
-                annualProduction={Math.round(metrics.kWp * 950)}
-                roofArea={metrics.roofArea}
-              />
-
-              <SavingsCalculator yearlyProduction={Math.round(metrics.kWp * 950)} />
-            </div>
-          </Card>
-
-          <Card className="p-8 bg-white/90 backdrop-blur shadow-lg rounded-2xl">
-            <div className="space-y-8">
-              <h2 className="text-2xl font-bold text-gray-900">Unser Rundum-Sorglos-Paket</h2>
-              
-              <div className="space-y-6">
-                <p className="text-lg text-gray-700">
-                  Ihre Solaranlage mit {metrics.kWp.toFixed(1)} kWp Leistung
-                </p>
-                <div className="bg-solar-orange/10 p-6 rounded-xl">
-                  <p className="text-lg font-semibold mb-2">Geschätzte Investition:</p>
-                  <p className="text-3xl font-bold text-solar-orange">
-                    {estimatedPriceMin.toLocaleString()}€ - {estimatedPriceMax.toLocaleString()}€
-                  </p>
-                  <p className="text-sm text-gray-600 mt-2">
-                    Komplettpreis inkl. MwSt.
-                  </p>
+        <div className="container mx-auto px-4 py-8 space-y-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <Card className="p-8 bg-white/90 backdrop-blur shadow-lg rounded-2xl">
+              <div className="space-y-8">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                  <h1 className="text-2xl font-bold text-gray-900">Ihre Solar-Analyse</h1>
+                  <PDFDownloadButton metrics={metrics} address={address} />
                 </div>
 
-                <Benefits />
+                <SystemMetrics
+                  moduleCount={Math.round(metrics.kWp * 2)}
+                  kWp={metrics.kWp}
+                  annualProduction={Math.round(metrics.kWp * 950)}
+                  roofArea={metrics.roofArea}
+                />
 
-                <div className="flex gap-4">
-                  <button
-                    onClick={handleQuoteRequest}
-                    className="flex-1 bg-solar-orange text-white px-6 py-3 rounded-lg hover:bg-solar-orange/90 transition-colors"
-                  >
-                    Angebot anfordern
-                  </button>
-                  <button
-                    onClick={handleConsultationRequest}
-                    className="flex-1 border border-solar-orange text-solar-orange px-6 py-3 rounded-lg hover:bg-solar-orange/10 transition-colors"
-                  >
-                    Beratungstermin
-                  </button>
+                <SavingsCalculator yearlyProduction={Math.round(metrics.kWp * 950)} />
+              </div>
+            </Card>
+
+            <Card className="p-8 bg-white/90 backdrop-blur shadow-lg rounded-2xl">
+              <div className="space-y-8">
+                <h2 className="text-2xl font-bold text-gray-900">Unser Rundum-Sorglos-Paket</h2>
+                
+                <div className="space-y-6">
+                  <p className="text-lg text-gray-700">
+                    Ihre Solaranlage mit {metrics.kWp.toFixed(1)} kWp Leistung
+                  </p>
+                  <div className="bg-solar-orange/10 p-6 rounded-xl">
+                    <p className="text-lg font-semibold mb-2">Geschätzte Investition:</p>
+                    <p className="text-3xl font-bold text-solar-orange">
+                      {(priceSettings?.price_per_kwp_min * metrics.kWp).toLocaleString()}€ - {(priceSettings?.price_per_kwp_max * metrics.kWp).toLocaleString()}€
+                    </p>
+                    <p className="text-sm text-gray-600 mt-2">
+                      Komplettpreis inkl. MwSt.
+                    </p>
+                  </div>
+
+                  <Benefits />
+
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() => handleQuoteRequest()}
+                      className="flex-1 bg-solar-orange text-white px-6 py-3 rounded-lg hover:bg-solar-orange/90 transition-colors"
+                    >
+                      Angebot anfordern
+                    </button>
+                    <button
+                      onClick={() => handleConsultationRequest()}
+                      className="flex-1 border border-solar-orange text-solar-orange px-6 py-3 rounded-lg hover:bg-solar-orange/10 transition-colors"
+                    >
+                      Beratungstermin
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          </Card>
+            </Card>
+          </div>
+
+          <PremiumProductsSection onConsultationRequest={handleConsultationRequest} />
+
+          <CallToAction 
+            onQuoteRequest={handleQuoteRequest}
+            onConsultationRequest={handleConsultationRequest}
+          />
+
+          <div className="max-w-4xl mx-auto space-y-16">
+            <Testimonials />
+            <FAQ />
+          </div>
         </div>
 
-        <PremiumProductsSection onConsultationRequest={handleConsultationRequest} />
-
-        <CallToAction 
-          onQuoteRequest={handleQuoteRequest}
-          onConsultationRequest={handleConsultationRequest}
-        />
-
-        <div className="max-w-4xl mx-auto space-y-16">
-          <Testimonials />
-          <FAQ />
-        </div>
+        {!isAuthenticated && showLeadForm && (
+          <RegistrationOverlay 
+            onComplete={() => setIsAuthenticated(true)} 
+            metrics={metrics}
+            address={address}
+          />
+        )}
       </div>
-
-      {!isAuthenticated && showLeadForm && (
-        <RegistrationOverlay 
-          onComplete={() => setIsAuthenticated(true)} 
-          metrics={metrics}
-          address={address}
-        />
-      )}
-    </div>
+    </QueryClientProvider>
   );
 };
-

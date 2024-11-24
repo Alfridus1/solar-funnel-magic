@@ -35,7 +35,13 @@ export const PremiumProductsSection = ({ onConsultationRequest }: PremiumProduct
         .order('order_number');
       
       if (error) throw error;
-      return data as PremiumProduct[];
+      
+      return data.map(item => ({
+        ...item,
+        purchase_options: typeof item.purchase_options === 'string' 
+          ? JSON.parse(item.purchase_options)
+          : item.purchase_options
+      })) as PremiumProduct[];
     }
   });
 
