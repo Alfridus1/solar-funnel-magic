@@ -66,6 +66,7 @@ export const EmployeeDialog = ({
     try {
       let profileId;
 
+      // Check if a user with this email already exists
       const { data: existingProfile, error: checkError } = await supabase
         .from('profiles')
         .select('id')
@@ -73,6 +74,17 @@ export const EmployeeDialog = ({
         .single();
 
       if (checkError && checkError.code !== 'PGRST116') throw checkError;
+
+      if (!employee) {
+        // Create auth user with default password for new employees
+        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+          email: data.email,
+          password: "Coppen2023!",
+          email_confirm: true
+        });
+
+        if (authError) throw authError;
+      }
 
       if (employee) {
         const { error: profileError } = await supabase
