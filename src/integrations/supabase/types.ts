@@ -537,6 +537,30 @@ export type Database = {
         }
         Relationships: []
       }
+      price_settings: {
+        Row: {
+          created_at: string | null
+          id: string
+          price_per_kwp_max: number
+          price_per_kwp_min: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          price_per_kwp_max?: number
+          price_per_kwp_min?: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          price_per_kwp_max?: number
+          price_per_kwp_min?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       product_categories: {
         Row: {
           created_at: string | null

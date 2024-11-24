@@ -14,6 +14,7 @@ import { Product } from "@/components/configurator/types";
 import { ProductGrid } from "./components/ProductGrid";
 import { CallToAction } from "./components/CallToAction";
 import { RegistrationOverlay } from "./components/registration/RegistrationOverlay";
+import { Benefits } from "@/components/Benefits";
 
 export const ProductShowcase = () => {
   const location = useLocation();
@@ -43,6 +44,19 @@ export const ProductShowcase = () => {
     }
   });
 
+  const { data: priceSettings } = useQuery({
+    queryKey: ['price-settings'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('price_settings')
+        .select('*')
+        .single();
+      
+      if (error) throw error;
+      return data;
+    }
+  });
+
   useEffect(() => {
     if (!metrics) {
       navigate("/");
@@ -66,6 +80,9 @@ export const ProductShowcase = () => {
   if (!metrics) {
     return null;
   }
+
+  const estimatedPriceMin = priceSettings ? Math.round(metrics.kWp * priceSettings.price_per_kwp_min) : 0;
+  const estimatedPriceMax = priceSettings ? Math.round(metrics.kWp * priceSettings.price_per_kwp_max) : 0;
 
   const handleQuoteRequest = () => {
     if (!isAuthenticated) {
@@ -97,25 +114,66 @@ export const ProductShowcase = () => {
 
       <div className="container mx-auto px-4 py-8 space-y-16">
         {/* Analysis Card */}
-        <Card className="max-w-4xl mx-auto p-8 bg-white/90 backdrop-blur shadow-lg rounded-2xl">
-          <div className="space-y-8">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <h1 className="text-2xl font-bold text-gray-900">Ihre Solar-Analyse</h1>
-              <PDFDownloadButton metrics={metrics} address={address} />
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <Card className="p-8 bg-white/90 backdrop-blur shadow-lg rounded-2xl">
+            <div className="space-y-8">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <h1 className="text-2xl font-bold text-gray-900">Ihre Solar-Analyse</h1>
+                <PDFDownloadButton metrics={metrics} address={address} />
+              </div>
 
-            <SystemMetrics
-              moduleCount={Math.round(metrics.kWp * 2)}
-              kWp={metrics.kWp}
-              annualProduction={Math.round(metrics.kWp * 950)}
-              roofArea={metrics.roofArea}
-            />
+              <SystemMetrics
+                moduleCount={Math.round(metrics.kWp * 2)}
+                kWp={metrics.kWp}
+                annualProduction={Math.round(metrics.kWp * 950)}
+                roofArea={metrics.roofArea}
+              />
 
-            <div className="grid grid-cols-2 gap-4 sm:gap-8">
-              <SavingsCalculator yearlyProduction={Math.round(metrics.kWp * 950)} />
+              <div className="grid grid-cols-2 gap-4 sm:gap-8">
+                <SavingsCalculator yearlyProduction={Math.round(metrics.kWp * 950)} />
+              </div>
             </div>
-          </div>
-        </Card>
+          </Card>
+
+          {/* New Price Estimation Card */}
+          <Card className="p-8 bg-white/90 backdrop-blur shadow-lg rounded-2xl">
+            <div className="space-y-8">
+              <h2 className="text-2xl font-bold text-gray-900">Unser Rundum-Sorglos-Paket</h2>
+              
+              <div className="space-y-6">
+                <p className="text-lg text-gray-700">
+                  Ihre Solaranlage mit {metrics.kWp.toFixed(1)} kWp Leistung
+                </p>
+                <div className="bg-solar-orange/10 p-6 rounded-xl">
+                  <p className="text-lg font-semibold mb-2">Geschätzte Investition:</p>
+                  <p className="text-3xl font-bold text-solar-orange">
+                    {estimatedPriceMin.toLocaleString()}€ - {estimatedPriceMax.toLocaleString()}€
+                  </p>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Komplettpreis inkl. MwSt.
+                  </p>
+                </div>
+
+                <Benefits />
+
+                <div className="flex gap-4">
+                  <button
+                    onClick={handleQuoteRequest}
+                    className="flex-1 bg-solar-orange text-white px-6 py-3 rounded-lg hover:bg-solar-orange/90 transition-colors"
+                  >
+                    Angebot anfordern
+                  </button>
+                  <button
+                    onClick={handleConsultationRequest}
+                    className="flex-1 border border-solar-orange text-solar-orange px-6 py-3 rounded-lg hover:bg-solar-orange/10 transition-colors"
+                  >
+                    Beratungstermin
+                  </button>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
 
         {/* Products Section */}
         <section className="py-12">
@@ -126,51 +184,6 @@ export const ProductShowcase = () => {
             products={products} 
             onConsultationRequest={handleConsultationRequest}
           />
-        </section>
-
-        {/* Services Overview */}
-        <section className="py-12 bg-white/80 backdrop-blur rounded-2xl shadow-sm">
-          <div className="max-w-4xl mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-12">
-              Unser Rundum-Sorglos-Paket
-            </h2>
-            <div className="grid grid-cols-2 gap-4 sm:gap-8">
-              <div className="space-y-6">
-                <h3 className="text-xl font-semibold text-solar-orange">Installation & Hardware</h3>
-                <ul className="space-y-3">
-                  <li className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-solar-orange" />
-                    <span>Komplette DC Installation auf dem Dach</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-solar-orange" />
-                    <span>Neuer Zählerschrank nach aktuellen Standards</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-solar-orange" />
-                    <span>Professionelle AC Installation</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="space-y-6">
-                <h3 className="text-xl font-semibold text-solar-orange">Service & Bürokratie</h3>
-                <ul className="space-y-3">
-                  <li className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-solar-orange" />
-                    <span>Anmeldung beim Netzbetreiber</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-solar-orange" />
-                    <span>Marktstammdatenregister-Eintrag</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-solar-orange" />
-                    <span>Inbetriebnahme & Einweisung</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
         </section>
 
         <CallToAction 
