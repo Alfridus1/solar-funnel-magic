@@ -44,16 +44,26 @@ export const ProductShowcase = () => {
   });
 
   useEffect(() => {
+    if (!metrics) {
+      navigate("/");
+      return;
+    }
+
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setIsAuthenticated(!!session);
     };
     
     checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => subscription.unsubscribe();
   }, [navigate, metrics]);
 
   if (!metrics) {
-    navigate("/");
     return null;
   }
 
@@ -62,13 +72,29 @@ export const ProductShowcase = () => {
   const estimatedPrice = Math.round(metrics.kWp * 1950);
 
   const handleQuoteRequest = () => {
-    setFormType("quote");
-    setShowLeadForm(true);
+    if (!isAuthenticated) {
+      setFormType("quote");
+      setShowLeadForm(true);
+    } else {
+      // Handle authenticated quote request
+      toast({
+        title: "Angebot angefordert",
+        description: "Wir werden uns in Kürze bei Ihnen melden.",
+      });
+    }
   };
 
   const handleConsultationRequest = () => {
-    setFormType("consultation");
-    setShowLeadForm(true);
+    if (!isAuthenticated) {
+      setFormType("consultation");
+      setShowLeadForm(true);
+    } else {
+      // Handle authenticated consultation request
+      toast({
+        title: "Beratung angefordert",
+        description: "Wir werden uns in Kürze bei Ihnen melden.",
+      });
+    }
   };
 
   return (
@@ -120,7 +146,11 @@ export const ProductShowcase = () => {
       </div>
 
       {!isAuthenticated && (
-        <RegistrationOverlay onComplete={() => setIsAuthenticated(true)} />
+        <RegistrationOverlay 
+          onComplete={() => setIsAuthenticated(true)} 
+          metrics={metrics}
+          address={address}
+        />
       )}
     </div>
   );

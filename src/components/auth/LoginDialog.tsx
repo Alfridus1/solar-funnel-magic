@@ -9,9 +9,11 @@ import { useNavigate } from "react-router-dom";
 interface LoginDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  metrics?: any;
+  address?: string;
 }
 
-export const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
+export const LoginDialog = ({ open, onOpenChange, metrics, address }: LoginDialogProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -23,27 +25,18 @@ export const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
           description: "Willkommen zurück!",
         });
         onOpenChange(false);
-        navigate("/");
-      } else if (event === 'SIGNED_OUT') {
-        toast({
-          title: "Abgemeldet",
-          description: "Sie wurden erfolgreich abgemeldet.",
-        });
-      } else if (event === 'USER_UPDATED') {
-        toast({
-          title: "Profil aktualisiert",
-          description: "Ihre Profildaten wurden aktualisiert.",
-        });
-      } else if (event === 'PASSWORD_RECOVERY') {
-        toast({
-          title: "Passwort zurückgesetzt",
-          description: "Ihr Passwort wurde erfolgreich zurückgesetzt.",
-        });
+        
+        // Wenn metrics vorhanden sind, zur Auswertung navigieren
+        if (metrics) {
+          navigate("/solar-showcase", { state: { metrics, address } });
+        } else {
+          navigate("/");
+        }
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, onOpenChange, toast]);
+  }, [navigate, onOpenChange, toast, metrics, address]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

@@ -45,17 +45,16 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/employee-login" element={<EmployeeLogin />} />
         <Route path="/admin/*" element={<AdminDashboard />} />
-        <Route path="/dashboard/*" element={<CustomerDashboard />} />
         <Route 
-          path="/solar-showcase" 
+          path="/dashboard/*" 
           element={
             <ProtectedRoute>
-              <ProductShowcase />
+              <CustomerDashboard />
             </ProtectedRoute>
           } 
         />
+        <Route path="/solar-showcase" element={<ProductShowcase />} />
         <Route path="/affiliate" element={<AffiliateLanding />} />
-        {/* Redirect /recommended-config to /solar-showcase */}
         <Route 
           path="/recommended-config" 
           element={<Navigate to="/solar-showcase" replace />} 

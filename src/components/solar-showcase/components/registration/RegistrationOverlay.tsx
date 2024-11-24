@@ -7,9 +7,11 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface RegistrationOverlayProps {
   onComplete: () => void;
+  metrics?: any;
+  address?: string;
 }
 
-export const RegistrationOverlay = ({ onComplete }: RegistrationOverlayProps) => {
+export const RegistrationOverlay = ({ onComplete, metrics, address }: RegistrationOverlayProps) => {
   const [showLogin, setShowLogin] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -45,11 +47,17 @@ export const RegistrationOverlay = ({ onComplete }: RegistrationOverlayProps) =>
         <RegistrationHeader showLogin={showLogin} />
         
         {showLogin ? (
-          <LoginForm onBack={() => setShowLogin(false)} />
+          <LoginForm 
+            onBack={() => setShowLogin(false)} 
+            metrics={metrics}
+            address={address}
+          />
         ) : (
           <RegistrationForm
             onComplete={onComplete}
             onShowLogin={() => setShowLogin(true)}
+            metrics={metrics}
+            address={address}
           />
         )}
       </Card>
