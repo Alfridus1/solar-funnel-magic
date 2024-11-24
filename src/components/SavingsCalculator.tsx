@@ -41,42 +41,40 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
   const thirtyYearSavings = totalYearlySavings * 30;
   
   return (
-    <div className="w-full max-w-3xl mx-auto space-y-6 p-6 bg-gradient-to-br from-blue-50 to-white rounded-2xl shadow-lg">
-      <Card className="p-6 bg-white/90 backdrop-blur">
-        <div className="space-y-6">
-          <div className="space-y-4">
-            <div className="flex flex-col space-y-2">
-              <Label htmlFor="consumption" className="text-lg font-medium">Jahresverbrauch</Label>
-              <span className="text-xl font-semibold text-blue-600">{yearlyConsumption.toLocaleString()} kWh</span>
-            </div>
-            <Slider
-              id="consumption"
-              min={2000}
-              max={15000}
-              step={100}
-              value={[yearlyConsumption]}
-              onValueChange={(value) => setYearlyConsumption(value[0])}
-              className="w-full"
-            />
+    <div className="space-y-6 p-6 bg-solar-blue-100 rounded-2xl h-full">
+      <div className="space-y-6">
+        <div className="space-y-4">
+          <div className="flex flex-col space-y-2">
+            <Label htmlFor="consumption" className="text-lg font-medium">Jahresverbrauch</Label>
+            <span className="text-xl font-semibold text-blue-600">{yearlyConsumption.toLocaleString()} kWh</span>
           </div>
-
-          <div className="space-y-4">
-            <div className="flex flex-col space-y-2">
-              <Label htmlFor="electricity-price" className="text-lg font-medium">Strompreis</Label>
-              <span className="text-xl font-semibold text-blue-600">{electricityPrice.toFixed(2)}€/kWh</span>
-            </div>
-            <Slider
-              id="electricity-price"
-              min={0.20}
-              max={0.60}
-              step={0.01}
-              value={[electricityPrice]}
-              onValueChange={(value) => setElectricityPrice(value[0])}
-              className="w-full"
-            />
-          </div>
+          <Slider
+            id="consumption"
+            min={2000}
+            max={15000}
+            step={100}
+            value={[yearlyConsumption]}
+            onValueChange={(value) => setYearlyConsumption(value[0])}
+            className="w-full"
+          />
         </div>
-      </Card>
+
+        <div className="space-y-4">
+          <div className="flex flex-col space-y-2">
+            <Label htmlFor="electricity-price" className="text-lg font-medium">Strompreis</Label>
+            <span className="text-xl font-semibold text-blue-600">{electricityPrice.toFixed(2)}€/kWh</span>
+          </div>
+          <Slider
+            id="electricity-price"
+            min={0.20}
+            max={0.60}
+            step={0.01}
+            value={[electricityPrice]}
+            onValueChange={(value) => setElectricityPrice(value[0])}
+            className="w-full"
+          />
+        </div>
+      </div>
 
       <div className="space-y-4">
         <Card className="p-6 bg-white/90 backdrop-blur">
