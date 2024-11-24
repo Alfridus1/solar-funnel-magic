@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { RoofDesigner } from "@/components/roof/RoofDesigner";
 import { RoofMetrics } from "@/components/roof/RoofMetrics";
 import { ProgressBar } from "@/components/ProgressBar";
+import { useCallback } from "react";
 
 interface RoofCheckContentProps {
   address: string;
@@ -25,6 +26,12 @@ export const RoofCheckContent = ({
     { title: "Unverbindliches Angebot", description: "Mit Vor-Ort Termin" }
   ];
 
+  const handleAddRoof = useCallback(() => {
+    onLog?.("User requested to add another roof surface");
+    // This will trigger the drawing mode in RoofDesigner
+    handleRoofOutlineComplete(paths, metrics.roofDetails || []);
+  }, [paths, metrics.roofDetails, handleRoofOutlineComplete, onLog]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-8">
       <div className="container mx-auto px-4">
@@ -45,7 +52,10 @@ export const RoofCheckContent = ({
             />
 
             {paths.length > 0 && (
-              <RoofMetrics {...metrics} />
+              <RoofMetrics 
+                {...metrics} 
+                onAddRoof={handleAddRoof}
+              />
             )}
           </div>
         </Card>
