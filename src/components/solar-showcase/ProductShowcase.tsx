@@ -10,12 +10,10 @@ import { FAQ } from "@/components/FAQ";
 import { PDFDownloadButton } from "./components/PDFDownloadButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { useQuery } from "@tanstack/react-query";
-import { Product } from "@/components/configurator/types";
-import { ProductGrid } from "./components/ProductGrid";
+import { Benefits } from "@/components/Benefits";
+import { PremiumProductsSection } from "./components/PremiumProductsSection";
 import { CallToAction } from "./components/CallToAction";
 import { RegistrationOverlay } from "./components/registration/RegistrationOverlay";
-import { Benefits } from "@/components/Benefits";
 
 export const ProductShowcase = () => {
   const location = useLocation();
@@ -172,16 +170,7 @@ export const ProductShowcase = () => {
           </Card>
         </div>
 
-        {/* Products Section */}
-        <section className="py-12">
-          <h2 className="text-3xl font-bold text-center mb-8">
-            Premium Komponenten für Ihre Anlage
-          </h2>
-          <ProductGrid 
-            products={products} 
-            onConsultationRequest={handleConsultationRequest}
-          />
-        </section>
+        <PremiumProductsSection onConsultationRequest={handleConsultationRequest} />
 
         <CallToAction 
           onQuoteRequest={handleQuoteRequest}
@@ -194,7 +183,7 @@ export const ProductShowcase = () => {
         </div>
       </div>
 
-      {!isAuthenticated && (
+      {!isAuthenticated && showLeadForm && (
         <RegistrationOverlay 
           onComplete={() => setIsAuthenticated(true)} 
           metrics={metrics}
