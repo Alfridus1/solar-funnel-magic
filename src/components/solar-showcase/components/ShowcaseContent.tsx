@@ -43,7 +43,6 @@ export const ShowcaseContent = ({
         <Card className="p-4 md:p-6 lg:p-8 bg-white/90 backdrop-blur shadow-lg rounded-2xl">
           <div className="space-y-6 lg:space-y-8">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <h1 className="text-xl md:text-2xl font-bold text-gray-900">Ihre Solar-Analyse</h1>
             </div>
 
             <SavingsCalculator yearlyProduction={Math.round(metrics.kWp * 950)} />
