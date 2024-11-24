@@ -76,7 +76,6 @@ export const EmployeeFormFields = ({ form }: EmployeeFormFieldsProps) => {
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                <SelectItem value="customer">Kunde</SelectItem>
                 <SelectItem value="sales_employee">Vertriebsmitarbeiter</SelectItem>
                 <SelectItem value="external_sales">Externer Vertrieb</SelectItem>
                 <SelectItem value="customer_service">Kundenservice</SelectItem>
