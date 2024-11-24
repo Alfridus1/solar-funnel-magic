@@ -19,11 +19,13 @@ export const ProductShowcase = () => {
   const [formType, setFormType] = useState<"quote" | "consultation" | null>(null);
   const { toast } = useToast();
   
-  const { metrics, address } = location.state || {};
+  // Try to get metrics and address from location state or localStorage
+  const metrics = location.state?.metrics || JSON.parse(localStorage.getItem('solarMetrics') || 'null');
+  const address = location.state?.address || localStorage.getItem('solarAddress');
 
   useEffect(() => {
-    // Only redirect if there are no metrics in the state
-    if (!location.state || !metrics) {
+    // Only redirect if there are no metrics in both state and localStorage
+    if (!metrics) {
       toast({
         title: "Keine Daten vorhanden",
         description: "Bitte starten Sie den Prozess von vorne.",
@@ -45,7 +47,7 @@ export const ProductShowcase = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, metrics, location.state, toast]);
+  }, [navigate, metrics, toast]);
 
   const { data: products = [] } = useQuery({
     queryKey: ['solar-products'],

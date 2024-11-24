@@ -38,7 +38,15 @@ export const LoginDialog = ({ open, onOpenChange, metrics, address }: LoginDialo
         
         onOpenChange(false);
         
-        // Navigate to solar-showcase with metrics and address if they exist
+        // Store metrics and address in localStorage before navigation
+        if (metrics) {
+          localStorage.setItem('solarMetrics', JSON.stringify(metrics));
+        }
+        if (address) {
+          localStorage.setItem('solarAddress', address);
+        }
+        
+        // Navigate to solar-showcase
         navigate("/solar-showcase", { 
           state: { metrics, address },
           replace: true 
