@@ -7,12 +7,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Employee } from "../types/employee";
 import { EmployeeFormFields } from "./EmployeeFormFields";
+import { EmployeeProfileForm } from "./EmployeeProfileForm";
 import { EmployeeFormData, employeeFormSchema } from "../types/employeeForm";
 
 interface EmployeeDialogProps {
@@ -64,7 +66,6 @@ export const EmployeeDialog = ({
     try {
       let profileId;
 
-      // Check if a profile with this email already exists
       const { data: existingProfile, error: checkError } = await supabase
         .from('profiles')
         .select('id')
@@ -74,7 +75,6 @@ export const EmployeeDialog = ({
       if (checkError && checkError.code !== 'PGRST116') throw checkError;
 
       if (employee) {
-        // Update existing profile
         const { error: profileError } = await supabase
           .from('profiles')
           .update({
@@ -90,10 +90,8 @@ export const EmployeeDialog = ({
         profileId = employee.profile_id;
       } else {
         if (existingProfile) {
-          // Use existing profile
           profileId = existingProfile.id;
         } else {
-          // Create new profile
           const { data: profileData, error: profileError } = await supabase
             .from('profiles')
             .insert({
@@ -111,9 +109,7 @@ export const EmployeeDialog = ({
         }
       }
 
-      // Handle employee record
       if (employee) {
-        // Update existing employee
         const { error: employeeError } = await supabase
           .from('employees')
           .update({
@@ -126,7 +122,6 @@ export const EmployeeDialog = ({
 
         if (employeeError) throw employeeError;
       } else {
-        // Create new employee
         const { error: employeeError } = await supabase
           .from('employees')
           .insert({
@@ -159,25 +154,38 @@ export const EmployeeDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>
             {employee ? "Mitarbeiter bearbeiten" : "Neuer Mitarbeiter"}
           </DialogTitle>
         </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <EmployeeFormFields form={form} />
-            <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Abbrechen
-              </Button>
-              <Button type="submit">
-                {employee ? "Speichern" : "Erstellen"}
-              </Button>
-            </div>
-          </form>
-        </Form>
+        <Tabs defaultValue="basic">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="basic">Basisdaten</TabsTrigger>
+            {employee && <TabsTrigger value="profile">Profil</TabsTrigger>}
+          </TabsList>
+          <TabsContent value="basic">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <EmployeeFormFields form={form} />
+                <div className="flex justify-end gap-2">
+                  <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                    Abbrechen
+                  </Button>
+                  <Button type="submit">
+                    {employee ? "Speichern" : "Erstellen"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </TabsContent>
+          {employee && (
+            <TabsContent value="profile">
+              <EmployeeProfileForm employeeId={employee.id} />
+            </TabsContent>
+          )}
+        </Tabs>
       </DialogContent>
     </Dialog>
   );

@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UseFormReturn } from "react-hook-form";
 import { EmployeeFormData } from "../types/employeeForm";
+import { roleTranslations } from "@/utils/roleTranslations";
 
 interface EmployeeFormFieldsProps {
   form: UseFormReturn<EmployeeFormData>;
@@ -76,18 +77,11 @@ export const EmployeeFormFields = ({ form }: EmployeeFormFieldsProps) => {
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                <SelectItem value="sales_employee">Vertriebsmitarbeiter</SelectItem>
-                <SelectItem value="external_sales">Externer Vertrieb</SelectItem>
-                <SelectItem value="customer_service">Kundenservice</SelectItem>
-                <SelectItem value="planning">Planung</SelectItem>
-                <SelectItem value="accountant">Buchhaltung</SelectItem>
-                <SelectItem value="construction_manager">Bauleiter</SelectItem>
-                <SelectItem value="installation_manager">Montageleiter</SelectItem>
-                <SelectItem value="installer">Monteur</SelectItem>
-                <SelectItem value="executive">Geschäftsführung</SelectItem>
-                <SelectItem value="admin">Administrator</SelectItem>
-                <SelectItem value="sales_team_leader">Vertriebsleiter</SelectItem>
-                <SelectItem value="sales_director">Vertriebsdirektor</SelectItem>
+                {Object.entries(roleTranslations).map(([value, label]) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <FormMessage />

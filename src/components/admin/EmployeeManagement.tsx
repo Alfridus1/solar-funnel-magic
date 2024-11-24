@@ -6,6 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { UserPlus, FileEdit, Trash2 } from "lucide-react";
 import { EmployeeDialog } from "./components/EmployeeDialog";
 import { Employee } from "./types/employee";
+import { roleTranslations } from "@/utils/roleTranslations";
 
 export const EmployeeManagement = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -100,7 +101,7 @@ export const EmployeeManagement = () => {
                 {employee.profiles?.first_name} {employee.profiles?.last_name}
               </TableCell>
               <TableCell>{employee.profiles?.email}</TableCell>
-              <TableCell>{employee.role}</TableCell>
+              <TableCell>{roleTranslations[employee.role] || employee.role}</TableCell>
               <TableCell>{employee.team_id || '-'}</TableCell>
               <TableCell>
                 <div className="flex gap-2">

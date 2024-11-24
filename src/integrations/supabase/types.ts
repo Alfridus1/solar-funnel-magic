@@ -216,42 +216,113 @@ export type Database = {
         }
         Relationships: []
       }
+      employee_devices: {
+        Row: {
+          created_at: string | null
+          device_name: string
+          device_type: string
+          employee_id: string | null
+          id: string
+          issued_date: string | null
+          notes: string | null
+          return_date: string | null
+          serial_number: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          device_name: string
+          device_type: string
+          employee_id?: string | null
+          id?: string
+          issued_date?: string | null
+          notes?: string | null
+          return_date?: string | null
+          serial_number?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          device_name?: string
+          device_type?: string
+          employee_id?: string | null
+          id?: string
+          issued_date?: string | null
+          notes?: string | null
+          return_date?: string | null
+          serial_number?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_devices_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employees: {
         Row: {
+          address: string | null
+          base_salary: number | null
+          commission_enabled: boolean | null
           created_at: string | null
           email: string
           first_name: string
+          has_company_car: boolean | null
+          hours_per_month: number | null
+          iban: string | null
           id: string
           last_name: string
+          location: string | null
           personio_id: string | null
           profile_id: string | null
           role: string
           team_id: string | null
           updated_at: string | null
+          vacation_days: number | null
         }
         Insert: {
+          address?: string | null
+          base_salary?: number | null
+          commission_enabled?: boolean | null
           created_at?: string | null
           email: string
           first_name: string
+          has_company_car?: boolean | null
+          hours_per_month?: number | null
+          iban?: string | null
           id?: string
           last_name: string
+          location?: string | null
           personio_id?: string | null
           profile_id?: string | null
           role: string
           team_id?: string | null
           updated_at?: string | null
+          vacation_days?: number | null
         }
         Update: {
+          address?: string | null
+          base_salary?: number | null
+          commission_enabled?: boolean | null
           created_at?: string | null
           email?: string
           first_name?: string
+          has_company_car?: boolean | null
+          hours_per_month?: number | null
+          iban?: string | null
           id?: string
           last_name?: string
+          location?: string | null
           personio_id?: string | null
           profile_id?: string | null
           role?: string
           team_id?: string | null
           updated_at?: string | null
+          vacation_days?: number | null
         }
         Relationships: [
           {
