@@ -2,10 +2,10 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { UseFormReturn } from "react-hook-form";
-import { EmployeeFormData } from "../../types/employeeForm";
+import { EmployeeProfileData } from "../../types/employeeForm";
 
 interface WorkScheduleFieldsProps {
-  form: UseFormReturn<EmployeeFormData>;
+  form: UseFormReturn<EmployeeProfileData>;
 }
 
 export const WorkScheduleFields = ({ form }: WorkScheduleFieldsProps) => {

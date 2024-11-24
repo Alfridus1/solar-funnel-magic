@@ -1,18 +1,21 @@
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import { Employee } from "../types/employee";
 import { EmployeeFormFields } from "./EmployeeFormFields";
-import { useForm } from "react-hook-form";
+import { EmployeeProfileForm } from "./EmployeeProfileForm";
 import { EmployeeFormData, employeeFormSchema } from "../types/employeeForm";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
-import { LogIn } from "lucide-react";
 
 interface EmployeeDialogProps {
   employee: Employee | null;
@@ -30,69 +33,50 @@ export const EmployeeDialog = ({
   const { toast } = useToast();
   const form = useForm<EmployeeFormData>({
     resolver: zodResolver(employeeFormSchema),
-    defaultValues: employee?.profiles ? {
-      first_name: employee.profiles.first_name,
-      last_name: employee.profiles.last_name,
-      email: employee.profiles.email,
-      phone: employee.profiles.phone || "",
-      role: employee.role as EmployeeFormData["role"],
-      address: employee.address || "",
-      location: employee.location || "",
-      iban: employee.iban || "",
-      base_salary: employee.base_salary || 0,
-      commission_enabled: employee.commission_enabled || false,
-      vacation_days: employee.vacation_days || 30,
-      hours_per_month: employee.hours_per_month || 160,
-      has_company_car: employee.has_company_car || false,
-    } : {
+    defaultValues: {
       first_name: "",
       last_name: "",
       email: "",
+      role: "sales_employee",
       phone: "",
-      role: "employee" as EmployeeFormData["role"],
-      address: "",
-      location: "",
-      iban: "",
-      base_salary: 0,
-      commission_enabled: false,
-      vacation_days: 30,
-      hours_per_month: 160,
-      has_company_car: false,
     },
   });
 
-  const handleLoginAs = async () => {
-    if (!employee?.profiles?.email) return;
-
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+  useEffect(() => {
+    if (employee && employee.profiles) {
+      form.reset({
+        first_name: employee.profiles.first_name,
+        last_name: employee.profiles.last_name,
         email: employee.profiles.email,
-        password: 'Coppen2023!'
+        role: employee.role as EmployeeFormData["role"],
+        phone: employee.profiles.phone || "",
       });
-
-      if (error) throw error;
-
-      toast({
-        title: "Erfolgreich eingeloggt",
-        description: `Sie sind jetzt als ${employee.profiles.email} eingeloggt.`,
-      });
-
-      window.location.href = '/';
-    } catch (error: any) {
-      toast({
-        title: "Login fehlgeschlagen",
-        description: error.message,
-        variant: "destructive",
+    } else {
+      form.reset({
+        first_name: "",
+        last_name: "",
+        email: "",
+        role: "sales_employee",
+        phone: "",
       });
     }
-  };
+  }, [employee, form]);
 
   const onSubmit = async (data: EmployeeFormData) => {
     try {
       let profileId;
 
+      // Check if a user with this email already exists
+      const { data: existingProfile, error: checkError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', data.email)
+        .single();
+
+      if (checkError && checkError.code !== 'PGRST116') throw checkError;
+
       if (!employee) {
-        // Create new user
+        // Create auth user with default password for new employees
         const { data: authData, error: authError } = await supabase.auth.admin.createUser({
           email: data.email,
           password: "Coppen2023!",
@@ -100,23 +84,9 @@ export const EmployeeDialog = ({
         });
 
         if (authError) throw authError;
+      }
 
-        // Create profile
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            first_name: data.first_name,
-            last_name: data.last_name,
-            email: data.email,
-            phone: data.phone,
-          })
-          .select()
-          .single();
-
-        if (profileError) throw profileError;
-        profileId = profileData.id;
-      } else {
-        // Update existing profile
+      if (employee) {
         const { error: profileError } = await supabase
           .from('profiles')
           .update({
@@ -124,58 +94,71 @@ export const EmployeeDialog = ({
             last_name: data.last_name,
             email: data.email,
             phone: data.phone,
+            role: data.role,
           })
           .eq('id', employee.profile_id);
 
         if (profileError) throw profileError;
         profileId = employee.profile_id;
+      } else {
+        if (existingProfile) {
+          profileId = existingProfile.id;
+        } else {
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .insert({
+              first_name: data.first_name,
+              last_name: data.last_name,
+              email: data.email,
+              phone: data.phone,
+              role: data.role,
+            })
+            .select()
+            .single();
+
+          if (profileError) throw profileError;
+          profileId = profileData.id;
+        }
       }
 
-      // Create or update employee
-      const employeeData = {
-        profile_id: profileId,
-        role: data.role,
-        address: data.address,
-        location: data.location,
-        iban: data.iban,
-        base_salary: data.base_salary,
-        commission_enabled: data.commission_enabled,
-        vacation_days: data.vacation_days,
-        hours_per_month: data.hours_per_month,
-        has_company_car: data.has_company_car,
-        first_name: data.first_name,
-        last_name: data.last_name,
-        email: data.email,
-      };
-
       if (employee) {
-        const { error } = await supabase
+        const { error: employeeError } = await supabase
           .from('employees')
-          .update(employeeData)
+          .update({
+            role: data.role,
+            email: data.email,
+            first_name: data.first_name,
+            last_name: data.last_name,
+          })
           .eq('id', employee.id);
 
-        if (error) throw error;
+        if (employeeError) throw employeeError;
       } else {
-        const { error } = await supabase
+        const { error: employeeError } = await supabase
           .from('employees')
-          .insert([employeeData]);
+          .insert({
+            profile_id: profileId,
+            role: data.role,
+            email: data.email,
+            first_name: data.first_name,
+            last_name: data.last_name,
+          });
 
-        if (error) throw error;
+        if (employeeError) throw employeeError;
       }
 
       toast({
-        title: employee ? "Mitarbeiter aktualisiert" : "Mitarbeiter angelegt",
-        description: `${data.first_name} ${data.last_name} wurde erfolgreich ${
-          employee ? "aktualisiert" : "angelegt"
-        }.`,
+        title: employee ? "Mitarbeiter aktualisiert" : "Mitarbeiter erstellt",
+        description: "Die Änderungen wurden erfolgreich gespeichert.",
       });
 
       onSuccess();
       onOpenChange(false);
     } catch (error: any) {
+      console.error('Error:', error);
       toast({
         title: "Fehler",
-        description: error.message,
+        description: error.message || "Ein unerwarteter Fehler ist aufgetreten",
         variant: "destructive",
       });
     }
@@ -189,27 +172,32 @@ export const EmployeeDialog = ({
             {employee ? "Mitarbeiter bearbeiten" : "Neuer Mitarbeiter"}
           </DialogTitle>
         </DialogHeader>
-
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <EmployeeFormFields form={form} />
-          
-          <div className="flex justify-between items-center">
-            <Button type="submit">
-              {employee ? "Aktualisieren" : "Anlegen"}
-            </Button>
-            
-            {employee && (
-              <Button 
-                type="button"
-                onClick={handleLoginAs}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                <LogIn className="mr-2 h-4 w-4" />
-                Als dieser Mitarbeiter einloggen
-              </Button>
-            )}
-          </div>
-        </form>
+        <Tabs defaultValue="basic">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="basic">Basisdaten</TabsTrigger>
+            {employee && <TabsTrigger value="profile">Profil</TabsTrigger>}
+          </TabsList>
+          <TabsContent value="basic">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <EmployeeFormFields form={form} />
+                <div className="flex justify-end gap-2">
+                  <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                    Abbrechen
+                  </Button>
+                  <Button type="submit">
+                    {employee ? "Speichern" : "Erstellen"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </TabsContent>
+          {employee && (
+            <TabsContent value="profile">
+              <EmployeeProfileForm employeeId={employee.id} />
+            </TabsContent>
+          )}
+        </Tabs>
       </DialogContent>
     </Dialog>
   );
