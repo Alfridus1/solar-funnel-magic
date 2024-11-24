@@ -70,6 +70,20 @@ export const ProductShowcase = () => {
     }
   });
 
+  const handleQuoteRequest = () => {
+    toast({
+      title: "Anfrage gesendet",
+      description: "Wir werden uns in Kürze bei Ihnen melden.",
+    });
+  };
+
+  const handleConsultationRequest = () => {
+    toast({
+      title: "Beratungstermin angefragt",
+      description: "Wir werden uns in Kürze bei Ihnen melden.",
+    });
+  };
+
   if (!metrics) return null;
 
   return (
@@ -84,6 +98,8 @@ export const ProductShowcase = () => {
               products={products}
               priceSettings={priceSettings}
               isAuthenticated={isAuthenticated}
+              onQuoteRequest={handleQuoteRequest}
+              onConsultationRequest={handleConsultationRequest}
             />
           </div>
           

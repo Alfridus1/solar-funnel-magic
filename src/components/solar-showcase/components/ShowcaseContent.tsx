@@ -33,8 +33,8 @@ export const ShowcaseContent = ({
     <div className={`space-y-8 ${!isAuthenticated ? 'blur-md' : ''}`}>
       <MetricsHeader metrics={metrics} address={address} />
       <SystemVisualizer metrics={metrics} />
-      <ProductGrid products={products} />
-      <PremiumProductsSection />
+      <ProductGrid products={products} onConsultationRequest={onConsultationRequest} />
+      <PremiumProductsSection onConsultationRequest={onConsultationRequest} />
       <PricingOptions priceSettings={priceSettings} metrics={metrics} />
       <ClimateEffects metrics={metrics} />
       <CallToAction onQuoteRequest={onQuoteRequest} onConsultationRequest={onConsultationRequest} />
