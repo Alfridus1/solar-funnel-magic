@@ -42,77 +42,81 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
 
   return (
     <div className="w-full xl:w-3/4 mx-auto space-y-8 p-8 bg-gradient-to-br from-blue-50 to-white rounded-2xl shadow-lg">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <Card className="p-8 bg-white/90 backdrop-blur transition-all hover:shadow-lg">
-          <div className="space-y-8">
-            <div className="space-y-4">
-              <div className="flex justify-between">
-                <Label htmlFor="consumption" className="text-lg font-medium">Jahresverbrauch</Label>
-                <span className="text-xl font-semibold text-blue-600">{yearlyConsumption.toLocaleString()} kWh</span>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
+          <Card className="p-8 bg-white/90 backdrop-blur transition-all hover:shadow-lg">
+            <div className="space-y-8">
+              <div className="space-y-4">
+                <div className="flex justify-between">
+                  <Label htmlFor="consumption" className="text-lg font-medium">Jahresverbrauch</Label>
+                  <span className="text-xl font-semibold text-blue-600">{yearlyConsumption.toLocaleString()} kWh</span>
+                </div>
+                <Slider
+                  id="consumption"
+                  min={2000}
+                  max={15000}
+                  step={100}
+                  value={[yearlyConsumption]}
+                  onValueChange={(value) => setYearlyConsumption(value[0])}
+                  className="w-full"
+                />
               </div>
-              <Slider
-                id="consumption"
-                min={2000}
-                max={15000}
-                step={100}
-                value={[yearlyConsumption]}
-                onValueChange={(value) => setYearlyConsumption(value[0])}
-                className="w-full"
-              />
-            </div>
 
-            <div className="space-y-4">
-              <div className="flex justify-between">
-                <Label htmlFor="electricity-price" className="text-lg font-medium">Strompreis</Label>
-                <span className="text-xl font-semibold text-blue-600">{electricityPrice.toFixed(2)}€/kWh</span>
+              <div className="space-y-4">
+                <div className="flex justify-between">
+                  <Label htmlFor="electricity-price" className="text-lg font-medium">Strompreis</Label>
+                  <span className="text-xl font-semibold text-blue-600">{electricityPrice.toFixed(2)}€/kWh</span>
+                </div>
+                <Slider
+                  id="electricity-price"
+                  min={0.20}
+                  max={0.60}
+                  step={0.01}
+                  value={[electricityPrice]}
+                  onValueChange={(value) => setElectricityPrice(value[0])}
+                  className="w-full"
+                />
               </div>
-              <Slider
-                id="electricity-price"
-                min={0.20}
-                max={0.60}
-                step={0.01}
-                value={[electricityPrice]}
-                onValueChange={(value) => setElectricityPrice(value[0])}
-                className="w-full"
-              />
             </div>
-          </div>
-        </Card>
+          </Card>
+        </div>
 
-        <Card className="p-8 bg-white/90 backdrop-blur transition-all hover:shadow-lg">
-          <div className="space-y-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-blue-100">
-                <Battery className="h-6 w-6 text-blue-600" />
+        <div>
+          <Card className="p-8 bg-white/90 backdrop-blur transition-all hover:shadow-lg">
+            <div className="space-y-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-full bg-blue-100">
+                  <Battery className="h-6 w-6 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Speichergröße</p>
+                  <p className="text-xl font-semibold">{batterySize} kWh</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-gray-600">Speichergröße</p>
-                <p className="text-xl font-semibold">{batterySize} kWh</p>
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-full bg-green-100">
+                  <Sun className="h-6 w-6 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Eigenverbrauch</p>
+                  <p className="text-xl font-semibold">{Math.round(selfConsumedEnergy).toLocaleString()} kWh</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-full bg-orange-100">
+                  <Home className="h-6 w-6 text-orange-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Netzeinspeisung</p>
+                  <p className="text-xl font-semibold">{Math.round(feedInEnergy).toLocaleString()} kWh</p>
+                </div>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-green-100">
-                <Sun className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Eigenverbrauch</p>
-                <p className="text-xl font-semibold">{Math.round(selfConsumedEnergy).toLocaleString()} kWh</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-orange-100">
-                <Home className="h-6 w-6 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Netzeinspeisung</p>
-                <p className="text-xl font-semibold">{Math.round(feedInEnergy).toLocaleString()} kWh</p>
-              </div>
-            </div>
-          </div>
-        </Card>
+          </Card>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="p-6 bg-gradient-to-br from-blue-50 to-white transition-all hover:shadow-lg">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-3 bg-blue-100 rounded-xl">
