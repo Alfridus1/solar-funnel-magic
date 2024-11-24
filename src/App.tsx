@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { Login } from "@/pages/Login";
 import { EmployeeLogin } from "@/pages/EmployeeLogin";
 import { AdminDashboard } from "@/pages/admin/Dashboard";
+import { EmployeeDashboard } from "@/pages/employee/Dashboard";
 import { CustomerDashboard } from "@/components/dashboard/CustomerDashboard";
 import { Toaster } from "@/components/ui/toaster";
 import { Index } from "@/pages/Index";
@@ -45,6 +46,11 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/employee-login" element={<EmployeeLogin />} />
         <Route path="/admin/*" element={<AdminDashboard />} />
+        <Route path="/employee/*" element={
+          <ProtectedRoute>
+            <EmployeeDashboard />
+          </ProtectedRoute>
+        } />
         <Route 
           path="/dashboard/*" 
           element={
