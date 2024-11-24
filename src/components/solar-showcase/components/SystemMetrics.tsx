@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Sun, Home, Zap, Battery } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface SystemMetricsProps {
   moduleCount: number;
@@ -9,47 +10,62 @@ interface SystemMetricsProps {
 }
 
 export const SystemMetrics = ({ moduleCount, kWp, annualProduction, roofArea }: SystemMetricsProps) => {
-  // Berechne kWp direkt aus der Modulanzahl (jedes Modul = 0,5 kWp)
-  const calculatedKWp = moduleCount * 0.5;
   const co2Savings = Math.round(annualProduction * 0.69); // 690g = 0.69kg CO₂-Äquivalente pro kWh
 
+  const metrics = [
+    {
+      icon: Sun,
+      title: "Dachfläche",
+      value: `${roofArea}m²`,
+      subtitle: "Nutzbare Fläche",
+      color: "text-amber-600",
+      bgColor: "from-amber-50",
+    },
+    {
+      icon: Home,
+      title: "Module",
+      value: `${moduleCount} Stück`,
+      subtitle: "500W Full Black",
+      color: "text-blue-600",
+      bgColor: "from-blue-50",
+    },
+    {
+      icon: Zap,
+      title: "Anlagengröße",
+      value: `${kWp.toFixed(1)} kWp`,
+      subtitle: "Gesamtleistung",
+      color: "text-emerald-600",
+      bgColor: "from-emerald-50",
+    },
+    {
+      icon: Battery,
+      title: "Jahresertrag",
+      value: `${annualProduction.toLocaleString()} kWh`,
+      subtitle: `${co2Savings.toLocaleString()} kg CO₂/Jahr`,
+      color: "text-purple-600",
+      bgColor: "from-purple-50",
+    },
+  ];
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <Card className="bg-gradient-to-br from-amber-50 to-white p-4 rounded-xl">
-        <div className="flex items-center gap-2 text-amber-600 mb-2">
-          <Sun className="h-5 w-5" />
-          <span className="text-sm font-medium">Dachfläche</span>
-        </div>
-        <p className="text-2xl font-bold">{roofArea}m²</p>
-        <p className="text-sm text-gray-600">Nutzbare Fläche</p>
-      </Card>
-
-      <Card className="bg-gradient-to-br from-blue-50 to-white p-4 rounded-xl">
-        <div className="flex items-center gap-2 text-blue-600 mb-2">
-          <Home className="h-5 w-5" />
-          <span className="text-sm font-medium">Module</span>
-        </div>
-        <p className="text-2xl font-bold">{moduleCount} Stück</p>
-        <p className="text-sm text-gray-600">500W Full Black</p>
-      </Card>
-
-      <Card className="bg-gradient-to-br from-emerald-50 to-white p-4 rounded-xl">
-        <div className="flex items-center gap-2 text-emerald-600 mb-2">
-          <Zap className="h-5 w-5" />
-          <span className="text-sm font-medium">Anlagengröße</span>
-        </div>
-        <p className="text-2xl font-bold">{calculatedKWp.toFixed(1)} kWp</p>
-        <p className="text-sm text-gray-600">Gesamtleistung</p>
-      </Card>
-
-      <Card className="bg-gradient-to-br from-purple-50 to-white p-4 rounded-xl">
-        <div className="flex items-center gap-2 text-purple-600 mb-2">
-          <Battery className="h-5 w-5" />
-          <span className="text-sm font-medium">Jahresertrag</span>
-        </div>
-        <p className="text-2xl font-bold">{annualProduction} kWh</p>
-        <p className="text-sm text-gray-600">{co2Savings} kg CO₂-Äquivalente/Jahr</p>
-      </Card>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {metrics.map((metric, index) => (
+        <motion.div
+          key={index}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 }}
+        >
+          <Card className={`bg-gradient-to-br ${metric.bgColor} to-white p-4 rounded-xl hover:shadow-md transition-shadow`}>
+            <div className={`flex items-center gap-2 ${metric.color} mb-2`}>
+              <metric.icon className="h-5 w-5" />
+              <span className="text-sm font-medium">{metric.title}</span>
+            </div>
+            <p className="text-2xl font-bold">{metric.value}</p>
+            <p className="text-sm text-gray-600">{metric.subtitle}</p>
+          </Card>
+        </motion.div>
+      ))}
     </div>
   );
 };

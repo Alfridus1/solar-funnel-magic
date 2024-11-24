@@ -25,7 +25,7 @@ export const ProductShowcase = () => {
   
   const { metrics, address } = location.state || {};
 
-  const { data: products = [] } = useQuery<Product[]>({
+  const { data: products = [] } = useQuery({
     queryKey: ['solar-products'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -67,10 +67,6 @@ export const ProductShowcase = () => {
     return null;
   }
 
-  const moduleCount = Math.round(metrics.kWp * 2);
-  const annualProduction = Math.round(metrics.kWp * 950);
-  const estimatedPrice = Math.round(metrics.kWp * 1950);
-
   const handleQuoteRequest = () => {
     if (!isAuthenticated) {
       setFormType("quote");
@@ -96,48 +92,93 @@ export const ProductShowcase = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F75c03]/5 to-white">
-      <div className="relative">
-        <HeroImage />
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-solar-blue-50 to-white">
+      <HeroImage />
 
-      <div className="container mx-auto px-4 py-8">
-        <Card className="max-w-4xl mx-auto mb-8 p-8 bg-white/90 backdrop-blur shadow-lg">
+      <div className="container mx-auto px-4 py-8 space-y-16">
+        {/* Analysis Card */}
+        <Card className="max-w-4xl mx-auto p-8 bg-white/90 backdrop-blur shadow-lg rounded-2xl">
           <div className="space-y-8">
-            <div className="flex justify-between items-center">
-              <h1 className="text-2xl font-bold">Ihre Solar-Analyse</h1>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <h1 className="text-2xl font-bold text-gray-900">Ihre Solar-Analyse</h1>
               <PDFDownloadButton metrics={metrics} address={address} />
             </div>
 
             <SystemMetrics
-              moduleCount={moduleCount}
+              moduleCount={Math.round(metrics.kWp * 2)}
               kWp={metrics.kWp}
-              annualProduction={annualProduction}
+              annualProduction={Math.round(metrics.kWp * 950)}
               roofArea={metrics.roofArea}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <SavingsCalculator yearlyProduction={annualProduction} />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <SavingsCalculator yearlyProduction={Math.round(metrics.kWp * 950)} />
             </div>
-
-            <section className="py-12">
-              <h2 className="text-3xl font-bold text-center mb-8">
-                Unsere Produkte für Sie
-              </h2>
-              <ProductGrid 
-                products={products} 
-                onConsultationRequest={handleConsultationRequest}
-              />
-            </section>
-
-            <CallToAction 
-              onQuoteRequest={handleQuoteRequest}
-              onConsultationRequest={handleConsultationRequest}
-            />
           </div>
         </Card>
 
-        <div className="max-w-4xl mx-auto">
+        {/* Products Section */}
+        <section className="py-12">
+          <h2 className="text-3xl font-bold text-center mb-8">
+            Premium Komponenten für Ihre Anlage
+          </h2>
+          <ProductGrid 
+            products={products} 
+            onConsultationRequest={handleConsultationRequest}
+          />
+        </section>
+
+        {/* Services Overview */}
+        <section className="py-12 bg-white/80 backdrop-blur rounded-2xl shadow-sm">
+          <div className="max-w-4xl mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center mb-12">
+              Unser Rundum-Sorglos-Paket
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold text-solar-orange">Installation & Hardware</h3>
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-solar-orange" />
+                    <span>Komplette DC Installation auf dem Dach</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-solar-orange" />
+                    <span>Neuer Zählerschrank nach aktuellen Standards</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-solar-orange" />
+                    <span>Professionelle AC Installation</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold text-solar-orange">Service & Bürokratie</h3>
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-solar-orange" />
+                    <span>Anmeldung beim Netzbetreiber</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-solar-orange" />
+                    <span>Marktstammdatenregister-Eintrag</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-solar-orange" />
+                    <span>Inbetriebnahme & Einweisung</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <CallToAction 
+          onQuoteRequest={handleQuoteRequest}
+          onConsultationRequest={handleConsultationRequest}
+        />
+
+        <div className="max-w-4xl mx-auto space-y-16">
           <Testimonials />
           <FAQ />
         </div>
