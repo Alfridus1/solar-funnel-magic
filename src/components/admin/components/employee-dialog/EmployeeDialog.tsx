@@ -9,13 +9,13 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Form } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Employee } from "../../types/employee";
 import { EmployeeFormData, employeeFormSchema } from "../../types/employeeForm";
-import { BasicInfoTab } from "./BasicInfoTab";
-import { ProfileTab } from "./ProfileTab";
+import { BasicInfoTab } from "./tabs/BasicInfoTab";
+import { ContractTab } from "./tabs/ContractTab";
+import { AccessControlTab } from "./tabs/AccessControlTab";
 
 interface EmployeeDialogProps {
   employee: Employee | null;
@@ -159,28 +159,33 @@ export const EmployeeDialog = ({
           </DialogTitle>
         </DialogHeader>
         <Tabs defaultValue="basic" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="basic">Basisdaten</TabsTrigger>
-            {employee && <TabsTrigger value="profile">Profil</TabsTrigger>}
+            {employee && <TabsTrigger value="contract">Vertrag</TabsTrigger>}
+            {employee && <TabsTrigger value="access">Berechtigungen</TabsTrigger>}
           </TabsList>
+          
           <TabsContent value="basic">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <BasicInfoTab form={form} />
-                <div className="flex justify-end gap-2">
-                  <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                    Abbrechen
-                  </Button>
-                  <Button type="submit">
-                    {employee ? "Speichern" : "Erstellen"}
-                  </Button>
-                </div>
+                <BasicInfoTab 
+                  form={form} 
+                  onCancel={() => onOpenChange(false)}
+                  isEditing={!!employee}
+                />
               </form>
             </Form>
           </TabsContent>
+
           {employee && (
-            <TabsContent value="profile">
-              <ProfileTab employeeId={employee.id} />
+            <TabsContent value="contract">
+              <ContractTab employeeId={employee.id} />
+            </TabsContent>
+          )}
+
+          {employee && (
+            <TabsContent value="access">
+              <AccessControlTab employeeId={employee.id} />
             </TabsContent>
           )}
         </Tabs>
