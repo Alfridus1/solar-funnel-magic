@@ -1,15 +1,9 @@
-import { useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
 
 interface LoginDialogProps {
   open: boolean;
@@ -20,34 +14,54 @@ interface LoginDialogProps {
 
 export const LoginDialog = ({ open, onOpenChange, metrics, address }: LoginDialogProps) => {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN") {
-        toast({
-          title: "Erfolgreich angemeldet",
-          description: "Sie wurden erfolgreich angemeldet.",
-        });
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === "SIGNED_IN" && session) {
+      setIsLoading(true);
+      
+      // Create a profile for the user if it doesn't exist
+      supabase.from('profiles').upsert({
+        id: session.user.id,
+        email: session.user.email,
+        first_name: "",
+        last_name: "",
+        phone: "",
+        role: "customer"
+      }).then(({ error }) => {
+        setIsLoading(false);
+        
+        if (error) {
+          console.error("Error creating profile:", error);
+          return;
+        }
+        
         onOpenChange(false);
         
-        // Always navigate to solar-showcase with metrics and address if they exist
+        // Navigate to solar-showcase with metrics and address if they exist
         navigate("/solar-showcase", { 
-          state: metrics && address ? { metrics, address } : undefined,
+          state: { metrics, address },
           replace: true 
         });
-      }
-    });
+      });
+    }
+  });
 
-    return () => subscription.unsubscribe();
-  }, [navigate, onOpenChange, toast, metrics, address]);
+  if (isLoading) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-md">
+          <div className="flex items-center justify-center p-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-solar-orange"></div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Anmelden oder Registrieren</DialogTitle>
-        </DialogHeader>
+      <DialogContent className="sm:max-w-md">
         <Auth
           supabaseClient={supabase}
           appearance={{
@@ -55,29 +69,29 @@ export const LoginDialog = ({ open, onOpenChange, metrics, address }: LoginDialo
             variables: {
               default: {
                 colors: {
-                  brand: '#f97316',
-                  brandAccent: '#ea580c',
+                  brand: '#F75C03',
+                  brandAccent: '#d94f02',
                 }
               }
-            },
-            className: {
-              container: 'flex-1',
-              button: 'bg-solar-orange hover:bg-solar-orange-600',
-              input: 'rounded-md',
-            },
+            }
           }}
-          providers={[]}
           localization={{
             variables: {
               sign_in: {
-                email_label: 'Email Adresse',
+                email_label: 'E-Mail',
                 password_label: 'Passwort',
                 button_label: 'Anmelden',
+                loading_button_label: 'Anmeldung...',
+                social_provider_text: 'Anmelden mit {{provider}}',
+                link_text: 'Bereits ein Konto? Anmelden',
               },
               sign_up: {
-                email_label: 'Email Adresse',
+                email_label: 'E-Mail',
                 password_label: 'Passwort',
                 button_label: 'Registrieren',
+                loading_button_label: 'Registrierung...',
+                social_provider_text: 'Registrieren mit {{provider}}',
+                link_text: 'Kein Konto? Registrieren',
               },
             },
           }}

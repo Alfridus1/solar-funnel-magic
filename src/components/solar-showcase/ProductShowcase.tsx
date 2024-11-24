@@ -24,6 +24,11 @@ export const ProductShowcase = () => {
   useEffect(() => {
     // Only redirect if there are no metrics in the state
     if (!location.state || !metrics) {
+      toast({
+        title: "Keine Daten vorhanden",
+        description: "Bitte starten Sie den Prozess von vorne.",
+        variant: "destructive"
+      });
       navigate("/");
       return;
     }
@@ -40,7 +45,7 @@ export const ProductShowcase = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, metrics, location.state]);
+  }, [navigate, metrics, location.state, toast]);
 
   const { data: products = [] } = useQuery({
     queryKey: ['solar-products'],
