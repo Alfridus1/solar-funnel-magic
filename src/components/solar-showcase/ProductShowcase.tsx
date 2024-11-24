@@ -14,12 +14,30 @@ const queryClient = new QueryClient();
 export const ProductShowcase = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [showLeadForm, setShowLeadForm] = useState(false);
-  const [formType, setFormType] = useState<"quote" | "consultation" | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { toast } = useToast();
   
   const { metrics, address } = location.state || {};
+
+  useEffect(() => {
+    if (!metrics) {
+      navigate("/");
+      return;
+    }
+
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+    };
+    
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate, metrics]);
 
   const { data: products = [] } = useQuery({
     queryKey: ['solar-products'],
@@ -52,69 +70,26 @@ export const ProductShowcase = () => {
     }
   });
 
-  useEffect(() => {
-    if (!metrics) {
-      navigate("/");
-      return;
-    }
-
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsAuthenticated(!!session);
-    };
-    
-    checkAuth();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setIsAuthenticated(!!session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate, metrics]);
-
   if (!metrics) return null;
-
-  const handleQuoteRequest = () => {
-    if (!isAuthenticated) {
-      setFormType("quote");
-      setShowLeadForm(true);
-    } else {
-      toast({
-        title: "Angebot angefordert",
-        description: "Wir werden uns in Kürze bei Ihnen melden.",
-      });
-    }
-  };
-
-  const handleConsultationRequest = () => {
-    if (!isAuthenticated) {
-      setFormType("consultation");
-      setShowLeadForm(true);
-    } else {
-      toast({
-        title: "Beratung angefordert",
-        description: "Wir werden uns in Kürze bei Ihnen melden.",
-      });
-    }
-  };
 
   return (
     <QueryClientProvider client={queryClient}>
       <ShowcaseLayout>
-        <div className="min-h-screen">
+        <div className="min-h-screen relative">
           <ShowcaseHeader />
-          <ShowcaseContent 
-            metrics={metrics}
-            address={address}
-            products={products}
-            priceSettings={priceSettings}
-            onQuoteRequest={handleQuoteRequest}
-            onConsultationRequest={handleConsultationRequest}
-            isAuthenticated={isAuthenticated}
-          />
-          {!isAuthenticated && showLeadForm && (
+          <div className={`${!isAuthenticated ? 'blur-md' : ''}`}>
+            <ShowcaseContent 
+              metrics={metrics}
+              address={address}
+              products={products}
+              priceSettings={priceSettings}
+              isAuthenticated={isAuthenticated}
+            />
+          </div>
+          
+          {!isAuthenticated && (
             <RegistrationOverlay 
-              onComplete={() => setIsAuthenticated(true)} 
+              onComplete={() => setIsAuthenticated(true)}
               metrics={metrics}
               address={address}
             />
