@@ -5,10 +5,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Copy } from "lucide-react";
+import { Copy, LogIn } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { Profile, AffiliateInfo } from "./types/userManagement";
+import { supabase } from "@/integrations/supabase/client";
 
 interface UserDetailsDialogProps {
   user: Profile | null;
@@ -30,6 +31,33 @@ export const UserDetailsDialog = ({ user, affiliateInfo, onOpenChange }: UserDet
       title: "Link kopiert!",
       description: "Der Affiliate-Link wurde in die Zwischenablage kopiert.",
     });
+  };
+
+  const handleLoginAs = async () => {
+    if (!user?.email) return;
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: 'admin123' // This is temporary and will be changed by the user on first login
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Erfolgreich eingeloggt",
+        description: `Sie sind jetzt als ${user.email} eingeloggt.`,
+      });
+
+      // Redirect to the main page or dashboard
+      window.location.href = '/';
+    } catch (error: any) {
+      toast({
+        title: "Login fehlgeschlagen",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -98,6 +126,14 @@ export const UserDetailsDialog = ({ user, affiliateInfo, onOpenChange }: UserDet
                 <p className="text-sm text-gray-500">Kein Affiliate-Konto</p>
               )}
             </Card>
+
+            <Button 
+              onClick={handleLoginAs}
+              className="w-full bg-blue-600 hover:bg-blue-700"
+            >
+              <LogIn className="mr-2 h-4 w-4" />
+              Als dieser Benutzer einloggen
+            </Button>
           </div>
         )}
       </DialogContent>

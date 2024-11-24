@@ -11,12 +11,15 @@ interface UserTableRowProps {
 
 export const UserTableRow = ({ user, onSelect, onDelete }: UserTableRowProps) => {
   return (
-    <TableRow>
+    <TableRow 
+      className="cursor-pointer hover:bg-gray-50"
+      onClick={() => onSelect(user)}
+    >
       <TableCell>{`${user.first_name} ${user.last_name}`}</TableCell>
       <TableCell>{user.email}</TableCell>
       <TableCell>{user.phone}</TableCell>
       <TableCell>
-        <div className="flex gap-2">
+        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
           <Button
             variant="outline"
             size="sm"
