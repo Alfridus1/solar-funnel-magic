@@ -10,7 +10,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Copy } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Copy, Users, TrendingUp, Calendar } from "lucide-react";
 
 interface Affiliate {
   id: string;
@@ -60,50 +61,110 @@ export const AffiliateManagement = () => {
     });
   };
 
+  // Calculate total stats
+  const totalReferrals = affiliates.reduce((sum, affiliate) => sum + (affiliate.referral_count || 0), 0);
+  const totalLeads = affiliates.reduce((sum, affiliate) => sum + (affiliate.total_leads || 0), 0);
+  const activeAffiliates = affiliates.filter(a => a.referral_count > 0).length;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6 bg-gray-50/50">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold">Affiliate Partner</h2>
+        <h2 className="text-3xl font-bold text-gray-900">Affiliate Partner</h2>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Referral Code</TableHead>
-            <TableHead>Vermittlungen</TableHead>
-            <TableHead>Leads</TableHead>
-            <TableHead>Registriert am</TableHead>
-            <TableHead>Aktionen</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {affiliates.map((affiliate) => (
-            <TableRow key={affiliate.id}>
-              <TableCell>{`${affiliate.first_name} ${affiliate.last_name}`}</TableCell>
-              <TableCell>{affiliate.email}</TableCell>
-              <TableCell>{affiliate.referral_code}</TableCell>
-              <TableCell>{affiliate.referral_count || 0}</TableCell>
-              <TableCell>{affiliate.total_leads || 0}</TableCell>
-              <TableCell>
-                {new Date(affiliate.created_at).toLocaleDateString('de-DE')}
-              </TableCell>
-              <TableCell>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => copyToClipboard(affiliate.referral_code)}
-                  className="flex items-center gap-2"
-                >
-                  <Copy className="h-4 w-4" />
-                  Link kopieren
-                </Button>
-              </TableCell>
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="p-6 bg-white shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-blue-100 rounded-lg">
+              <Users className="h-6 w-6 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Aktive Partner</p>
+              <p className="text-2xl font-bold text-gray-900">{activeAffiliates}</p>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-6 bg-white shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-green-100 rounded-lg">
+              <TrendingUp className="h-6 w-6 text-green-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Vermittlungen</p>
+              <p className="text-2xl font-bold text-gray-900">{totalReferrals}</p>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-6 bg-white shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-purple-100 rounded-lg">
+              <Calendar className="h-6 w-6 text-purple-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Generierte Leads</p>
+              <p className="text-2xl font-bold text-gray-900">{totalLeads}</p>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Affiliate Table */}
+      <Card className="bg-white shadow-sm">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-gray-50/50">
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Referral Code</TableHead>
+              <TableHead className="text-right">Vermittlungen</TableHead>
+              <TableHead className="text-right">Leads</TableHead>
+              <TableHead>Registriert am</TableHead>
+              <TableHead className="text-right">Aktionen</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {affiliates.map((affiliate) => (
+              <TableRow 
+                key={affiliate.id}
+                className="hover:bg-gray-50/50 transition-colors"
+              >
+                <TableCell className="font-medium">
+                  {`${affiliate.first_name} ${affiliate.last_name}`}
+                </TableCell>
+                <TableCell>{affiliate.email}</TableCell>
+                <TableCell>
+                  <code className="px-2 py-1 bg-gray-100 rounded text-sm">
+                    {affiliate.referral_code}
+                  </code>
+                </TableCell>
+                <TableCell className="text-right font-medium">
+                  {affiliate.referral_count || 0}
+                </TableCell>
+                <TableCell className="text-right font-medium">
+                  {affiliate.total_leads || 0}
+                </TableCell>
+                <TableCell>
+                  {new Date(affiliate.created_at).toLocaleDateString('de-DE')}
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => copyToClipboard(affiliate.referral_code)}
+                    className="hover:bg-gray-100"
+                  >
+                    <Copy className="h-4 w-4 mr-2" />
+                    Link kopieren
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Card>
     </div>
   );
 };
