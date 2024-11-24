@@ -2,12 +2,10 @@ import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLoadScript } from "@react-google-maps/api";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { calculateRoofArea, calculateSolarMetrics } from "@/utils/roofCalculations";
 import { RoofCheckContent } from "./RoofCheck/RoofCheckContent";
 import { RoofCheckLoading } from "./RoofCheck/RoofCheckLoading";
 import { saveConfigToCookie } from "@/utils/configCookieManager";
-import { useToast } from "@/components/ui/use-toast";
 
 const libraries: ("places" | "drawing" | "geometry")[] = ["places", "drawing", "geometry"];
 
@@ -27,7 +25,6 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
     roofDetails: []
   });
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
@@ -47,36 +44,23 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
       setMetrics(updatedMetrics);
       onLog?.("Metrics calculated: " + JSON.stringify(updatedMetrics));
       
+      // Save configuration to cookie
       saveConfigToCookie({
         metrics: updatedMetrics,
         address,
       });
-
-      toast({
-        title: "Dachfläche berechnet",
-        description: `${roofDetails.length} Dachflächen mit insgesamt ${updatedMetrics.roofArea}m² wurden erfolgreich vermessen.`,
-      });
     },
-    [onLog, address, toast]
+    [onLog, address]
   );
 
-  const handleContinue = () => {
-    if (paths.length === 0) {
-      toast({
-        title: "Keine Dachfläche eingezeichnet",
-        description: "Bitte zeichnen Sie mindestens eine Dachfläche ein.",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  const handleContinue = useCallback(() => {
     navigate("/solar-showcase", {
       state: {
         metrics,
         address,
       },
     });
-  };
+  }, [navigate, metrics, address]);
 
   if (loadError) {
     return (
@@ -93,25 +77,13 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
   }
 
   return (
-    <div className="space-y-6">
-      <RoofCheckContent
-        address={address}
-        handleRoofOutlineComplete={handleRoofOutlineComplete}
-        paths={paths}
-        metrics={metrics}
-        onLog={onLog}
-      />
-      
-      {paths.length > 0 && (
-        <div className="flex justify-center">
-          <Button 
-            onClick={handleContinue}
-            className="bg-solar-orange hover:bg-solar-orange-dark text-white px-8 py-3 rounded-lg text-lg"
-          >
-            Weiter zur Konfiguration
-          </Button>
-        </div>
-      )}
-    </div>
+    <RoofCheckContent
+      address={address}
+      handleRoofOutlineComplete={handleRoofOutlineComplete}
+      paths={paths}
+      metrics={metrics}
+      onLog={onLog}
+      onContinue={handleContinue}
+    />
   );
 };
