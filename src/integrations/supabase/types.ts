@@ -506,6 +506,7 @@ export type Database = {
           features: string[]
           id: string
           image_url: string
+          inclusion_type: string
           name: string
           order_number: number
           purchase_options: Json | null
@@ -518,6 +519,7 @@ export type Database = {
           features?: string[]
           id?: string
           image_url: string
+          inclusion_type?: string
           name: string
           order_number: number
           purchase_options?: Json | null
@@ -530,6 +532,7 @@ export type Database = {
           features?: string[]
           id?: string
           image_url?: string
+          inclusion_type?: string
           name?: string
           order_number?: number
           purchase_options?: Json | null

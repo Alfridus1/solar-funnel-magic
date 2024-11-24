@@ -11,6 +11,7 @@ interface PremiumProduct {
   image_url: string;
   features: string[];
   climate_impact: string;
+  inclusion_type: 'included' | 'optional';
   purchase_options: {
     price: number;
     financing: {
@@ -98,10 +99,16 @@ export const PremiumProductsSection = ({ onConsultationRequest }: PremiumProduct
                   )}
                 </div>
                 <Button 
-                  className="w-full bg-solar-orange hover:bg-solar-orange/90"
+                  className={`w-full ${
+                    product.inclusion_type === 'included' 
+                      ? 'bg-green-600 hover:bg-green-700' 
+                      : 'bg-solar-orange hover:bg-solar-orange/90'
+                  }`}
                   onClick={onConsultationRequest}
                 >
-                  Beratung anfragen
+                  {product.inclusion_type === 'included' 
+                    ? 'Im Paket enthalten' 
+                    : 'Optional hinzufügbar'}
                 </Button>
               </div>
             </div>
