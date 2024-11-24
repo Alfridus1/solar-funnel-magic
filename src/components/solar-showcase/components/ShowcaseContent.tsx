@@ -27,15 +27,17 @@ export const ShowcaseContent = ({
   onQuoteRequest,
   onConsultationRequest
 }: ShowcaseContentProps) => {
-  const navigate = useNavigate();
-
   return (
     <div className={`space-y-8 ${!isAuthenticated ? 'blur-md' : ''}`}>
       <MetricsHeader metrics={metrics} address={address} />
-      <SystemVisualizer metrics={metrics} />
+      <SystemVisualizer activeFeature="solar" />
       <ProductGrid products={products} onConsultationRequest={onConsultationRequest} />
       <PremiumProductsSection onConsultationRequest={onConsultationRequest} />
-      <PricingOptions priceSettings={priceSettings} metrics={metrics} />
+      <PricingOptions 
+        metrics={metrics} 
+        onShowQuoteForm={onQuoteRequest} 
+        onShowConsultationForm={onConsultationRequest} 
+      />
       <ClimateEffects metrics={metrics} />
       <CallToAction onQuoteRequest={onQuoteRequest} onConsultationRequest={onConsultationRequest} />
     </div>

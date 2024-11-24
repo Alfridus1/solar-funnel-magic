@@ -3,16 +3,20 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 interface PricingOptionsProps {
-  estimatedPrice: number;
+  metrics: {
+    estimatedPrice?: number;
+  };
   onShowQuoteForm: () => void;
   onShowConsultationForm: () => void;
 }
 
 export const PricingOptions = ({
-  estimatedPrice,
+  metrics,
   onShowQuoteForm,
   onShowConsultationForm,
 }: PricingOptionsProps) => {
+  const estimatedPrice = metrics?.estimatedPrice || 0;
+
   return (
     <div className="mt-16 max-w-4xl mx-auto">
       <div className="grid md:grid-cols-2 gap-8">
