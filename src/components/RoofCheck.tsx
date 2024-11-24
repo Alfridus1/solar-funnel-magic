@@ -66,8 +66,8 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
       address,
     });
 
-    // Navigate to recommended-config with state
-    navigate("/recommended-config", {
+    // Navigate to roof-analysis with state
+    navigate("/roof-analysis", {
       state: {
         metrics,
         address,
