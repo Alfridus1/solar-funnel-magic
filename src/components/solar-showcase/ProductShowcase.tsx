@@ -32,29 +32,45 @@ export const ProductShowcase = () => {
 
       // If user is authenticated, save the request with a UID
       if (session?.user) {
-        const calculationId = uuidv4();
-        const { error } = await supabase
-          .from('leads')
-          .insert([{
-            user_id: session.user.id,
-            type: 'solar_analysis',
-            metrics,
-            address,
-            calculation_id: calculationId,
-            status: 'new'
-          }]);
+        try {
+          // First get user profile data
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('first_name, last_name, email, phone')
+            .eq('id', session.user.id)
+            .single();
 
-        if (error) {
+          if (profileError) throw profileError;
+          if (!profile) throw new Error('Profile not found');
+
+          const calculationId = uuidv4();
+          const { error } = await supabase
+            .from('leads')
+            .insert({
+              user_id: session.user.id,
+              type: 'solar_analysis',
+              metrics,
+              address,
+              calculation_id: calculationId,
+              status: 'new',
+              // Add required fields from profile
+              name: `${profile.first_name} ${profile.last_name}`,
+              email: profile.email,
+              phone: profile.phone
+            });
+
+          if (error) throw error;
+
+          toast({
+            title: "Anfrage gespeichert",
+            description: "Sie können diese Auswertung später in Ihrem Kundenportal einsehen.",
+          });
+        } catch (error: any) {
           console.error('Error saving calculation:', error);
           toast({
             title: "Fehler beim Speichern",
             description: "Ihre Anfrage konnte nicht gespeichert werden.",
             variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Anfrage gespeichert",
-            description: "Sie können diese Auswertung später in Ihrem Kundenportal einsehen.",
           });
         }
       }
