@@ -26,7 +26,6 @@ export const LoginDialog = ({ open, onOpenChange, metrics, address }: LoginDialo
         });
         onOpenChange(false);
         
-        // Wenn metrics vorhanden sind, zur Auswertung navigieren
         if (metrics) {
           navigate("/solar-showcase", { state: { metrics, address } });
         } else {
@@ -61,13 +60,6 @@ export const LoginDialog = ({ open, onOpenChange, metrics, address }: LoginDialo
                   brandAccent: '#FF8A3D',
                 }
               }
-            },
-            className: {
-              container: 'w-full',
-              button: 'w-full bg-solar-orange hover:bg-solar-orange-light text-white',
-              input: 'w-full rounded border-gray-300',
-              label: 'text-gray-700',
-              message: 'text-red-600',
             }
           }}
           localization={{
@@ -100,8 +92,7 @@ export const LoginDialog = ({ open, onOpenChange, metrics, address }: LoginDialo
             },
           }}
           providers={[]}
-          theme="light"
-          view="sign_in"
+          redirectTo={`${window.location.origin}/auth/callback`}
         />
       </DialogContent>
     </Dialog>

@@ -18,7 +18,6 @@ export const LoginForm = ({ onBack, metrics, address }: LoginFormProps) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user && metrics && address) {
         try {
-          // Create a new lead for the logged-in user
           const { error: leadError } = await supabase
             .from('leads')
             .insert([{
@@ -65,7 +64,7 @@ export const LoginForm = ({ onBack, metrics, address }: LoginFormProps) => {
           },
         }}
         providers={[]}
-        view="sign_in"
+        redirectTo={`${window.location.origin}/auth/callback`}
         localization={{
           variables: {
             sign_in: {
