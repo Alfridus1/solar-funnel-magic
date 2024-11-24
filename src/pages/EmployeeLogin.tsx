@@ -13,25 +13,37 @@ export function EmployeeLogin() {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        // Überprüfen, ob der Benutzer ein Mitarbeiter ist
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
+        try {
+          // Überprüfen, ob der Benutzer ein Mitarbeiter ist
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .maybeSingle();
 
-        if (profile?.role && profile.role !== 'customer') {
-          toast({
-            title: "Erfolgreich angemeldet",
-            description: "Willkommen im Mitarbeiterbereich!",
-          });
-          navigate("/admin");
-        } else {
-          // Wenn kein Mitarbeiter, ausloggen und Fehlermeldung anzeigen
+          if (error) throw error;
+
+          if (profile?.role && profile.role !== 'customer') {
+            toast({
+              title: "Erfolgreich angemeldet",
+              description: "Willkommen im Mitarbeiterbereich!",
+            });
+            navigate("/admin");
+          } else {
+            // Wenn kein Mitarbeiter oder kein Profil gefunden, ausloggen und Fehlermeldung anzeigen
+            await supabase.auth.signOut();
+            toast({
+              title: "Zugriff verweigert",
+              description: "Sie haben keine Berechtigung für den Mitarbeiterbereich.",
+              variant: "destructive",
+            });
+          }
+        } catch (error: any) {
+          console.error('Profile check error:', error);
           await supabase.auth.signOut();
           toast({
-            title: "Zugriff verweigert",
-            description: "Sie haben keine Berechtigung für den Mitarbeiterbereich.",
+            title: "Fehler beim Anmelden",
+            description: "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
             variant: "destructive",
           });
         }
