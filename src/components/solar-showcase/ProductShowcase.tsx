@@ -8,6 +8,7 @@ import { ShowcaseContent } from "./components/ShowcaseContent";
 import { RegistrationOverlay } from "./components/registration/RegistrationOverlay";
 import { ShowcaseLayout } from "./components/ShowcaseLayout";
 import type { Product } from "@/components/configurator/types";
+import { v4 as uuidv4 } from 'uuid';
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,35 @@ export const ProductShowcase = () => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setIsAuthenticated(!!session);
+
+      // If user is authenticated, save the request with a UID
+      if (session?.user) {
+        const calculationId = uuidv4();
+        const { error } = await supabase
+          .from('leads')
+          .insert([{
+            user_id: session.user.id,
+            type: 'solar_analysis',
+            metrics,
+            address,
+            calculation_id: calculationId,
+            status: 'new'
+          }]);
+
+        if (error) {
+          console.error('Error saving calculation:', error);
+          toast({
+            title: "Fehler beim Speichern",
+            description: "Ihre Anfrage konnte nicht gespeichert werden.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Anfrage gespeichert",
+            description: "Sie können diese Auswertung später in Ihrem Kundenportal einsehen.",
+          });
+        }
+      }
     };
     
     checkAuth();
@@ -37,7 +67,7 @@ export const ProductShowcase = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, metrics]);
+  }, [navigate, metrics, address, toast]);
 
   const { data: products = [] } = useQuery({
     queryKey: ['solar-products'],
