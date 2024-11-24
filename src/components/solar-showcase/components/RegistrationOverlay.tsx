@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { LoginForm } from "../LoginForm";
-import { RegistrationForm } from "./RegistrationForm";
-import { RegistrationHeader } from "./RegistrationHeader";
+import { RegistrationForm } from "./registration/RegistrationForm";
+import { RegistrationHeader } from "./registration/RegistrationHeader";
 import { supabase } from "@/integrations/supabase/client";
 
 interface RegistrationOverlayProps {
