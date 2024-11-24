@@ -5,6 +5,7 @@ import { useRoofMapHandlers } from "./hooks/useRoofMapHandlers";
 import { useModuleManagement } from "./hooks/useModuleManagement";
 import { useRectangleCreation } from "./hooks/useRectangleCreation";
 import { RoofMapUI } from "./components/RoofMapUI";
+import { useGoogleMaps } from "@/hooks/useGoogleMaps";
 
 interface RoofMapProps {
   address: string;
@@ -17,6 +18,7 @@ export const RoofMap = ({ address, onRoofOutlineComplete, onLog }: RoofMapProps)
   const [isLoading, setIsLoading] = useState(true);
   const [formattedAddress, setFormattedAddress] = useState("");
   const { toast } = useToast();
+  const { isLoaded, loadError } = useGoogleMaps();
 
   const {
     map,

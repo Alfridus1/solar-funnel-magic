@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { GoogleMap, DrawingManager, useLoadScript } from '@react-google-maps/api';
+import { GoogleMap, DrawingManager } from '@react-google-maps/api';
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { RoofAreaCalculator } from './components/RoofAreaCalculator';
+import { useGoogleMaps } from '@/hooks/useGoogleMaps';
 
 interface RoofDesignerProps {
   onComplete?: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number }[]) => void;
@@ -16,18 +17,13 @@ const mapContainerStyle = {
   position: "relative" as const,
 };
 
-const libraries: ("places" | "drawing" | "geometry")[] = ["places", "drawing", "geometry"];
-
 export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [polygons, setPolygons] = useState<google.maps.Polygon[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
   const { toast } = useToast();
 
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-    libraries,
-  });
+  const { isLoaded, loadError } = useGoogleMaps();
 
   const onLoad = useCallback((map: google.maps.Map) => {
     setMap(map);

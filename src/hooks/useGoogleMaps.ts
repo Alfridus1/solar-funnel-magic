@@ -1,6 +1,7 @@
 import { useLoadScript } from "@react-google-maps/api";
 
-const libraries: ("places" | "drawing" | "geometry")[] = ["places", "drawing", "geometry"];
+// Define libraries once to ensure consistency
+export const libraries: ("places" | "drawing" | "geometry")[] = ["places", "drawing", "geometry"];
 
 export const useGoogleMaps = () => {
   return useLoadScript({
