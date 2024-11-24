@@ -7,6 +7,7 @@ import { calculateRoofArea, calculateSolarMetrics } from "@/utils/roofCalculatio
 import { RoofCheckContent } from "./RoofCheck/RoofCheckContent";
 import { RoofCheckLoading } from "./RoofCheck/RoofCheckLoading";
 import { saveConfigToCookie } from "@/utils/configCookieManager";
+import { useToast } from "@/components/ui/use-toast";
 
 const libraries: ("places" | "drawing" | "geometry")[] = ["places", "drawing", "geometry"];
 
@@ -26,6 +27,7 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
     roofDetails: []
   });
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
@@ -45,16 +47,29 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
       setMetrics(updatedMetrics);
       onLog?.("Metrics calculated: " + JSON.stringify(updatedMetrics));
       
-      // Save configuration to cookie
       saveConfigToCookie({
         metrics: updatedMetrics,
         address,
       });
+
+      toast({
+        title: "Dachfläche berechnet",
+        description: `${roofDetails.length} Dachflächen mit insgesamt ${updatedMetrics.roofArea}m² wurden erfolgreich vermessen.`,
+      });
     },
-    [onLog, address]
+    [onLog, address, toast]
   );
 
   const handleContinue = () => {
+    if (paths.length === 0) {
+      toast({
+        title: "Keine Dachfläche eingezeichnet",
+        description: "Bitte zeichnen Sie mindestens eine Dachfläche ein.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     navigate("/solar-showcase", {
       state: {
         metrics,

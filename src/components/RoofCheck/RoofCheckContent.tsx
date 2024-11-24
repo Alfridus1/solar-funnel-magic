@@ -45,7 +45,15 @@ export const RoofCheckContent = ({
             />
 
             {paths.length > 0 && (
-              <RoofMetrics {...metrics} />
+              <RoofMetrics 
+                monthlyProduction={metrics.monthlyProduction}
+                annualSavings={metrics.annualSavings}
+                roofArea={metrics.roofArea}
+                possiblePanels={metrics.possiblePanels}
+                kWp={metrics.kWp}
+                roofDetails={metrics.roofDetails}
+                onContinue={() => {}}
+              />
             )}
           </div>
         </Card>

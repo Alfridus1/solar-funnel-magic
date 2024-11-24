@@ -17,11 +17,10 @@ export const calculateSolarMetrics = (totalRoofArea: number) => {
   // Convert from square meters to actual usable area
   const usableArea = totalRoofArea * USABLE_AREA_FACTOR;
   
-  // Calculate how many panels can fit, always rounding down to whole numbers
+  // Calculate how many panels can fit
   const possiblePanels = Math.floor(usableArea / MODULE_AREA);
   
   // Calculate system size in kWp (500W = 0.5 kWp per module)
-  // Each module is exactly 0.5 kWp, so multiply number of panels by 0.5
   const kWp = possiblePanels * 0.5;
   
   // Calculate annual production (kWp * 950 kWh/kWp)
@@ -39,6 +38,6 @@ export const calculateSolarMetrics = (totalRoofArea: number) => {
     monthlyProduction,
     annualProduction,
     annualSavings,
-    kWp, // Return exact kWp (will be in 0.5 steps since each module is 0.5 kWp)
+    kWp,
   };
 };
