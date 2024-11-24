@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import { ShowcaseSidebar } from "./ShowcaseSidebar";
 
 interface ShowcaseLayoutProps {
