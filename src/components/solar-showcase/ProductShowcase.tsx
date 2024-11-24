@@ -3,17 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { ShowcaseContent } from "./components/ShowcaseContent";
 
-interface Product {
-  id: string;
-  name: string;
-  category: "module" | "inverter" | "battery";
-  price: number;
-  specs: any;
-  created_at: string;
-  updated_at: string;
-  datasheet_url: string;
-}
-
 interface ProductShowcaseProps {
   metrics: any;
   address: any;

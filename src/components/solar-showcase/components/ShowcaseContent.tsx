@@ -36,7 +36,8 @@ export const ShowcaseContent = ({
       <PricingOptions 
         metrics={metrics} 
         onShowQuoteForm={onQuoteRequest} 
-        onShowConsultationForm={onConsultationRequest} 
+        onShowConsultationForm={onConsultationRequest}
+        priceSettings={priceSettings}
       />
       <ClimateEffects metrics={metrics} />
       <CallToAction onQuoteRequest={onQuoteRequest} onConsultationRequest={onConsultationRequest} />

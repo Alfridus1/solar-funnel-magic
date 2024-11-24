@@ -8,13 +8,22 @@ interface SystemVisualizerProps {
 }
 
 export const SystemVisualizer = ({ activeFeature }: SystemVisualizerProps) => {
-  const feature = getFeatureConfig(activeFeature) || {
+  const feature = getFeatureConfig(activeFeature);
+  const defaultFeature = {
     position: "top-4 left-4",
     backgroundColor: "bg-white/80",
     iconColor: "text-blue-500",
-    icon: () => null,
+    icon: null,
     label: "",
   };
+
+  const {
+    position,
+    backgroundColor,
+    iconColor,
+    icon: Icon,
+    label
+  } = feature || defaultFeature;
 
   return (
     <Card className="relative aspect-[16/9] overflow-hidden bg-gradient-to-b from-blue-50/50 to-white border-none">
@@ -33,12 +42,12 @@ export const SystemVisualizer = ({ activeFeature }: SystemVisualizerProps) => {
             exit={{ opacity: 0, scale: 0.9 }}
             className={cn(
               "absolute p-4 rounded-lg backdrop-blur-sm",
-              feature.position,
-              feature.backgroundColor
+              position,
+              backgroundColor
             )}
           >
-            {feature.icon && <feature.icon className={cn("h-6 w-6 mb-2", feature.iconColor)} />}
-            <p className="text-sm font-medium">{feature.label}</p>
+            {Icon && <Icon className={cn("h-6 w-6 mb-2", iconColor)} />}
+            <p className="text-sm font-medium">{label}</p>
           </motion.div>
         </AnimatePresence>
       </div>
