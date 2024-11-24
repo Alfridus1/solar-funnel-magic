@@ -1,66 +1,75 @@
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { Employee } from "../types/employee";
 import { EmployeeFormFields } from "./EmployeeFormFields";
-import { EmployeeProfileForm } from "./EmployeeProfileForm";
-import { EmployeeFormData, employeeFormSchema } from "../types/employeeForm";
+import { useForm } from "react-hook-form";
+import { EmployeeFormData } from "../types/employeeForm";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
+import { LogIn } from "lucide-react";
 
 interface EmployeeDialogProps {
   employee: Employee | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess: () => void;
+  onEmployeeUpdated: () => void;
 }
 
 export const EmployeeDialog = ({
   employee,
   open,
   onOpenChange,
-  onSuccess,
+  onEmployeeUpdated,
 }: EmployeeDialogProps) => {
   const { toast } = useToast();
   const form = useForm<EmployeeFormData>({
-    resolver: zodResolver(employeeFormSchema),
-    defaultValues: {
+    defaultValues: employee || {
       first_name: "",
       last_name: "",
       email: "",
-      role: "sales_employee",
-      phone: "",
+      role: "",
+      address: "",
+      location: "",
+      iban: "",
+      base_salary: 0,
+      commission_enabled: false,
+      vacation_days: 30,
+      hours_per_month: 160,
+      has_company_car: false,
     },
   });
 
-  useEffect(() => {
-    if (employee && employee.profiles) {
-      form.reset({
-        first_name: employee.profiles.first_name,
-        last_name: employee.profiles.last_name,
-        email: employee.profiles.email,
-        role: employee.role as EmployeeFormData["role"],
-        phone: employee.profiles.phone || "",
+  const handleLoginAs = async () => {
+    if (!employee?.email) return;
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: employee.email,
+        password: 'Coppen2023!'
       });
-    } else {
-      form.reset({
-        first_name: "",
-        last_name: "",
-        email: "",
-        role: "sales_employee",
-        phone: "",
+
+      if (error) throw error;
+
+      toast({
+        title: "Erfolgreich eingeloggt",
+        description: `Sie sind jetzt als ${employee.email} eingeloggt.`,
+      });
+
+      // Redirect to the main page
+      window.location.href = '/';
+    } catch (error: any) {
+      toast({
+        title: "Login fehlgeschlagen",
+        description: error.message,
+        variant: "destructive",
       });
     }
-  }, [employee, form]);
+  };
 
   const onSubmit = async (data: EmployeeFormData) => {
     try {
@@ -93,72 +102,71 @@ export const EmployeeDialog = ({
             first_name: data.first_name,
             last_name: data.last_name,
             email: data.email,
-            phone: data.phone,
-            role: data.role,
           })
           .eq('id', employee.profile_id);
 
         if (profileError) throw profileError;
         profileId = employee.profile_id;
       } else {
-        if (existingProfile) {
-          profileId = existingProfile.id;
-        } else {
-          const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .insert({
-              first_name: data.first_name,
-              last_name: data.last_name,
-              email: data.email,
-              phone: data.phone,
-              role: data.role,
-            })
-            .select()
-            .single();
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            first_name: data.first_name,
+            last_name: data.last_name,
+            email: data.email,
+            role: 'employee',
+          })
+          .select()
+          .single();
 
-          if (profileError) throw profileError;
-          profileId = profileData.id;
-        }
+        if (profileError) throw profileError;
+        profileId = profile.id;
       }
+
+      const employeeData = {
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        role: data.role,
+        profile_id: profileId,
+        address: data.address,
+        location: data.location,
+        iban: data.iban,
+        base_salary: data.base_salary,
+        commission_enabled: data.commission_enabled,
+        vacation_days: data.vacation_days,
+        hours_per_month: data.hours_per_month,
+        has_company_car: data.has_company_car,
+      };
 
       if (employee) {
-        const { error: employeeError } = await supabase
+        const { error } = await supabase
           .from('employees')
-          .update({
-            role: data.role,
-            email: data.email,
-            first_name: data.first_name,
-            last_name: data.last_name,
-          })
+          .update(employeeData)
           .eq('id', employee.id);
 
-        if (employeeError) throw employeeError;
+        if (error) throw error;
       } else {
-        const { error: employeeError } = await supabase
+        const { error } = await supabase
           .from('employees')
-          .insert({
-            profile_id: profileId,
-            role: data.role,
-            email: data.email,
-            first_name: data.first_name,
-            last_name: data.last_name,
-          });
+          .insert(employeeData);
 
-        if (employeeError) throw employeeError;
+        if (error) throw error;
       }
 
       toast({
-        title: employee ? "Mitarbeiter aktualisiert" : "Mitarbeiter erstellt",
-        description: "Die Änderungen wurden erfolgreich gespeichert.",
+        title: employee ? "Mitarbeiter aktualisiert" : "Mitarbeiter angelegt",
+        description: `${data.first_name} ${data.last_name} wurde erfolgreich ${
+          employee ? "aktualisiert" : "angelegt"
+        }.`,
       });
 
-      onSuccess();
+      onEmployeeUpdated();
       onOpenChange(false);
     } catch (error: any) {
-      console.error('Error:', error);
       toast({
         title: "Fehler",
-        description: error.message || "Ein unerwarteter Fehler ist aufgetreten",
+        description: error.message,
         variant: "destructive",
       });
     }
@@ -172,32 +180,27 @@ export const EmployeeDialog = ({
             {employee ? "Mitarbeiter bearbeiten" : "Neuer Mitarbeiter"}
           </DialogTitle>
         </DialogHeader>
-        <Tabs defaultValue="basic">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="basic">Basisdaten</TabsTrigger>
-            {employee && <TabsTrigger value="profile">Profil</TabsTrigger>}
-          </TabsList>
-          <TabsContent value="basic">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <EmployeeFormFields form={form} />
-                <div className="flex justify-end gap-2">
-                  <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                    Abbrechen
-                  </Button>
-                  <Button type="submit">
-                    {employee ? "Speichern" : "Erstellen"}
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </TabsContent>
-          {employee && (
-            <TabsContent value="profile">
-              <EmployeeProfileForm employeeId={employee.id} />
-            </TabsContent>
-          )}
-        </Tabs>
+
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <EmployeeFormFields form={form} />
+          
+          <div className="flex justify-between items-center">
+            <Button type="submit">
+              {employee ? "Aktualisieren" : "Anlegen"}
+            </Button>
+            
+            {employee && (
+              <Button 
+                type="button"
+                onClick={handleLoginAs}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <LogIn className="mr-2 h-4 w-4" />
+                Als dieser Mitarbeiter einloggen
+              </Button>
+            )}
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );
