@@ -33,13 +33,12 @@ export const RegistrationForm = ({ onComplete, onShowLogin, metrics, address }: 
 
     try {
       // Check if email already exists in profiles
-      const { data: existingProfile } = await supabase
+      const { data: existingProfiles } = await supabase
         .from('profiles')
         .select('id')
-        .eq('email', formData.email)
-        .single();
+        .eq('email', formData.email);
 
-      if (existingProfile) {
+      if (existingProfiles && existingProfiles.length > 0) {
         toast({
           title: "E-Mail bereits registriert",
           description: "Diese E-Mail-Adresse ist bereits registriert. Bitte loggen Sie sich ein.",

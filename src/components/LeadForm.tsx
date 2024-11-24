@@ -26,11 +26,12 @@ export const LeadForm = ({ formType = "quote", onSuccess, metrics, address }: Le
 
     try {
       // Check if email exists in profiles
-      const { data: existingProfile } = await supabase
+      const { data: existingProfiles } = await supabase
         .from('profiles')
         .select('id')
-        .eq('email', formData.email)
-        .single();
+        .eq('email', formData.email);
+
+      const existingProfile = existingProfiles?.[0];
 
       // Get current user
       const { data: { user } } = await supabase.auth.getUser();
@@ -54,7 +55,9 @@ export const LeadForm = ({ formType = "quote", onSuccess, metrics, address }: Le
       const { error } = await supabase
         .from('leads')
         .insert([{
-          ...formData,
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
           type: formType,
           source: window.location.href,
           status: 'new',
