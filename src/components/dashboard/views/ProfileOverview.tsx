@@ -1,16 +1,28 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { User, Phone, Mail, Home, Zap, Save } from "lucide-react";
-import { PageHeader } from "./components/PageHeader";
+import { User, Phone, Mail, Home, Zap } from "lucide-react";
+import { Profile, ProfileFormData } from "./types/Profile";
+import { ProfileForm } from "./components/ProfileForm";
+
+interface PageHeaderProps {
+  heading: string;
+  text?: string;
+}
+
+const PageHeader = ({ heading, text }: PageHeaderProps) => (
+  <div className="flex flex-col gap-2">
+    <h1 className="text-3xl font-bold">{heading}</h1>
+    {text && <p className="text-gray-600">{text}</p>}
+  </div>
+);
 
 export const ProfileOverview = () => {
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ProfileFormData>({
     first_name: "",
     last_name: "",
     email: "",
@@ -92,8 +104,8 @@ export const ProfileOverview = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Mein Profil"
-        description="Verwalten Sie hier Ihre persönlichen Daten"
+        heading="Mein Profil"
+        text="Verwalten Sie hier Ihre persönlichen Daten"
       />
 
       <Card className="p-6">
@@ -107,131 +119,35 @@ export const ProfileOverview = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-gray-600">
-              <User className="h-4 w-4" />
-              <span>Name</span>
-            </div>
-            {isEditing ? (
-              <div className="grid grid-cols-2 gap-2">
-                <Input
-                  placeholder="Vorname"
-                  value={formData.first_name}
-                  onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                />
-                <Input
-                  placeholder="Nachname"
-                  value={formData.last_name}
-                  onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                />
-              </div>
-            ) : (
-              <p className="font-medium">{profile?.first_name} {profile?.last_name}</p>
-            )}
+        <div className="grid gap-6">
+          <div className="flex items-center gap-2 text-gray-600">
+            <User className="h-4 w-4" />
+            <span>Name</span>
           </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-gray-600">
-              <Mail className="h-4 w-4" />
-              <span>E-Mail</span>
-            </div>
-            {isEditing ? (
-              <Input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              />
-            ) : (
-              <p className="font-medium">{profile?.email}</p>
-            )}
+          <div className="flex items-center gap-2 text-gray-600">
+            <Mail className="h-4 w-4" />
+            <span>E-Mail</span>
           </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-gray-600">
-              <Phone className="h-4 w-4" />
-              <span>Telefon</span>
-            </div>
-            {isEditing ? (
-              <Input
-                type="tel"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              />
-            ) : (
-              <p className="font-medium">{profile?.phone || "-"}</p>
-            )}
+          <div className="flex items-center gap-2 text-gray-600">
+            <Phone className="h-4 w-4" />
+            <span>Telefon</span>
           </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-gray-600">
-              <Zap className="h-4 w-4" />
-              <span>Jährlicher Stromverbrauch (kWh)</span>
-            </div>
-            {isEditing ? (
-              <Input
-                type="number"
-                value={formData.annual_consumption}
-                onChange={(e) => setFormData({ ...formData, annual_consumption: e.target.value })}
-              />
-            ) : (
-              <p className="font-medium">{profile?.annual_consumption || "-"} kWh</p>
-            )}
+          <div className="flex items-center gap-2 text-gray-600">
+            <Zap className="h-4 w-4" />
+            <span>Jährlicher Stromverbrauch (kWh)</span>
           </div>
-        </div>
-
-        <div className="mt-6">
-          <div className="flex items-center gap-2 text-gray-600 mb-2">
+          <div className="flex items-center gap-2 text-gray-600">
             <Home className="h-4 w-4" />
             <span>Adresse</span>
           </div>
-          {isEditing ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="grid grid-cols-3 gap-2">
-                <div className="col-span-2">
-                  <Input
-                    placeholder="Straße"
-                    value={formData.street}
-                    onChange={(e) => setFormData({ ...formData, street: e.target.value })}
-                  />
-                </div>
-                <Input
-                  placeholder="Nr."
-                  value={formData.house_number}
-                  onChange={(e) => setFormData({ ...formData, house_number: e.target.value })}
-                />
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                <Input
-                  placeholder="PLZ"
-                  value={formData.postal_code}
-                  onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
-                />
-                <div className="col-span-2">
-                  <Input
-                    placeholder="Ort"
-                    value={formData.city}
-                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  />
-                </div>
-              </div>
-            </div>
-          ) : (
-            <p className="font-medium">
-              {profile?.street} {profile?.house_number}<br />
-              {profile?.postal_code} {profile?.city}
-            </p>
-          )}
         </div>
 
-        {isEditing && (
-          <div className="mt-6 flex justify-end">
-            <Button onClick={handleSave} className="flex items-center gap-2">
-              <Save className="h-4 w-4" />
-              Speichern
-            </Button>
-          </div>
-        )}
+        <ProfileForm
+          formData={formData}
+          setFormData={setFormData}
+          onSave={handleSave}
+          isEditing={isEditing}
+        />
       </Card>
     </div>
   );

@@ -629,33 +629,48 @@ export type Database = {
       }
       profiles: {
         Row: {
+          annual_consumption: number | null
+          city: string | null
           created_at: string | null
           email: string
           first_name: string
+          house_number: string | null
           id: string
           last_name: string
           phone: string
+          postal_code: string | null
           role: Database["public"]["Enums"]["user_role"] | null
+          street: string | null
           updated_at: string | null
         }
         Insert: {
+          annual_consumption?: number | null
+          city?: string | null
           created_at?: string | null
           email: string
           first_name: string
+          house_number?: string | null
           id?: string
           last_name: string
           phone: string
+          postal_code?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
+          street?: string | null
           updated_at?: string | null
         }
         Update: {
+          annual_consumption?: number | null
+          city?: string | null
           created_at?: string | null
           email?: string
           first_name?: string
+          house_number?: string | null
           id?: string
           last_name?: string
           phone?: string
+          postal_code?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
+          street?: string | null
           updated_at?: string | null
         }
         Relationships: []
