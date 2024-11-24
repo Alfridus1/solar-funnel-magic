@@ -41,12 +41,7 @@ export const ShowcaseContent = ({
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
         <Card className="p-4 md:p-6 lg:p-8 bg-white/90 backdrop-blur shadow-lg rounded-2xl">
-          <div className="space-y-6 lg:space-y-8">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            </div>
-
-            <SavingsCalculator yearlyProduction={Math.round(metrics.kWp * 950)} />
-          </div>
+          <SavingsCalculator yearlyProduction={Math.round(metrics.kWp * 950)} />
         </Card>
 
         <Card className="p-4 md:p-6 lg:p-8 bg-white/90 backdrop-blur shadow-lg rounded-2xl">
