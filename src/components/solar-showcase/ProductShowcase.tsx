@@ -36,22 +36,22 @@ export const ProductShowcase = () => {
           console.log('Starting to save calculation...');
           
           // First get user profile data
-          const { data: profile, error: profileError } = await supabase
+          const { data: profiles, error: profileError } = await supabase
             .from('profiles')
             .select('first_name, last_name, email, phone')
-            .eq('id', session.user.id)
-            .single();
+            .eq('id', session.user.id);
 
           if (profileError) {
             console.error('Profile error:', profileError);
             throw profileError;
           }
           
-          if (!profile) {
+          if (!profiles || profiles.length === 0) {
             console.error('No profile found');
             throw new Error('Profile not found');
           }
 
+          const profile = profiles[0];
           console.log('Profile found:', profile);
 
           const calculationId = uuidv4();
