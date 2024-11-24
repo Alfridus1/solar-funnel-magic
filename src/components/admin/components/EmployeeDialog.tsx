@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Employee } from "../types/employee";
 import { EmployeeFormFields } from "./EmployeeFormFields";
 import { useForm } from "react-hook-form";
-import { EmployeeFormData } from "../types/employeeForm";
+import { EmployeeFormData, employeeFormSchema } from "../types/employeeForm";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { LogIn } from "lucide-react";
@@ -17,22 +18,38 @@ interface EmployeeDialogProps {
   employee: Employee | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onEmployeeUpdated: () => void;
+  onSuccess: () => void;
 }
 
 export const EmployeeDialog = ({
   employee,
   open,
   onOpenChange,
-  onEmployeeUpdated,
+  onSuccess,
 }: EmployeeDialogProps) => {
   const { toast } = useToast();
   const form = useForm<EmployeeFormData>({
-    defaultValues: employee || {
+    resolver: zodResolver(employeeFormSchema),
+    defaultValues: employee?.profiles ? {
+      first_name: employee.profiles.first_name,
+      last_name: employee.profiles.last_name,
+      email: employee.profiles.email,
+      role: employee.role as EmployeeFormData["role"],
+      phone: employee.profiles.phone,
+      address: employee.address || "",
+      location: employee.location || "",
+      iban: employee.iban || "",
+      base_salary: employee.base_salary || 0,
+      commission_enabled: employee.commission_enabled || false,
+      vacation_days: employee.vacation_days || 30,
+      hours_per_month: employee.hours_per_month || 160,
+      has_company_car: employee.has_company_car || false,
+    } : {
       first_name: "",
       last_name: "",
       email: "",
-      role: "",
+      role: "employee" as EmployeeFormData["role"],
+      phone: "",
       address: "",
       location: "",
       iban: "",
@@ -45,11 +62,11 @@ export const EmployeeDialog = ({
   });
 
   const handleLoginAs = async () => {
-    if (!employee?.email) return;
+    if (!employee?.profiles?.email) return;
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: employee.email,
+        email: employee.profiles.email,
         password: 'Coppen2023!'
       });
 
@@ -57,10 +74,9 @@ export const EmployeeDialog = ({
 
       toast({
         title: "Erfolgreich eingeloggt",
-        description: `Sie sind jetzt als ${employee.email} eingeloggt.`,
+        description: `Sie sind jetzt als ${employee.profiles.email} eingeloggt.`,
       });
 
-      // Redirect to the main page
       window.location.href = '/';
     } catch (error: any) {
       toast({
@@ -75,7 +91,6 @@ export const EmployeeDialog = ({
     try {
       let profileId;
 
-      // Check if a user with this email already exists
       const { data: existingProfile, error: checkError } = await supabase
         .from('profiles')
         .select('id')
@@ -85,7 +100,6 @@ export const EmployeeDialog = ({
       if (checkError && checkError.code !== 'PGRST116') throw checkError;
 
       if (!employee) {
-        // Create auth user with default password for new employees
         const { data: authData, error: authError } = await supabase.auth.admin.createUser({
           email: data.email,
           password: "Coppen2023!",
@@ -102,6 +116,7 @@ export const EmployeeDialog = ({
             first_name: data.first_name,
             last_name: data.last_name,
             email: data.email,
+            phone: data.phone,
           })
           .eq('id', employee.profile_id);
 
@@ -114,7 +129,8 @@ export const EmployeeDialog = ({
             first_name: data.first_name,
             last_name: data.last_name,
             email: data.email,
-            role: 'employee',
+            phone: data.phone,
+            role: data.role,
           })
           .select()
           .single();
@@ -124,11 +140,8 @@ export const EmployeeDialog = ({
       }
 
       const employeeData = {
-        first_name: data.first_name,
-        last_name: data.last_name,
-        email: data.email,
-        role: data.role,
         profile_id: profileId,
+        role: data.role,
         address: data.address,
         location: data.location,
         iban: data.iban,
@@ -161,7 +174,7 @@ export const EmployeeDialog = ({
         }.`,
       });
 
-      onEmployeeUpdated();
+      onSuccess();
       onOpenChange(false);
     } catch (error: any) {
       toast({
