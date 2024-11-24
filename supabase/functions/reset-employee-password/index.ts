@@ -31,6 +31,18 @@ Deno.serve(async (req) => {
       }
     )
 
+    // First check if the employee exists
+    const { data: employeeData, error: employeeError } = await supabaseAdmin
+      .from('employees')
+      .select('email')
+      .eq('email', email)
+      .single()
+
+    if (employeeError || !employeeData) {
+      console.error('Employee not found:', email)
+      throw new Error('Employee not found')
+    }
+
     // Get user by email
     const { data: { users }, error: getUserError } = await supabaseAdmin.auth.admin.listUsers()
     
@@ -41,8 +53,8 @@ Deno.serve(async (req) => {
 
     const user = users.find(u => u.email === email)
     if (!user) {
-      console.error('User not found')
-      throw new Error('User not found')
+      console.error('Auth user not found for email:', email)
+      throw new Error('Auth user not found')
     }
 
     console.log('Found user:', user.id)
