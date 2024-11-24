@@ -9,7 +9,11 @@ interface SolarMetricsProps {
   annualSavings: number;
 }
 
-export const SolarMetrics = ({ kWp, yearlyProduction, annualSavings }: SolarMetricsProps) => {
+export const SolarMetrics = ({ 
+  kWp = 0, 
+  yearlyProduction = 0, 
+  annualSavings = 0 
+}: SolarMetricsProps) => {
   const metrics = [
     {
       icon: Sun,

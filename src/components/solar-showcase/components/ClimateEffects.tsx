@@ -4,7 +4,7 @@ interface ClimateEffectsProps {
   annualProduction: number;
 }
 
-export const ClimateEffects = ({ annualProduction }: ClimateEffectsProps) => {
+export const ClimateEffects = ({ annualProduction = 0 }: ClimateEffectsProps) => {
   return (
     <div className="flex items-center justify-center gap-3 p-4 bg-blue-50 rounded-lg">
       <CloudSun className="h-8 w-8 text-blue-500" />
