@@ -17,6 +17,8 @@ Deno.serve(async (req) => {
       throw new Error('Email is required')
     }
 
+    console.log('Resetting password for email:', email);
+
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',

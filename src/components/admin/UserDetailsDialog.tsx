@@ -44,13 +44,23 @@ export const UserDetailsDialog = ({ user, affiliateInfo, onOpenChange }: UserDet
 
       if (resetError) throw resetError;
 
+      // Add a small delay to ensure the password reset is processed
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
       // Then attempt to sign in with the temporary password
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email: user.email,
         password: '123456' // This matches the password set in the reset-password function
       });
 
-      if (signInError) throw signInError;
+      if (signInError) {
+        console.error('Sign in error:', signInError);
+        throw signInError;
+      }
+
+      if (!data?.user) {
+        throw new Error('No user data returned after login');
+      }
 
       toast({
         title: "Erfolgreich eingeloggt",
@@ -60,9 +70,10 @@ export const UserDetailsDialog = ({ user, affiliateInfo, onOpenChange }: UserDet
       // Redirect to the main page
       window.location.href = '/';
     } catch (error: any) {
+      console.error('Login error:', error);
       toast({
         title: "Login fehlgeschlagen",
-        description: error.message,
+        description: error.message || "Ein unerwarteter Fehler ist aufgetreten",
         variant: "destructive",
       });
     }
