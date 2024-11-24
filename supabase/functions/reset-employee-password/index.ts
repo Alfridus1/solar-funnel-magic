@@ -51,17 +51,33 @@ Deno.serve(async (req) => {
       throw getUserError
     }
 
+    let userId;
     const user = users.find(u => u.email === email)
+    
     if (!user) {
-      console.error('Auth user not found for email:', email)
-      throw new Error('Auth user not found')
-    }
+      console.log('Auth user not found, creating new user')
+      // Create a new auth user if one doesn't exist
+      const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
+        email: email,
+        password: 'Coppen2023!',
+        email_confirm: true
+      })
 
-    console.log('Found user:', user.id)
+      if (createError) {
+        console.error('Error creating user:', createError)
+        throw createError
+      }
+
+      userId = newUser.user.id
+      console.log('Created new user:', userId)
+    } else {
+      userId = user.id
+      console.log('Found existing user:', userId)
+    }
 
     // Update password
     const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
-      user.id,
+      userId,
       { password: 'Coppen2023!' }
     )
 
