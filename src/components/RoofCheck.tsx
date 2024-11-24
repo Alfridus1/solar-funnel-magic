@@ -66,8 +66,8 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
       address,
     });
 
-    // Navigate to product showcase with state
-    navigate("/product-showcase", {
+    // Navigate to recommended config with state
+    navigate("/recommended-config", {
       state: {
         metrics,
         address,
