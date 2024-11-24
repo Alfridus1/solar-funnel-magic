@@ -2,7 +2,12 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { 
   LayoutDashboard,
-  ArrowLeft,
+  Inbox,
+  LayoutGrid,
+  Award,
+  FileText,
+  Settings,
+  LogOut,
   ChevronLeft,
   ChevronRight,
   Menu
@@ -13,14 +18,34 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const menuItems = [
   { 
-    label: "Zurück zur Startseite", 
-    icon: ArrowLeft, 
-    path: "/" 
+    label: "Dashboard", 
+    icon: LayoutDashboard, 
+    value: "dashboard" 
   },
   { 
-    label: "Zum Dashboard", 
-    icon: LayoutDashboard, 
-    path: "/dashboard" 
+    label: "Meine Anfragen", 
+    icon: Inbox, 
+    value: "requests" 
+  },
+  { 
+    label: "Meine Projekte", 
+    icon: LayoutGrid, 
+    value: "projects" 
+  },
+  { 
+    label: "Empfehlungsprogramm", 
+    icon: Award, 
+    value: "referral" 
+  },
+  { 
+    label: "Dokumente", 
+    icon: FileText, 
+    value: "documents" 
+  },
+  { 
+    label: "Einstellungen", 
+    icon: Settings, 
+    value: "settings" 
   },
 ];
 
@@ -41,7 +66,7 @@ export const ShowcaseSidebar = () => {
             <div className="flex flex-col h-full bg-white dark:bg-gray-800">
               <div className="p-6">
                 <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-                  Solar-Konfigurator
+                  Dashboard
                 </h2>
               </div>
               <nav className="space-y-1 px-3">
@@ -49,8 +74,8 @@ export const ShowcaseSidebar = () => {
                   const Icon = item.icon;
                   return (
                     <Link
-                      key={item.path}
-                      to={item.path}
+                      key={item.value}
+                      to={`#${item.value}`}
                       className="flex items-center px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
                     >
                       <Icon className="h-5 w-5 mr-3" />
@@ -58,6 +83,13 @@ export const ShowcaseSidebar = () => {
                     </Link>
                   );
                 })}
+                <button
+                  onClick={() => {}}
+                  className="flex w-full items-center px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+                >
+                  <LogOut className="h-5 w-5 mr-3" />
+                  <span>Ausloggen</span>
+                </button>
               </nav>
             </div>
           </SheetContent>
@@ -84,7 +116,7 @@ export const ShowcaseSidebar = () => {
             "text-2xl font-bold text-gray-800 dark:text-white transition-all duration-300",
             isCollapsed && "text-center text-xl"
           )}>
-            {isCollapsed ? "Menu" : "Solar-Konfigurator"}
+            {isCollapsed ? "D" : "Dashboard"}
           </h2>
         </div>
 
@@ -93,8 +125,8 @@ export const ShowcaseSidebar = () => {
             const Icon = item.icon;
             return (
               <Link
-                key={item.path}
-                to={item.path}
+                key={item.value}
+                to={`#${item.value}`}
                 className="flex items-center px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
               >
                 <Icon className="h-5 w-5 mr-3" />
@@ -107,6 +139,19 @@ export const ShowcaseSidebar = () => {
               </Link>
             );
           })}
+          
+          <button
+            onClick={() => {}}
+            className="flex w-full items-center px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+          >
+            <LogOut className="h-5 w-5 mr-3" />
+            <span className={cn(
+              "transition-all duration-300",
+              isCollapsed && "hidden"
+            )}>
+              Ausloggen
+            </span>
+          </button>
         </nav>
       </div>
     </>
