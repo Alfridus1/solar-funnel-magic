@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card";
+import { SystemMetrics } from "./SystemMetrics";
 import { SavingsCalculator } from "@/components/SavingsCalculator";
 import { SavingsMetrics } from "./SavingsMetrics";
 import { Testimonials } from "@/components/Testimonials";
@@ -48,6 +49,13 @@ export const ShowcaseContent = ({
               <h1 className="text-xl md:text-2xl font-bold text-gray-900">Ihre Solar-Analyse</h1>
               <PDFDownloadButton metrics={metrics} address={address} />
             </div>
+
+            <SystemMetrics
+              moduleCount={metrics.moduleCount}
+              kWp={metrics.kWp}
+              annualProduction={metrics.annualProduction}
+              roofArea={metrics.roofArea}
+            />
 
             <SavingsCalculator yearlyProduction={Math.round(metrics.kWp * 950)} />
           </div>
