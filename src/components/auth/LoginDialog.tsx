@@ -1,10 +1,15 @@
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Auth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { Auth } from "@supabase/auth-ui-react";
+import { ThemeSupa } from "@supabase/auth-ui-shared";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface LoginDialogProps {
   open: boolean;
@@ -14,40 +19,36 @@ interface LoginDialogProps {
 }
 
 export const LoginDialog = ({ open, onOpenChange, metrics, address }: LoginDialogProps) => {
-  const { toast } = useToast();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
+      if (event === "SIGNED_IN") {
         toast({
           title: "Erfolgreich angemeldet",
-          description: "Willkommen zurück!",
+          description: "Sie wurden erfolgreich angemeldet.",
         });
         onOpenChange(false);
         
-        // Nur zur Landing Page navigieren, wenn keine Metrics vorhanden sind
-        if (!metrics) {
+        // If metrics exist, navigate to showcase, otherwise to dashboard
+        if (metrics) {
+          navigate("/solar-showcase", { state: { metrics, address } });
+        } else {
           navigate("/dashboard");
         }
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, onOpenChange, toast, metrics]);
+  }, [navigate, onOpenChange, toast, metrics, address]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Willkommen zurück
-          </h1>
-          <p className="text-gray-600">
-            Melden Sie sich an, um Ihre Solaranlage zu verwalten
-          </p>
-        </div>
-        
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Anmelden oder Registrieren</DialogTitle>
+        </DialogHeader>
         <Auth
           supabaseClient={supabase}
           appearance={{
@@ -55,51 +56,32 @@ export const LoginDialog = ({ open, onOpenChange, metrics, address }: LoginDialo
             variables: {
               default: {
                 colors: {
-                  brand: '#F75C03',
-                  brandAccent: '#FF8A3D',
+                  brand: '#f97316',
+                  brandAccent: '#ea580c',
                 }
               }
             },
             className: {
-              container: 'w-full',
-              button: 'w-full bg-solar-orange hover:bg-solar-orange-light text-white',
-              input: 'w-full rounded border-gray-300',
-              label: 'text-gray-700',
-              message: 'text-red-600',
-            }
-          }}
-          localization={{
-            variables: {
-              sign_in: {
-                email_label: 'E-Mail Adresse',
-                password_label: 'Passwort',
-                button_label: 'Anmelden',
-                loading_button_label: 'Anmeldung läuft...',
-                link_text: 'Noch kein Konto? Jetzt registrieren',
-                email_input_placeholder: 'Ihre E-Mail Adresse',
-                password_input_placeholder: 'Ihr Passwort',
-              },
-              sign_up: {
-                email_label: 'E-Mail Adresse',
-                password_label: 'Passwort',
-                button_label: 'Registrieren',
-                loading_button_label: 'Registrierung läuft...',
-                link_text: 'Bereits ein Konto? Jetzt anmelden',
-                email_input_placeholder: 'Ihre E-Mail Adresse',
-                password_input_placeholder: 'Wählen Sie ein sicheres Passwort',
-              },
-              forgotten_password: {
-                link_text: 'Passwort vergessen?',
-                button_label: 'Passwort zurücksetzen',
-                loading_button_label: 'Sende Anweisungen...',
-                email_input_placeholder: 'Ihre E-Mail Adresse',
-                confirmation_text: 'Überprüfen Sie Ihre E-Mails für den Bestätigungslink',
-              },
+              container: 'flex-1',
+              button: 'bg-solar-orange hover:bg-solar-orange-600',
+              input: 'rounded-md',
             },
           }}
           providers={[]}
-          theme="light"
-          view="sign_in"
+          localization={{
+            variables: {
+              sign_in: {
+                email_label: 'Email Adresse',
+                password_label: 'Passwort',
+                button_label: 'Anmelden',
+              },
+              sign_up: {
+                email_label: 'Email Adresse',
+                password_label: 'Passwort',
+                button_label: 'Registrieren',
+              },
+            },
+          }}
         />
       </DialogContent>
     </Dialog>

@@ -80,6 +80,9 @@ export const ProductShowcase = () => {
     setFormType("consultation");
   };
 
+  // Guard against missing metrics
+  if (!metrics) return null;
+
   return (
     <QueryClientProvider client={queryClient}>
       <ShowcaseLayout>
