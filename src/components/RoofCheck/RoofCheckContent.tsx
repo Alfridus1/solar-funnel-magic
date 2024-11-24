@@ -29,10 +29,6 @@ export const RoofCheckContent = ({
     { title: "Unverbindliches Angebot", description: "Mit Vor-Ort Termin" }
   ];
 
-  const handleRoofComplete = (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number; kWp: number }[]) => {
-    handleRoofOutlineComplete(paths, roofDetails);
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-8">
       <div className="container mx-auto px-4">
@@ -56,7 +52,7 @@ export const RoofCheckContent = ({
 
             {isDrawingEnabled && (
               <RoofDesigner 
-                onComplete={handleRoofComplete} 
+                onComplete={handleRoofOutlineComplete} 
                 address={address}
               />
             )}
