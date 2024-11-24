@@ -14,10 +14,10 @@ const employeeProfileSchema = z.object({
   address: z.string().min(1, "Adresse wird benötigt"),
   location: z.string().min(1, "Standort wird benötigt"),
   iban: z.string().min(1, "IBAN wird benötigt"),
-  base_salary: z.string().min(1, "Fixgehalt wird benötigt"),
+  base_salary: z.number().min(1, "Fixgehalt wird benötigt"),
   commission_enabled: z.boolean(),
-  vacation_days: z.string().min(1, "Urlaubstage werden benötigt"),
-  hours_per_month: z.string().min(1, "Arbeitsstunden pro Monat werden benötigt"),
+  vacation_days: z.number().min(1, "Urlaubstage werden benötigt"),
+  hours_per_month: z.number().min(1, "Arbeitsstunden pro Monat werden benötigt"),
   has_company_car: z.boolean(),
 });
 
@@ -36,10 +36,10 @@ export const EmployeeProfileForm = ({ employeeId, initialData }: EmployeeProfile
       address: "",
       location: "",
       iban: "",
-      base_salary: "",
+      base_salary: 0,
       commission_enabled: false,
-      vacation_days: "30",
-      hours_per_month: "160",
+      vacation_days: 30,
+      hours_per_month: 160,
       has_company_car: false,
     },
   });
@@ -52,10 +52,10 @@ export const EmployeeProfileForm = ({ employeeId, initialData }: EmployeeProfile
           address: data.address,
           location: data.location,
           iban: data.iban,
-          base_salary: parseFloat(data.base_salary),
+          base_salary: data.base_salary,
           commission_enabled: data.commission_enabled,
-          vacation_days: parseInt(data.vacation_days),
-          hours_per_month: parseInt(data.hours_per_month),
+          vacation_days: data.vacation_days,
+          hours_per_month: data.hours_per_month,
           has_company_car: data.has_company_car,
         })
         .eq('id', employeeId);

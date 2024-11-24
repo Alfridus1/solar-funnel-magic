@@ -155,7 +155,7 @@ export const EmployeeDialog = ({
       } else {
         const { error } = await supabase
           .from('employees')
-          .insert(employeeData);
+          .insert([employeeData]);
 
         if (error) throw error;
       }

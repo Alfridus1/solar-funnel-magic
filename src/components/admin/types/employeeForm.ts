@@ -31,4 +31,3 @@ export const employeeFormSchema = z.object({
 });
 
 export type EmployeeFormData = z.infer<typeof employeeFormSchema>;
-export type EmployeeProfileData = EmployeeFormData;
