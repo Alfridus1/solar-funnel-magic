@@ -18,7 +18,7 @@ export const ProductShowcase = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { toast } = useToast();
   
-  const { metrics, address } = location.state || {};
+  const { metrics, address, existingLeadId } = location.state || {};
 
   useEffect(() => {
     if (!metrics) {
@@ -30,8 +30,8 @@ export const ProductShowcase = () => {
       const { data: { session } } = await supabase.auth.getSession();
       setIsAuthenticated(!!session);
 
-      // If user is authenticated, save the request
-      if (session?.user) {
+      // If user is authenticated and this is not an existing lead, save the request
+      if (session?.user && !existingLeadId) {
         try {
           console.log('Starting to save calculation...');
           
@@ -102,7 +102,7 @@ export const ProductShowcase = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, metrics, address, toast]);
+  }, [navigate, metrics, address, toast, existingLeadId]);
 
   const { data: products = [] } = useQuery({
     queryKey: ['solar-products'],
