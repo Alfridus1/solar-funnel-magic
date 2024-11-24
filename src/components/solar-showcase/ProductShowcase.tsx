@@ -35,10 +35,10 @@ export const ProductShowcase = () => {
       
       if (error) throw error;
       
-      // Ensure the category is correctly typed
       return data.map(product => ({
         ...product,
-        category: product.category as 'module' | 'inverter' | 'battery'
+        category: product.category as 'module' | 'inverter' | 'battery',
+        specs: product.specs as Product['specs']
       }));
     }
   });

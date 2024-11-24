@@ -11,9 +11,9 @@ export interface Product {
     warranty?: number;
   };
   image_url?: string;
-  datasheet_url?: string;
-  created_at?: string;
-  updated_at?: string;
+  datasheet_url?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
 }
 
 export interface SystemConfig {
