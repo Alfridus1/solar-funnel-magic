@@ -7,6 +7,7 @@ import { RecommendedConfig } from "@/pages/RecommendedConfig";
 import { Toaster } from "@/components/ui/toaster";
 import { Index } from "@/pages/Index";
 import { AffiliateLanding } from "@/pages/AffiliateLanding";
+import { ProductShowcase } from "@/components/solar-showcase/ProductShowcase";
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
         <Route path="/admin/*" element={<AdminDashboard />} />
         <Route path="/dashboard/*" element={<CustomerDashboard />} />
         <Route path="/recommended-config" element={<RecommendedConfig />} />
+        <Route path="/solar-showcase" element={<ProductShowcase />} />
         <Route path="/affiliate" element={<AffiliateLanding />} />
       </Routes>
       <Toaster />
