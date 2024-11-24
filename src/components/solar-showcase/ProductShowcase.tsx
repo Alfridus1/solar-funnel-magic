@@ -9,48 +9,9 @@ import { SavingsCalculator } from "@/components/SavingsCalculator";
 import { Testimonials } from "@/components/Testimonials";
 import { FAQ } from "@/components/FAQ";
 import { PDFDownloadButton } from "./components/PDFDownloadButton";
-import { PremiumProductsList } from "./components/PremiumProductsList";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-
-const premiumProducts = [
-  {
-    title: "Premium Solarmodule",
-    description: "Hocheffiziente Module mit 30 Jahren Garantie",
-    image: "/lovable-uploads/fe437c08-df76-4ced-92d4-e82b0a6afe5c.png",
-    features: ["500W Nennleistung", "21% Wirkungsgrad", "30 Jahre Garantie"]
-  },
-  {
-    title: "Smart Wechselrichter",
-    description: "Intelligente Steuerung Ihrer Solaranlage",
-    image: "/lovable-uploads/f2d1edec-2b0f-4af0-9ec8-9e7caf7a8ea7.png",
-    features: ["98.6% Wirkungsgrad", "Integriertes Monitoring", "Smart-Home ready"]
-  },
-  {
-    title: "Hochleistungsspeicher",
-    description: "Maximale Unabhängigkeit durch effiziente Speicherung",
-    image: "/lovable-uploads/2b67e439-3bd1-4ad6-8498-ee34e8f6d45f.png",
-    features: ["15kWh Kapazität", "95% Entladetiefe", "10 Jahre Garantie"]
-  },
-  {
-    title: "Premium Wallbox",
-    description: "Intelligente Ladestation für Ihr E-Auto",
-    image: "/lovable-uploads/b078c6ba-faca-4278-af13-f78ce0cdb4cf.png",
-    features: ["22kW Ladeleistung", "Dynamisches Lastmanagement", "RFID-Zugangskontrolle"]
-  },
-  {
-    title: "Smart Home System",
-    description: "Vernetzte Haussteuerung für maximale Effizienz",
-    image: "/lovable-uploads/230bf2e3-b64a-4f51-bb2f-f246df2597be.png",
-    features: ["Energiemanagement", "App-Steuerung", "KNX-Integration"]
-  },
-  {
-    title: "Wärmepumpe",
-    description: "Effiziente Heizlösung für Ihr Zuhause",
-    image: "/lovable-uploads/03677377-bf21-4a7d-b8a4-c5f6e9b87885.png",
-    features: ["COP bis 5.0", "PV-Optimiert", "Smart Grid Ready"]
-  }
-];
+import { useQuery } from "@tanstack/react-query";
 
 export const ProductShowcase = () => {
   const location = useLocation();
@@ -61,6 +22,20 @@ export const ProductShowcase = () => {
   const { toast } = useToast();
   
   const { metrics, address } = location.state || {};
+
+  // Fetch products from solar_products table
+  const { data: products = [] } = useQuery({
+    queryKey: ['solar-products'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('solar_products')
+        .select('*')
+        .order('name');
+      
+      if (error) throw error;
+      return data;
+    }
+  });
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -147,12 +122,38 @@ export const ProductShowcase = () => {
 
             <section className="py-12">
               <h2 className="text-3xl font-bold text-center mb-8">
-                Unsere Premium Produkte für Sie
+                Unsere Produkte für Sie
               </h2>
-              <PremiumProductsList 
-                products={premiumProducts}
-                onRequestConsultation={handleConsultationRequest}
-              />
+              <div className="grid md:grid-cols-3 gap-8">
+                {products.map((product) => (
+                  <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                    <div className="aspect-video bg-gradient-to-br from-solar-blue-50 to-white p-6">
+                      {product.image_url && (
+                        <img 
+                          src={product.image_url} 
+                          alt={product.name}
+                          className="w-full h-full object-contain"
+                        />
+                      )}
+                    </div>
+                    <div className="p-6 space-y-4">
+                      <h3 className="text-xl font-semibold">{product.name}</h3>
+                      <div className="text-sm text-gray-600">
+                        {product.category === 'module' && `${product.specs.watts}W`}
+                        {product.category === 'battery' && `${product.specs.capacity}kWh`}
+                        {product.category === 'inverter' && `${product.specs.power}kW`}
+                      </div>
+                      <div className="font-semibold">{product.price}€</div>
+                      <Button 
+                        className="w-full bg-solar-orange hover:bg-solar-orange-dark"
+                        onClick={handleConsultationRequest}
+                      >
+                        Beratung anfragen
+                      </Button>
+                    </div>
+                  </Card>
+                ))}
+              </div>
             </section>
 
             <section className="py-16 bg-gradient-to-br from-solar-blue-50 to-white rounded-3xl">
