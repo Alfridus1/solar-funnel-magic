@@ -23,8 +23,11 @@ export const employeeFormSchema = z.object({
 });
 
 export const employeeProfileSchema = z.object({
-  address: z.string().min(1, "Adresse wird benötigt"),
-  location: z.string().min(1, "Standort wird benötigt"),
+  street: z.string().min(1, "Straße wird benötigt"),
+  house_number: z.string().min(1, "Hausnummer wird benötigt"),
+  postal_code: z.string().min(1, "Postleitzahl wird benötigt"),
+  city: z.string().min(1, "Stadt wird benötigt"),
+  country: z.string().min(1, "Land wird benötigt"),
   iban: z.string().min(1, "IBAN wird benötigt"),
   base_salary: z.string().min(1, "Fixgehalt wird benötigt"),
   commission_enabled: z.boolean(),
