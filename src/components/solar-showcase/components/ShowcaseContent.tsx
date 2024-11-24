@@ -6,7 +6,10 @@ import { CallToAction } from "./CallToAction";
 import { Product } from "@/components/configurator/types";
 
 interface ShowcaseContentProps {
-  metrics: any;
+  metrics: {
+    kWp: number;
+    roofArea: number;
+  };
   address?: string;
   products: Product[];
   priceSettings: any;
@@ -30,7 +33,7 @@ export const ShowcaseContent = ({
       <div className="px-4 md:px-8 space-y-8 md:space-y-12">
         <MetricsHeader metrics={metrics} />
         <SystemVisualizer />
-        <PremiumProductsSection />
+        <PremiumProductsSection onConsultationRequest={onConsultationRequest} />
         <CallToAction
           onQuoteRequest={onQuoteRequest}
           onConsultationRequest={onConsultationRequest}
