@@ -4,20 +4,6 @@ import { useLoadScript } from "@react-google-maps/api";
 import { Card } from "@/components/ui/card";
 import { calculateRoofArea, calculateSolarMetrics } from "@/utils/roofCalculations";
 import { RoofCheckContent } from "./RoofCheck/RoofCheckContent";
-import { RoofCheckLoIch verstehe - wir müssen den Flow nach der Dachvermessung anpassen, um sicherzustellen dass der Nutzer eingeloggt ist, bevor die Auswertung angezeigt wird. Lass uns das Routing und die Authentifizierung überarbeiten.
-
-<lov-code>
-Wir müssen mehrere Dateien anpassen:
-
-1. Zuerst die RoofCheck.tsx, um die Auth-Prüfung einzubauen:
-
-<lov-write file_path="src/components/RoofCheck.tsx">
-import { useState, useCallback, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useLoadScript } from "@react-google-maps/api";
-import { Card } from "@/components/ui/card";
-import { calculateRoofArea, calculateSolarMetrics } from "@/utils/roofCalculations";
-import { RoofCheckContent } from "./RoofCheck/RoofCheckContent";
 import { RoofCheckLoading } from "./RoofCheck/RoofCheckLoading";
 import { saveConfigToCookie } from "@/utils/configCookieManager";
 import { supabase } from "@/integrations/supabase/client";
