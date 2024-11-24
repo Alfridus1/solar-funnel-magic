@@ -31,20 +31,20 @@ export const Benefits = () => {
   return (
     <div className="py-16 bg-gradient-to-br from-solar-orange/5 to-white">
       <h2 className="text-3xl font-bold text-center mb-4">Unser Komplettpaket</h2>
-      <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+      <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto px-4">
         Von der Planung bis zur Wartung - wir bieten Ihnen einen Rundum-Sorglos-Service für Ihre Solaranlage
       </p>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
+      <div className="grid grid-cols-1 gap-6 max-w-4xl mx-auto px-4">
         {benefits.map((benefit, index) => (
           <div 
             key={index} 
-            className="flex flex-col items-start p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300"
+            className="flex flex-col bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 p-6"
           >
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-3 mb-3">
               <CheckCircle className="h-6 w-6 text-solar-orange flex-shrink-0" />
               <h3 className="text-xl font-semibold">{benefit.title}</h3>
             </div>
-            <p className="text-gray-600">{benefit.description}</p>
+            <p className="text-gray-600 ml-9">{benefit.description}</p>
           </div>
         ))}
       </div>
