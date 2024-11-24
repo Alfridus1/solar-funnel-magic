@@ -20,32 +20,38 @@ const menuItems = [
   { 
     label: "Dashboard", 
     icon: LayoutDashboard, 
-    value: "dashboard" 
+    value: "dashboard",
+    path: "/solar-showcase#dashboard"
   },
   { 
     label: "Meine Anfragen", 
     icon: Inbox, 
-    value: "requests" 
+    value: "requests",
+    path: "/solar-showcase#requests"
   },
   { 
     label: "Meine Projekte", 
     icon: LayoutGrid, 
-    value: "projects" 
+    value: "projects",
+    path: "/solar-showcase#projects"
   },
   { 
     label: "Empfehlungsprogramm", 
     icon: Award, 
-    value: "referral" 
+    value: "referral",
+    path: "/solar-showcase#referral"
   },
   { 
     label: "Dokumente", 
     icon: FileText, 
-    value: "documents" 
+    value: "documents",
+    path: "/solar-showcase#documents"
   },
   { 
     label: "Einstellungen", 
     icon: Settings, 
-    value: "settings" 
+    value: "settings",
+    path: "/solar-showcase#settings"
   },
 ];
 
@@ -75,7 +81,7 @@ export const ShowcaseSidebar = () => {
                   return (
                     <Link
                       key={item.value}
-                      to={`#${item.value}`}
+                      to={item.path}
                       className="flex items-center px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
                     >
                       <Icon className="h-5 w-5 mr-3" />
@@ -130,7 +136,7 @@ export const ShowcaseSidebar = () => {
             return (
               <Link
                 key={item.value}
-                to={`#${item.value}`}
+                to={item.path}
                 className="flex items-center px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
               >
                 <Icon className="h-5 w-5 mr-3" />
