@@ -22,14 +22,21 @@ export const RecommendedConfig = () => {
   });
   const { toast } = useToast();
   
-  const { metrics, address } = location.state || loadConfigFromCookie() || {};
+  // Try to get configuration from location state or cookie
+  const config = location.state || loadConfigFromCookie();
+  const { metrics, address } = config || {};
 
   useEffect(() => {
     if (!metrics || !address) {
+      toast({
+        title: "Fehler",
+        description: "Keine Konfigurationsdaten gefunden. Bitte starten Sie erneut mit der Dachvermessung.",
+        variant: "destructive"
+      });
       navigate("/");
       return;
     }
-  }, [metrics, address, navigate]);
+  }, [metrics, address, navigate, toast]);
 
   if (!metrics || !address) {
     return null;
