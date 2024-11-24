@@ -2,33 +2,28 @@ import { motion } from "framer-motion";
 import { Sun, Battery, ChartBar } from "lucide-react";
 
 interface MetricsHeaderProps {
-  metrics: {
-    kWp: number;
-    roofArea: number;
-  };
+  kWp: number;
+  yearlyProduction: number;
+  annualSavings: number;
 }
 
-export const MetricsHeader = ({ metrics }: MetricsHeaderProps) => {
-  // Calculate values based on kWp
-  const yearlyProduction = Math.round(metrics.kWp * 950); // 950kWh per kWp per year
-  const annualSavings = Math.round(yearlyProduction * 0.30); // 30 cents per kWh
-
-  const metricsData = [
+export const MetricsHeader = ({ kWp, yearlyProduction, annualSavings }: MetricsHeaderProps) => {
+  const metrics = [
     {
       icon: Sun,
-      value: `${metrics.kWp.toFixed(1)} kWp`,
+      value: `${kWp}kWp`,
       label: "Anlagenleistung",
       color: "text-yellow-500",
     },
     {
       icon: Battery,
-      value: `${yearlyProduction.toLocaleString()} kWh`,
+      value: `${yearlyProduction.toLocaleString()}kWh`,
       label: "Jährliche Produktion",
       color: "text-green-500",
     },
     {
       icon: ChartBar,
-      value: `${annualSavings.toLocaleString()} €`,
+      value: `${annualSavings.toLocaleString()}€`,
       label: "Jährliche Einsparung",
       color: "text-blue-500",
     },
@@ -36,7 +31,7 @@ export const MetricsHeader = ({ metrics }: MetricsHeaderProps) => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-      {metricsData.map((metric, index) => (
+      {metrics.map((metric, index) => (
         <motion.div
           key={index}
           initial={{ opacity: 0, y: 20 }}
