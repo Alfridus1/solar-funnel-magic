@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { GoogleMap, DrawingManager, Marker } from "@react-google-maps/api";
 import { MapControls } from "./MapControls";
 import { Loader2 } from "lucide-react";
@@ -45,12 +45,12 @@ export const RoofMapUI = ({
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const [markerPosition, setMarkerPosition] = useState(coordinates);
 
-  const handleMapLoad = useCallback((map: google.maps.Map) => {
+  const handleMapLoad = (map: google.maps.Map) => {
     if (!mapInstance) {
       setMapInstance(map);
       onLoad(map);
     }
-  }, [mapInstance, onLoad]);
+  };
 
   const handleMarkerDragEnd = (e: google.maps.MapMouseEvent) => {
     if (e.latLng) {
