@@ -1,14 +1,10 @@
 import { CloudSun } from "lucide-react";
 
 interface ClimateEffectsProps {
-  metrics: {
-    annualProduction?: number;
-  };
+  annualProduction: number;
 }
 
-export const ClimateEffects = ({ metrics }: ClimateEffectsProps) => {
-  const annualProduction = metrics?.annualProduction || 0;
-
+export const ClimateEffects = ({ annualProduction }: ClimateEffectsProps) => {
   return (
     <div className="flex items-center justify-center gap-3 p-4 bg-blue-50 rounded-lg">
       <CloudSun className="h-8 w-8 text-blue-500" />

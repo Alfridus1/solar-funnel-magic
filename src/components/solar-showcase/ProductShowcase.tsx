@@ -1,16 +1,43 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ShowcaseHeader } from "./components/ShowcaseHeader";
 import { ShowcaseContent } from "./components/ShowcaseContent";
+import { RegistrationOverlay } from "./components/registration/RegistrationOverlay";
+import { ShowcaseLayout } from "./components/ShowcaseLayout";
+import type { Product } from "@/components/configurator/types";
 
-interface ProductShowcaseProps {
-  metrics: any;
-  address: any;
-  isAuthenticated: boolean;
-}
+const queryClient = new QueryClient();
 
-export const ProductShowcase = ({ metrics, address, isAuthenticated }: ProductShowcaseProps) => {
+export const ProductShowcase = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { toast } = useToast();
+  
+  const { metrics, address } = location.state || {};
+
+  useEffect(() => {
+    if (!metrics) {
+      navigate("/");
+      return;
+    }
+
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+    };
+    
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate, metrics]);
 
   const { data: products = [] } = useQuery({
     queryKey: ['solar-products'],
@@ -18,18 +45,15 @@ export const ProductShowcase = ({ metrics, address, isAuthenticated }: ProductSh
       const { data, error } = await supabase
         .from('solar_products')
         .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        toast({
-          title: "Fehler beim Laden der Produkte",
-          description: error.message,
-          variant: "destructive",
-        });
-        return [];
-      }
-
-      return data as Product[];
+        .order('name');
+      
+      if (error) throw error;
+      
+      return data.map(product => ({
+        ...product,
+        category: product.category as 'module' | 'inverter' | 'battery',
+        specs: product.specs as Product['specs']
+      }));
     }
   });
 
@@ -40,49 +64,38 @@ export const ProductShowcase = ({ metrics, address, isAuthenticated }: ProductSh
         .from('price_settings')
         .select('*')
         .single();
-
-      if (error) {
-        toast({
-          title: "Fehler beim Laden der Preiseinstellungen",
-          description: error.message,
-          variant: "destructive",
-        });
-        return null;
-      }
-
+      
+      if (error) throw error;
       return data;
     }
   });
 
-  const handleQuoteRequest = () => {
-    toast({
-      title: "Anfrage gesendet",
-      description: "Wir werden uns in Kürze bei Ihnen melden.",
-    });
-  };
-
-  const handleConsultationRequest = () => {
-    toast({
-      title: "Beratungstermin angefragt",
-      description: "Wir werden uns in Kürze bei Ihnen melden.",
-    });
-  };
-
   if (!metrics) return null;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-7xl mx-auto">
-        <ShowcaseContent
-          metrics={metrics}
-          address={address}
-          products={products}
-          priceSettings={priceSettings}
-          isAuthenticated={isAuthenticated}
-          onQuoteRequest={handleQuoteRequest}
-          onConsultationRequest={handleConsultationRequest}
-        />
-      </div>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <ShowcaseLayout>
+        <div className="min-h-screen relative">
+          <ShowcaseHeader />
+          <div className={`${!isAuthenticated ? 'blur-md' : ''}`}>
+            <ShowcaseContent 
+              metrics={metrics}
+              address={address}
+              products={products}
+              priceSettings={priceSettings}
+              isAuthenticated={isAuthenticated}
+            />
+          </div>
+          
+          {!isAuthenticated && (
+            <RegistrationOverlay 
+              onComplete={() => setIsAuthenticated(true)}
+              metrics={metrics}
+              address={address}
+            />
+          )}
+        </div>
+      </ShowcaseLayout>
+    </QueryClientProvider>
   );
 };

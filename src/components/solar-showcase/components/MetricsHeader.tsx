@@ -2,31 +2,28 @@ import { motion } from "framer-motion";
 import { Sun, Battery, ChartBar } from "lucide-react";
 
 interface MetricsHeaderProps {
-  metrics: {
-    kWp?: number;
-    yearlyProduction?: number;
-    annualSavings?: number;
-  };
-  address: string;
+  kWp: number;
+  yearlyProduction: number;
+  annualSavings: number;
 }
 
-export const MetricsHeader = ({ metrics, address }: MetricsHeaderProps) => {
-  const metricsData = [
+export const MetricsHeader = ({ kWp, yearlyProduction, annualSavings }: MetricsHeaderProps) => {
+  const metrics = [
     {
       icon: Sun,
-      value: `${metrics?.kWp || 0}kWp`,
+      value: `${kWp}kWp`,
       label: "Anlagenleistung",
       color: "text-yellow-500",
     },
     {
       icon: Battery,
-      value: `${(metrics?.yearlyProduction || 0).toLocaleString()}kWh`,
+      value: `${yearlyProduction.toLocaleString()}kWh`,
       label: "Jährliche Produktion",
       color: "text-green-500",
     },
     {
       icon: ChartBar,
-      value: `${(metrics?.annualSavings || 0).toLocaleString()}€`,
+      value: `${annualSavings.toLocaleString()}€`,
       label: "Jährliche Einsparung",
       color: "text-blue-500",
     },
@@ -34,7 +31,7 @@ export const MetricsHeader = ({ metrics, address }: MetricsHeaderProps) => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-      {metricsData.map((metric, index) => (
+      {metrics.map((metric, index) => (
         <motion.div
           key={index}
           initial={{ opacity: 0, y: 20 }}

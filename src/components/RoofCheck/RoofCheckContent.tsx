@@ -1,14 +1,11 @@
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { RoofDesigner } from "@/components/roof/RoofDesigner";
 import { RoofMetrics } from "@/components/roof/RoofMetrics";
 import { ProgressBar } from "@/components/ProgressBar";
-import { Plus, ArrowRight } from "lucide-react";
 
 interface RoofCheckContentProps {
   address: string;
   handleRoofOutlineComplete: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number; kWp: number }[]) => void;
-  handleViewAnalysis: () => void;
   paths: google.maps.LatLng[][];
   metrics: any;
   onLog?: (message: string) => void;
@@ -17,7 +14,6 @@ interface RoofCheckContentProps {
 export const RoofCheckContent = ({
   address,
   handleRoofOutlineComplete,
-  handleViewAnalysis,
   paths,
   metrics,
   onLog
@@ -49,33 +45,7 @@ export const RoofCheckContent = ({
             />
 
             {paths.length > 0 && (
-              <>
-                <RoofMetrics {...metrics} />
-                
-                <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
-                  <Button 
-                    variant="outline"
-                    className="w-full sm:w-auto"
-                    onClick={() => {
-                      const roofDesignerElement = document.querySelector('.roof-designer');
-                      if (roofDesignerElement) {
-                        roofDesignerElement.scrollIntoView({ behavior: 'smooth' });
-                      }
-                    }}
-                  >
-                    <Plus className="mr-2 h-4 w-4" />
-                    Weitere Dachfläche hinzufügen
-                  </Button>
-                  
-                  <Button 
-                    className="w-full sm:w-auto bg-solar-orange hover:bg-solar-orange-600"
-                    onClick={handleViewAnalysis}
-                  >
-                    Auswertung ansehen
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </div>
-              </>
+              <RoofMetrics {...metrics} />
             )}
           </div>
         </Card>
