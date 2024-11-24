@@ -25,6 +25,13 @@ export const LeadForm = ({ formType = "quote", onSuccess, metrics, address }: Le
     setIsSubmitting(true);
 
     try {
+      // Check if email exists in profiles
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', formData.email)
+        .single();
+
       // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -33,7 +40,7 @@ export const LeadForm = ({ formType = "quote", onSuccess, metrics, address }: Le
         const { error: profileError } = await supabase
           .from('profiles')
           .upsert({
-            id: user.id,
+            id: existingProfile?.id || user.id,
             first_name: formData.name.split(' ')[0],
             last_name: formData.name.split(' ').slice(1).join(' '),
             email: formData.email,
@@ -53,7 +60,7 @@ export const LeadForm = ({ formType = "quote", onSuccess, metrics, address }: Le
           status: 'new',
           metrics: metrics || null,
           address: address || null,
-          user_id: user?.id || null // Link to user if logged in
+          user_id: existingProfile?.id || user?.id || null
         }]);
 
       if (error) throw error;

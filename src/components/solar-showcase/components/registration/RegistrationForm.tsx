@@ -32,6 +32,23 @@ export const RegistrationForm = ({ onComplete, onShowLogin, metrics, address }: 
     setIsSubmitting(true);
 
     try {
+      // Check if email already exists in profiles
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', formData.email)
+        .single();
+
+      if (existingProfile) {
+        toast({
+          title: "E-Mail bereits registriert",
+          description: "Diese E-Mail-Adresse ist bereits registriert. Bitte loggen Sie sich ein.",
+          variant: "destructive",
+        });
+        onShowLogin();
+        return;
+      }
+
       // Get referral code from localStorage
       const referralCode = localStorage.getItem('referralCode');
       
