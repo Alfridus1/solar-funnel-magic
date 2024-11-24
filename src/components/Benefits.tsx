@@ -3,31 +3,47 @@ import { CheckCircle } from "lucide-react";
 export const Benefits = () => {
   const benefits = [
     {
-      title: "Maximale Ersparnis",
-      description: "Optimieren Sie Ihre Energiekosten durch maßgeschneiderte Solaranlagen",
+      title: "Komplette DC Installation",
+      description: "Professionelle Installation der Solarmodule und Verkabelung auf Ihrem Dach",
     },
     {
-      title: "Schnelle Installation",
-      description: "Professionelle Montage innerhalb weniger Tage",
+      title: "AC Installation",
+      description: "Fachgerechte Installation des Wechselrichters und neuen Zählerschranks nach aktuellen Standards",
     },
     {
-      title: "Komplett-Service",
-      description: "Von der Planung bis zur Wartung - alles aus einer Hand",
+      title: "Smart Home Integration",
+      description: "Intelligente Vernetzung mit Ihrem Heimnetzwerk für optimale Energiesteuerung",
+    },
+    {
+      title: "Wartung & Service",
+      description: "Regelmäßige Wartung und schneller Support bei Fragen oder Problemen",
+    },
+    {
+      title: "Behördengänge",
+      description: "Wir kümmern uns um alle notwendigen Anmeldungen und Genehmigungen",
     },
     {
       title: "Garantierte Qualität",
-      description: "Hochwertige Komponenten mit langer Garantiezeit",
+      description: "Premium Komponenten mit langer Garantiezeit und TÜV-zertifizierte Installation",
     },
   ];
 
   return (
-    <div className="py-16">
-      <h2 className="text-3xl font-bold text-center mb-12">Ihre Vorteile</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+    <div className="py-16 bg-gradient-to-br from-solar-orange/5 to-white">
+      <h2 className="text-3xl font-bold text-center mb-4">Unser Komplettpaket</h2>
+      <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+        Von der Planung bis zur Wartung - wir bieten Ihnen einen Rundum-Sorglos-Service für Ihre Solaranlage
+      </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
         {benefits.map((benefit, index) => (
-          <div key={index} className="flex flex-col items-center text-center p-6 bg-white/80 backdrop-blur rounded-xl">
-            <CheckCircle className="h-10 w-10 text-solar-orange mb-4" />
-            <h3 className="text-xl font-semibold mb-2">{benefit.title}</h3>
+          <div 
+            key={index} 
+            className="flex flex-col items-start p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <CheckCircle className="h-6 w-6 text-solar-orange flex-shrink-0" />
+              <h3 className="text-xl font-semibold">{benefit.title}</h3>
+            </div>
             <p className="text-gray-600">{benefit.description}</p>
           </div>
         ))}

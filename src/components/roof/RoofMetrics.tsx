@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { Benefits } from "@/components/Benefits";
 
 interface RoofDetail {
   roofId: string;
@@ -32,7 +33,7 @@ export const RoofMetrics = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="space-y-6"
+      className="space-y-12"
     >
       <div className="text-center">
         <h2 className="text-2xl font-bold mb-2">Ihre Potenzialanalyse</h2>
@@ -58,13 +59,15 @@ export const RoofMetrics = ({
 
         <Card className="p-4 bg-gradient-to-br from-green-50 to-white">
           <div className="text-center">
-            <p className="text-sm text-gray-600">Anlagenleistung</p>
-            <p className="text-2xl font-bold">{kWp.toLocaleString('de-DE')} kWp</p>
+            <p className="text-sm text-gray-600">Nutzbare Dachfläche</p>
+            <p className="text-2xl font-bold">{roofArea.toFixed(2)} m²</p>
           </div>
         </Card>
       </div>
 
-      <div className="flex justify-center pt-4">
+      <Benefits />
+
+      <div className="flex justify-center">
         <Button 
           onClick={onContinue}
           className="bg-solar-orange hover:bg-solar-orange-600 text-lg py-6 px-8 shadow-lg hover:shadow-xl transition-all duration-300"
