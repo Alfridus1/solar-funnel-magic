@@ -49,17 +49,18 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
         metrics: updatedMetrics,
         address,
       });
-
-      // Navigate directly to solar showcase with metrics
-      navigate("/solar-showcase", {
-        state: {
-          metrics: updatedMetrics,
-          address,
-        },
-      });
     },
-    [onLog, navigate, address]
+    [onLog, address]
   );
+
+  const handleContinue = useCallback(() => {
+    navigate("/solar-showcase", {
+      state: {
+        metrics,
+        address,
+      },
+    });
+  }, [navigate, metrics, address]);
 
   if (loadError) {
     return (
@@ -82,6 +83,7 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
       paths={paths}
       metrics={metrics}
       onLog={onLog}
+      onContinue={handleContinue}
     />
   );
 };

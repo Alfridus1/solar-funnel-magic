@@ -10,6 +10,7 @@ interface RoofCheckContentProps {
   paths: google.maps.LatLng[][];
   metrics: any;
   onLog?: (message: string) => void;
+  onContinue: () => void;
 }
 
 export const RoofCheckContent = ({
@@ -17,7 +18,8 @@ export const RoofCheckContent = ({
   handleRoofOutlineComplete,
   paths,
   metrics,
-  onLog
+  onLog,
+  onContinue
 }: RoofCheckContentProps) => {
   const steps = [
     { title: "Adresse", description: "Ihre Adresse" },
@@ -55,6 +57,7 @@ export const RoofCheckContent = ({
               <RoofMetrics 
                 {...metrics} 
                 onAddRoof={handleAddRoof}
+                onContinue={onContinue}
               />
             )}
           </div>
