@@ -13,27 +13,36 @@ export type Database = {
         Row: {
           affiliate_id: string | null
           amount: number
+          commission_percentage: number | null
+          commission_type: string
           created_at: string | null
           id: string
           lead_id: string | null
+          purchase_amount: number | null
           status: string | null
           updated_at: string | null
         }
         Insert: {
           affiliate_id?: string | null
           amount: number
+          commission_percentage?: number | null
+          commission_type?: string
           created_at?: string | null
           id?: string
           lead_id?: string | null
+          purchase_amount?: number | null
           status?: string | null
           updated_at?: string | null
         }
         Update: {
           affiliate_id?: string | null
           amount?: number
+          commission_percentage?: number | null
+          commission_type?: string
           created_at?: string | null
           id?: string
           lead_id?: string | null
+          purchase_amount?: number | null
           status?: string | null
           updated_at?: string | null
         }
@@ -127,6 +136,7 @@ export type Database = {
           bank_details: string | null
           company_name: string
           created_at: string | null
+          default_commission_percentage: number | null
           id: string
           letterhead_url: string | null
           tax_number: string | null
@@ -138,6 +148,7 @@ export type Database = {
           bank_details?: string | null
           company_name: string
           created_at?: string | null
+          default_commission_percentage?: number | null
           id?: string
           letterhead_url?: string | null
           tax_number?: string | null
@@ -149,6 +160,7 @@ export type Database = {
           bank_details?: string | null
           company_name?: string
           created_at?: string | null
+          default_commission_percentage?: number | null
           id?: string
           letterhead_url?: string | null
           tax_number?: string | null
@@ -1298,7 +1310,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      calculate_commission: {
+        Args: {
+          purchase_amount: number
+          commission_percentage: number
+        }
+        Returns: number
+      }
     }
     Enums: {
       user_role:

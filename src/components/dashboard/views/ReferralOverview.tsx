@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { Users, Link, Copy } from "lucide-react";
+import { Users, Link, Copy, Euro } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -47,7 +47,22 @@ export const ReferralOverview = () => {
         affiliate = newAffiliate;
       }
 
-      return affiliate;
+      // Get affiliate bonuses
+      const { data: bonuses } = await supabase
+        .from('affiliate_bonuses')
+        .select('*')
+        .eq('affiliate_id', affiliate.id);
+
+      const totalCommission = bonuses?.reduce((sum, bonus) => sum + Number(bonus.amount), 0) || 0;
+      const purchaseCommissions = bonuses?.filter(bonus => bonus.commission_type === 'purchase') || [];
+      const totalPurchaseAmount = purchaseCommissions.reduce((sum, bonus) => sum + Number(bonus.purchase_amount), 0);
+
+      return {
+        ...affiliate,
+        totalCommission,
+        totalPurchaseAmount,
+        purchaseCount: purchaseCommissions.length
+      };
     }
   });
 
@@ -69,7 +84,7 @@ export const ReferralOverview = () => {
     <div className="space-y-6 p-4">
       <h1 className="text-2xl font-bold">Empfehlungsprogramm</h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-6 bg-gradient-to-br from-blue-50 to-white">
           <div className="flex items-center gap-3 mb-4">
             <Users className="h-8 w-8 text-blue-600" />
@@ -95,6 +110,32 @@ export const ReferralOverview = () => {
             Generierte Leads über Ihre Empfehlungen
           </p>
         </Card>
+
+        <Card className="p-6 bg-gradient-to-br from-yellow-50 to-white">
+          <div className="flex items-center gap-3 mb-4">
+            <Euro className="h-8 w-8 text-yellow-600" />
+            <div>
+              <p className="text-sm text-gray-600">Provision</p>
+              <p className="text-2xl font-bold">{affiliateData?.totalCommission?.toLocaleString('de-DE')} €</p>
+            </div>
+          </div>
+          <p className="text-sm text-gray-600">
+            Ihre gesamte verdiente Provision
+          </p>
+        </Card>
+
+        <Card className="p-6 bg-gradient-to-br from-purple-50 to-white">
+          <div className="flex items-center gap-3 mb-4">
+            <Euro className="h-8 w-8 text-purple-600" />
+            <div>
+              <p className="text-sm text-gray-600">Verkäufe</p>
+              <p className="text-2xl font-bold">{affiliateData?.purchaseCount || 0}</p>
+            </div>
+          </div>
+          <p className="text-sm text-gray-600">
+            Erfolgreiche Verkäufe: {affiliateData?.totalPurchaseAmount?.toLocaleString('de-DE')} €
+          </p>
+        </Card>
       </div>
 
       <Card className="p-6">
@@ -112,7 +153,7 @@ export const ReferralOverview = () => {
           </Button>
         </div>
         <p className="text-sm text-gray-600 mt-4">
-          Teilen Sie diesen Link mit Ihren Kontakten. Für jede erfolgreiche Empfehlung erhalten Sie eine Provision.
+          Teilen Sie diesen Link mit Ihren Kontakten. Für jede erfolgreiche Empfehlung und jeden Verkauf erhalten Sie eine Provision.
         </p>
       </Card>
 
@@ -135,9 +176,9 @@ export const ReferralOverview = () => {
               2
             </div>
             <div>
-              <p className="font-medium">Registrierung</p>
+              <p className="font-medium">Registrierung & Kauf</p>
               <p className="text-sm text-gray-600">
-                Wenn sich jemand über Ihren Link registriert, wird dies automatisch erfasst
+                Wenn sich jemand über Ihren Link registriert und ein System kauft, wird dies automatisch erfasst
               </p>
             </div>
           </div>
@@ -148,7 +189,7 @@ export const ReferralOverview = () => {
             <div>
               <p className="font-medium">Provision</p>
               <p className="text-sm text-gray-600">
-                Für jede erfolgreiche Vermittlung erhalten Sie eine attraktive Provision
+                Sie erhalten eine Provision für die Registrierung und einen Prozentsatz des Verkaufswertes
               </p>
             </div>
           </div>
