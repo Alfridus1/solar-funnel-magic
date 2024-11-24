@@ -5,11 +5,20 @@ import { ProgressBar } from "@/components/ProgressBar";
 import { loadConfigFromCookie } from "@/utils/configCookieManager";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { useEffect } from "react";
 
 export const RecommendedConfig = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { metrics, address } = location.state || loadConfigFromCookie() || {};
+  const configData = location.state || loadConfigFromCookie();
+  const { metrics, address } = configData || {};
+
+  useEffect(() => {
+    // If no metrics are available, redirect to home
+    if (!metrics) {
+      navigate("/");
+    }
+  }, [metrics, navigate]);
 
   const steps = [
     { title: "Adresse", description: "Ihre Adresse" },
@@ -29,12 +38,12 @@ export const RecommendedConfig = () => {
                 Bitte starten Sie erneut mit der Dachvermessung.
               </p>
               <Button 
-                onClick={() => navigate(-1)}
+                onClick={() => navigate("/")}
                 variant="outline"
                 className="flex items-center gap-2"
               >
                 <ArrowLeft className="h-4 w-4" />
-                Zurück
+                Zurück zur Startseite
               </Button>
             </div>
           </Card>
