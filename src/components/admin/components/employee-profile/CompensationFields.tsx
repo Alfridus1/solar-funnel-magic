@@ -2,10 +2,10 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { UseFormReturn } from "react-hook-form";
-import { EmployeeProfileData } from "../../types/employeeForm";
+import { EmployeeFormData } from "../../types/employeeForm";
 
 interface CompensationFieldsProps {
-  form: UseFormReturn<EmployeeProfileData>;
+  form: UseFormReturn<EmployeeFormData>;
 }
 
 export const CompensationFields = ({ form }: CompensationFieldsProps) => {

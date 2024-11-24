@@ -35,7 +35,7 @@ export const EmployeeDialog = ({
       last_name: employee.profiles.last_name,
       email: employee.profiles.email,
       role: employee.role as EmployeeFormData["role"],
-      phone: employee.profiles.phone,
+      phone: employee.profiles.phone || "",
       address: employee.address || "",
       location: employee.location || "",
       iban: employee.iban || "",
@@ -91,15 +91,8 @@ export const EmployeeDialog = ({
     try {
       let profileId;
 
-      const { data: existingProfile, error: checkError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', data.email)
-        .single();
-
-      if (checkError && checkError.code !== 'PGRST116') throw checkError;
-
       if (!employee) {
+        // Create new user
         const { data: authData, error: authError } = await supabase.auth.admin.createUser({
           email: data.email,
           password: "Coppen2023!",
@@ -107,22 +100,8 @@ export const EmployeeDialog = ({
         });
 
         if (authError) throw authError;
-      }
 
-      if (employee) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .update({
-            first_name: data.first_name,
-            last_name: data.last_name,
-            email: data.email,
-            phone: data.phone,
-          })
-          .eq('id', employee.profile_id);
-
-        if (profileError) throw profileError;
-        profileId = employee.profile_id;
-      } else {
+        // Create profile
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .insert({
@@ -137,8 +116,23 @@ export const EmployeeDialog = ({
 
         if (profileError) throw profileError;
         profileId = profile.id;
+      } else {
+        // Update existing profile
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            first_name: data.first_name,
+            last_name: data.last_name,
+            email: data.email,
+            phone: data.phone,
+          })
+          .eq('id', employee.profile_id);
+
+        if (profileError) throw profileError;
+        profileId = employee.profile_id;
       }
 
+      // Create or update employee
       const employeeData = {
         profile_id: profileId,
         role: data.role,
