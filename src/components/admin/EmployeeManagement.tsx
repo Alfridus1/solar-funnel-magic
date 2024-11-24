@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { UserPlus, FileEdit, Trash2 } from "lucide-react";
+import { UserPlus, FileEdit, Trash2, KeyRound } from "lucide-react";
 import { EmployeeDialog } from "./components/EmployeeDialog";
 import { Employee } from "./types/employee";
 import { roleTranslations } from "@/utils/roleTranslations";
@@ -12,6 +12,7 @@ export const EmployeeManagement = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -74,6 +75,31 @@ export const EmployeeManagement = () => {
     }
   };
 
+  const handleResetPassword = async (email: string) => {
+    setIsResetting(true);
+    try {
+      const { error } = await supabase.functions.invoke('reset-employee-password', {
+        body: { email }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Passwort zurückgesetzt",
+        description: "Das Passwort wurde erfolgreich auf 'Coppen2023!' zurückgesetzt.",
+      });
+    } catch (error: any) {
+      console.error('Reset password error:', error);
+      toast({
+        title: "Fehler beim Zurücksetzen",
+        description: error.message || "Ein unerwarteter Fehler ist aufgetreten",
+        variant: "destructive",
+      });
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -111,6 +137,14 @@ export const EmployeeManagement = () => {
                     onClick={() => handleEditEmployee(employee)}
                   >
                     <FileEdit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleResetPassword(employee.profiles?.email || '')}
+                    disabled={isResetting || !employee.profiles?.email}
+                  >
+                    <KeyRound className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="destructive"
