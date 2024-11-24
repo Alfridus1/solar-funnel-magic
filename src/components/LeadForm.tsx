@@ -38,6 +38,8 @@ export const LeadForm = ({ formType = "quote", onSuccess, metrics, address }: Le
             last_name: formData.name.split(' ').slice(1).join(' '),
             email: formData.email,
             phone: formData.phone,
+          }, {
+            onConflict: 'id'
           });
 
         if (profileError) throw profileError;
@@ -53,7 +55,7 @@ export const LeadForm = ({ formType = "quote", onSuccess, metrics, address }: Le
           status: 'new',
           metrics: metrics || null,
           address: address || null,
-          user_id: user?.id || null // Link to user if logged in
+          user_id: user?.id || null
         }]);
 
       if (error) throw error;
