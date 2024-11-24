@@ -22,7 +22,7 @@ export const PDFDownloadButton = ({ metrics, address }: PDFDownloadButtonProps) 
           ) : (
             <>
               <Download className="w-4 h-4 mr-2" />
-              Angebot als PDF
+              Einschätzung als PDF herunterladen
             </>
           )}
         </Button>
