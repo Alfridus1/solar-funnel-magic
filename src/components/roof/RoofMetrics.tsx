@@ -1,6 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Benefits } from "@/components/Benefits";
 
@@ -28,6 +27,13 @@ export const RoofMetrics = ({
   roofDetails,
   onContinue
 }: RoofMetricsProps) => {
+  // Automatically trigger navigation when metrics are available
+  useEffect(() => {
+    if (monthlyProduction && annualSavings && roofArea) {
+      onContinue();
+    }
+  }, [monthlyProduction, annualSavings, roofArea, onContinue]);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -66,16 +72,6 @@ export const RoofMetrics = ({
       </div>
 
       <Benefits />
-
-      <div className="flex justify-center">
-        <Button 
-          onClick={onContinue}
-          className="bg-solar-orange hover:bg-solar-orange-600 text-lg py-6 px-8 shadow-lg hover:shadow-xl transition-all duration-300"
-        >
-          Jetzt Ihre Einsparungen erfahren
-          <ArrowRight className="ml-2 h-5 w-5" />
-        </Button>
-      </div>
     </motion.div>
   );
 };
