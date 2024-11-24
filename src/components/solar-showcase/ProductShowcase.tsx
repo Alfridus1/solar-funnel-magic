@@ -63,20 +63,27 @@ export const ProductShowcase = () => {
   const { metrics, address } = location.state || {};
 
   useEffect(() => {
-    // Check authentication status on mount and when it changes
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setIsAuthenticated(!!session);
+      
+      if (!metrics || !session) {
+        navigate("/");
+        return;
+      }
     };
     
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setIsAuthenticated(!!session);
+      if (!session) {
+        navigate("/");
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [navigate, metrics]);
 
   if (!metrics) {
     navigate("/");

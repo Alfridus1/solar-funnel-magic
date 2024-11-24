@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,7 +9,9 @@ import { Button } from "@/components/ui/button";
 
 export function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
+  const { returnTo, metrics, address } = location.state || {};
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -18,12 +20,18 @@ export function Login() {
           title: "Erfolgreich angemeldet",
           description: "Willkommen zurück!",
         });
-        navigate("/");
+        
+        // Wenn returnTo und metrics vorhanden sind, zur Auswertung navigieren
+        if (returnTo && metrics) {
+          navigate(returnTo, { state: { metrics, address } });
+        } else {
+          navigate("/");
+        }
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, toast]);
+  }, [navigate, toast, returnTo, metrics, address]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-solar-blue to-white flex items-center justify-center p-4">

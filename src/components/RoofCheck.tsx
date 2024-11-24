@@ -1,4 +1,18 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useLoadScript } from "@react-google-maps/api";
+import { Card } from "@/components/ui/card";
+import { calculateRoofArea, calculateSolarMetrics } from "@/utils/roofCalculations";
+import { RoofCheckContent } from "./RoofCheck/RoofCheckContent";
+import { RoofCheckLoIch verstehe - wir müssen den Flow nach der Dachvermessung anpassen, um sicherzustellen dass der Nutzer eingeloggt ist, bevor die Auswertung angezeigt wird. Lass uns das Routing und die Authentifizierung überarbeiten.
+
+<lov-code>
+Wir müssen mehrere Dateien anpassen:
+
+1. Zuerst die RoofCheck.tsx, um die Auth-Prüfung einzubauen:
+
+<lov-write file_path="src/components/RoofCheck.tsx">
+import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLoadScript } from "@react-google-maps/api";
 import { Card } from "@/components/ui/card";
@@ -6,6 +20,8 @@ import { calculateRoofArea, calculateSolarMetrics } from "@/utils/roofCalculatio
 import { RoofCheckContent } from "./RoofCheck/RoofCheckContent";
 import { RoofCheckLoading } from "./RoofCheck/RoofCheckLoading";
 import { saveConfigToCookie } from "@/utils/configCookieManager";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 const libraries: ("places" | "drawing" | "geometry")[] = ["places", "drawing", "geometry"];
 
@@ -33,13 +49,22 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
     kWp: 0,
     roofDetails: []
   });
-
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
     libraries,
   });
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+    };
+    checkAuth();
+  }, []);
 
   const handleRoofOutlineComplete = useCallback(
     (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number; kWp: number }[]) => {
@@ -48,7 +73,7 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
       const calculatedMetrics = calculateSolarMetrics(totalArea);
       const updatedMetrics = {
         ...calculatedMetrics,
-        roofArea: totalArea,
+        roofArea: Math.round(totalArea * 100) / 100, // Runden auf 2 Nachkommastellen
         roofDetails
       };
       setMetrics(updatedMetrics);
@@ -60,7 +85,23 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
         address,
       });
 
-      // Automatically navigate to solar showcase after calculations
+      // Prüfen ob der Nutzer eingeloggt ist
+      if (!isAuthenticated) {
+        toast({
+          title: "Anmeldung erforderlich",
+          description: "Bitte melden Sie sich an oder erstellen Sie einen Account, um Ihre persönliche Auswertung zu sehen.",
+        });
+        navigate("/login", {
+          state: {
+            returnTo: "/solar-showcase",
+            metrics: updatedMetrics,
+            address,
+          }
+        });
+        return;
+      }
+
+      // Wenn eingeloggt, direkt zur Auswertung
       navigate("/solar-showcase", {
         state: {
           metrics: updatedMetrics,
@@ -68,7 +109,7 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
         },
       });
     },
-    [onLog, navigate, address]
+    [onLog, navigate, address, isAuthenticated, toast]
   );
 
   if (loadError) {
