@@ -7,9 +7,11 @@ import type { LeadCalculation } from "./types/LeadCalculation";
 import { CalculationCard } from "./components/CalculationCard";
 import { EmptyState } from "./components/EmptyState";
 import { PageHeader } from "./components/PageHeader";
+import { MeetingsDialog } from "@/components/solar-showcase/components/MeetingsDialog";
 
 export const RequestsOverview = () => {
   const [calculations, setCalculations] = useState<LeadCalculation[]>([]);
+  const [showMeetingsDialog, setShowMeetingsDialog] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -60,6 +62,10 @@ export const RequestsOverview = () => {
     navigate("/");
   };
 
+  const handleConsultation = () => {
+    setShowMeetingsDialog(true);
+  };
+
   const handleCalculationClick = (calculation: LeadCalculation) => {
     if (calculation.metrics) {
       navigate("/solar-showcase", {
@@ -107,6 +113,7 @@ export const RequestsOverview = () => {
     <div className="space-y-6">
       <PageHeader 
         onNewRequest={handleNewRequest}
+        onConsultation={handleConsultation}
       />
 
       <div className="grid gap-6">
@@ -123,6 +130,11 @@ export const RequestsOverview = () => {
           <EmptyState onNewRequest={handleNewRequest} />
         )}
       </div>
+
+      <MeetingsDialog
+        open={showMeetingsDialog}
+        onOpenChange={setShowMeetingsDialog}
+      />
     </div>
   );
 };
