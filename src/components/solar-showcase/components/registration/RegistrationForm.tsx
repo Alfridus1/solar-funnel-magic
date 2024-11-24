@@ -32,7 +32,7 @@ export const RegistrationForm = ({ onComplete, onShowLogin, metrics, address }: 
     setIsSubmitting(true);
 
     try {
-      // Get referral code from localStorage if it exists
+      // Get referral code from localStorage
       const referralCode = localStorage.getItem('referralCode');
       
       // If there's a referral code, get the affiliate's ID
@@ -63,11 +63,15 @@ export const RegistrationForm = ({ onComplete, onShowLogin, metrics, address }: 
 
       if (authError) throw authError;
 
+      if (!authData.user) {
+        throw new Error('Benutzer konnte nicht erstellt werden');
+      }
+
       // Create profile
       const { error: profileError } = await supabase
         .from('profiles')
         .insert([{
-          id: authData.user?.id,
+          id: authData.user.id,
           first_name: formData.firstName,
           last_name: formData.lastName,
           email: formData.email,
@@ -76,9 +80,26 @@ export const RegistrationForm = ({ onComplete, onShowLogin, metrics, address }: 
 
       if (profileError) throw profileError;
 
-      // Save the initial lead with the calculation data
-      if (metrics && address && authData.user) {
-        await saveInitialLead(authData.user.id, formData, metrics, address);
+      // Create lead for tracking the referral
+      if (affiliateId) {
+        const { error: leadError } = await supabase
+          .from('leads')
+          .insert([{
+            name: `${formData.firstName} ${formData.lastName}`,
+            email: formData.email,
+            phone: formData.phone,
+            type: 'registration',
+            affiliate_id: affiliateId,
+            user_id: authData.user.id,
+            status: 'converted'
+          }]);
+
+        if (leadError) throw leadError;
+      }
+
+      // Save the initial lead with the calculation data if present
+      if (metrics && address) {
+        await saveInitialLead(authData.user.id, formData, metrics, address, affiliateId);
       }
 
       // Clear the referral code from localStorage after successful registration
