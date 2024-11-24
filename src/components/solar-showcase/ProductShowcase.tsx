@@ -34,7 +34,12 @@ export const ProductShowcase = () => {
         .order('name');
       
       if (error) throw error;
-      return data;
+      
+      // Ensure the category is correctly typed
+      return data.map(product => ({
+        ...product,
+        category: product.category as 'module' | 'inverter' | 'battery'
+      }));
     }
   });
 
@@ -55,6 +60,16 @@ export const ProductShowcase = () => {
   const moduleCount = Math.round(metrics.kWp * 2);
   const annualProduction = Math.round(metrics.kWp * 950);
   const estimatedPrice = Math.round(metrics.kWp * 1950);
+
+  const handleQuoteRequest = () => {
+    setFormType("quote");
+    setShowLeadForm(true);
+  };
+
+  const handleConsultationRequest = () => {
+    setFormType("consultation");
+    setShowLeadForm(true);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F75c03]/5 to-white">
@@ -85,10 +100,16 @@ export const ProductShowcase = () => {
               <h2 className="text-3xl font-bold text-center mb-8">
                 Unsere Produkte für Sie
               </h2>
-              <ProductGrid products={products} />
+              <ProductGrid 
+                products={products} 
+                onConsultationRequest={handleConsultationRequest}
+              />
             </section>
 
-            <CallToAction />
+            <CallToAction 
+              onQuoteRequest={handleQuoteRequest}
+              onConsultationRequest={handleConsultationRequest}
+            />
           </div>
         </Card>
 
