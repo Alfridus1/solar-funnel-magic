@@ -2,7 +2,6 @@ import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLoadScript } from "@react-google-maps/api";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { calculateRoofArea, calculateSolarMetrics } from "@/utils/roofCalculations";
 import { RoofCheckContent } from "./RoofCheck/RoofCheckContent";
 import { RoofCheckLoading } from "./RoofCheck/RoofCheckLoading";
@@ -50,18 +49,17 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
         metrics: updatedMetrics,
         address,
       });
-    },
-    [onLog, address]
-  );
 
-  const handleContinue = () => {
-    navigate("/solar-showcase", {
-      state: {
-        metrics,
-        address,
-      },
-    });
-  };
+      // Navigate directly to solar showcase with metrics
+      navigate("/solar-showcase", {
+        state: {
+          metrics: updatedMetrics,
+          address,
+        },
+      });
+    },
+    [onLog, navigate, address]
+  );
 
   if (loadError) {
     return (
@@ -78,25 +76,12 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
   }
 
   return (
-    <div className="space-y-6">
-      <RoofCheckContent
-        address={address}
-        handleRoofOutlineComplete={handleRoofOutlineComplete}
-        paths={paths}
-        metrics={metrics}
-        onLog={onLog}
-      />
-      
-      {paths.length > 0 && (
-        <div className="flex justify-center">
-          <Button 
-            onClick={handleContinue}
-            className="bg-solar-orange hover:bg-solar-orange-dark text-white px-8 py-3 rounded-lg text-lg"
-          >
-            Weiter zur Konfiguration
-          </Button>
-        </div>
-      )}
-    </div>
+    <RoofCheckContent
+      address={address}
+      handleRoofOutlineComplete={handleRoofOutlineComplete}
+      paths={paths}
+      metrics={metrics}
+      onLog={onLog}
+    />
   );
 };
