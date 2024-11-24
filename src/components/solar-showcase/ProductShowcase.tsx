@@ -111,7 +111,7 @@ export const ProductShowcase = () => {
               roofArea={metrics.roofArea}
             />
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-2 gap-4 sm:gap-8">
               <SavingsCalculator yearlyProduction={Math.round(metrics.kWp * 950)} />
             </div>
           </div>
@@ -134,7 +134,7 @@ export const ProductShowcase = () => {
             <h2 className="text-3xl font-bold text-center mb-12">
               Unser Rundum-Sorglos-Paket
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-2 gap-4 sm:gap-8">
               <div className="space-y-6">
                 <h3 className="text-xl font-semibold text-solar-orange">Installation & Hardware</h3>
                 <ul className="space-y-3">
