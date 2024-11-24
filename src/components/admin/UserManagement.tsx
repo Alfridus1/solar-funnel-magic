@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Profile, AffiliateInfo } from "./types/userManagement";
 import { UserTableRow } from "./components/UserTableRow";
+import { Card } from "@/components/ui/card";
 
 export const UserManagement = () => {
   const [users, setUsers] = useState<Profile[]>([]);
@@ -34,8 +35,20 @@ export const UserManagement = () => {
     }
   };
 
-  const handleUserSelect = (user: Profile) => {
+  const handleUserSelect = async (user: Profile) => {
     setSelectedUser(user);
+    // Fetch affiliate info when user is selected
+    const { data: affiliateData, error } = await supabase
+      .from('affiliates')
+      .select('*')
+      .eq('email', user.email)
+      .single();
+
+    if (!error && affiliateData) {
+      setAffiliateInfo(affiliateData);
+    } else {
+      setAffiliateInfo(null);
+    }
   };
 
   const handleDeleteUser = async (userId: string) => {
@@ -96,45 +109,49 @@ export const UserManagement = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold">Benutzer</h2>
-        <Button 
-          onClick={handleResetAllPasswords}
-          disabled={isResettingPasswords}
-          variant="outline"
-          className="bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700"
-        >
-          {isResettingPasswords ? "Wird zurückgesetzt..." : "Alle Passwörter zurücksetzen"}
-        </Button>
+    <Card className="p-6">
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-semibold text-gray-900">Benutzerverwaltung</h2>
+          <Button 
+            onClick={handleResetAllPasswords}
+            disabled={isResettingPasswords}
+            variant="outline"
+            className="bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700"
+          >
+            {isResettingPasswords ? "Wird zurückgesetzt..." : "Alle Passwörter zurücksetzen"}
+          </Button>
+        </div>
+
+        <div className="rounded-lg border">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-gray-50">
+                <TableHead className="font-semibold">Name</TableHead>
+                <TableHead className="font-semibold">Email</TableHead>
+                <TableHead className="font-semibold">Telefon</TableHead>
+                <TableHead className="font-semibold text-right">Aktionen</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.map((user) => (
+                <UserTableRow 
+                  key={user.id}
+                  user={user}
+                  onSelect={handleUserSelect}
+                  onDelete={handleDeleteUser}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+
+        <UserDetailsDialog
+          user={selectedUser}
+          affiliateInfo={affiliateInfo}
+          onOpenChange={(open) => !open && setSelectedUser(null)}
+        />
       </div>
-
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Telefon</TableHead>
-            <TableHead>Aktionen</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {users.map((user) => (
-            <UserTableRow 
-              key={user.id}
-              user={user}
-              onSelect={handleUserSelect}
-              onDelete={handleDeleteUser}
-            />
-          ))}
-        </TableBody>
-      </Table>
-
-      <UserDetailsDialog
-        user={selectedUser}
-        affiliateInfo={affiliateInfo}
-        onOpenChange={(open) => !open && setSelectedUser(null)}
-      />
-    </div>
+    </Card>
   );
 };

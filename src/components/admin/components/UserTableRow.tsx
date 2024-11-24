@@ -1,7 +1,7 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Profile } from "../types/userManagement";
-import { Trash2, FileSearch } from "lucide-react";
+import { Trash2, FileSearch, LogIn } from "lucide-react";
 
 interface UserTableRowProps {
   user: Profile;
@@ -11,19 +11,17 @@ interface UserTableRowProps {
 
 export const UserTableRow = ({ user, onSelect, onDelete }: UserTableRowProps) => {
   return (
-    <TableRow 
-      className="cursor-pointer hover:bg-gray-50"
-      onClick={() => onSelect(user)}
-    >
+    <TableRow className="hover:bg-gray-50">
       <TableCell>{`${user.first_name} ${user.last_name}`}</TableCell>
       <TableCell>{user.email}</TableCell>
       <TableCell>{user.phone}</TableCell>
       <TableCell>
-        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+        <div className="flex justify-end gap-2">
           <Button
             variant="outline"
             size="sm"
             onClick={() => onSelect(user)}
+            className="text-gray-600 hover:text-gray-900"
           >
             <FileSearch className="h-4 w-4" />
           </Button>
@@ -31,6 +29,7 @@ export const UserTableRow = ({ user, onSelect, onDelete }: UserTableRowProps) =>
             variant="destructive"
             size="sm"
             onClick={() => onDelete(user.id)}
+            className="bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-700 border-red-200"
           >
             <Trash2 className="h-4 w-4" />
           </Button>
