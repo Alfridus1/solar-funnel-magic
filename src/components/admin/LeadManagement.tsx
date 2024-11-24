@@ -12,7 +12,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { PDFDownloadButton } from "../solar-showcase/components/PDFDownloadButton";
 import { Trash2 } from "lucide-react";
 
 interface Lead {
@@ -168,12 +167,6 @@ export const LeadManagement = () => {
                   >
                     Status ändern
                   </Button>
-                  {lead.metrics && lead.address && (
-                    <PDFDownloadButton 
-                      metrics={lead.metrics} 
-                      address={lead.address}
-                    />
-                  )}
                   <Button
                     variant="destructive"
                     size="sm"

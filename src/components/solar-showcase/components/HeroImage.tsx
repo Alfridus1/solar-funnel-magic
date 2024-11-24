@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { PDFDownloadButton } from "./PDFDownloadButton";
 
 interface HeroImageProps {
   className?: string;
@@ -24,9 +23,6 @@ export const HeroImage = ({ className, metrics, address }: HeroImageProps) => {
         <p className="text-lg md:text-xl max-w-2xl mx-auto text-white/90 mb-8">
           Premium Komponenten und professionelle Installation für maximale Effizienz
         </p>
-        {metrics && address && (
-          <PDFDownloadButton metrics={metrics} address={address} />
-        )}
       </motion.div>
       <img
         src="/lovable-uploads/03677377-bf21-4a7d-b8a4-c5f6e9b87885.png"

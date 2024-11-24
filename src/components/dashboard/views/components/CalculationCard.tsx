@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Sun, Euro, TrendingUp, Trash2 } from "lucide-react";
-import { PDFDownloadButton } from "@/components/solar-showcase/components/PDFDownloadButton";
 import type { LeadCalculation } from "../types/LeadCalculation";
 
 interface CalculationCardProps {
@@ -76,13 +75,6 @@ export const CalculationCard = ({
           >
             Details anzeigen
           </Button>
-          
-          {calc.metrics && calc.address && (
-            <PDFDownloadButton 
-              metrics={calc.metrics}
-              address={calc.address}
-            />
-          )}
         </div>
       </CardContent>
     </Card>

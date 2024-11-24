@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { PDFDownloadButton } from "@/components/solar-showcase/components/PDFDownloadButton";
 import type { LeadCalculation } from "./types/LeadCalculation";
 import { CalculationCard } from "./components/CalculationCard";
 import { EmptyState } from "./components/EmptyState";

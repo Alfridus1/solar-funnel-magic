@@ -4,7 +4,6 @@ import { SavingsCalculator } from "@/components/SavingsCalculator";
 import { SavingsMetrics } from "./SavingsMetrics";
 import { Testimonials } from "@/components/Testimonials";
 import { FAQ } from "@/components/FAQ";
-import { PDFDownloadButton } from "./PDFDownloadButton";
 import { Benefits } from "@/components/Benefits";
 import { PremiumProductsSection } from "./PremiumProductsSection";
 import { CallToAction } from "./CallToAction";
@@ -45,7 +44,6 @@ export const ShowcaseContent = ({
           <div className="space-y-6 lg:space-y-8">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <h1 className="text-xl md:text-2xl font-bold text-gray-900">Ihre Solar-Analyse</h1>
-              <PDFDownloadButton metrics={metrics} address={address} />
             </div>
 
             <SavingsCalculator yearlyProduction={Math.round(metrics.kWp * 950)} />
