@@ -48,26 +48,24 @@ export const SystemMetrics = ({ moduleCount, kWp, annualProduction, roofArea }: 
   ];
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 mb-12">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {metrics.map((metric, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-          >
-            <Card className={`bg-gradient-to-br ${metric.bgColor} to-white p-6 rounded-xl hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1`}>
-              <div className={`flex items-center gap-3 ${metric.color} mb-3`}>
-                <metric.icon className="h-6 w-6" />
-                <span className="text-lg font-medium">{metric.title}</span>
-              </div>
-              <p className="text-3xl font-bold mb-2">{metric.value}</p>
-              <p className="text-sm text-gray-600">{metric.subtitle}</p>
-            </Card>
-          </motion.div>
-        ))}
-      </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {metrics.map((metric, index) => (
+        <motion.div
+          key={index}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 }}
+        >
+          <Card className={`bg-gradient-to-br ${metric.bgColor} to-white p-4 rounded-xl hover:shadow-md transition-shadow`}>
+            <div className={`flex items-center gap-2 ${metric.color} mb-2`}>
+              <metric.icon className="h-5 w-5" />
+              <span className="text-sm font-medium">{metric.title}</span>
+            </div>
+            <p className="text-2xl font-bold">{metric.value}</p>
+            <p className="text-sm text-gray-600">{metric.subtitle}</p>
+          </Card>
+        </motion.div>
+      ))}
     </div>
   );
 };
