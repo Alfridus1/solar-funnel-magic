@@ -6,7 +6,18 @@ import { ProductList } from "./configurator/ProductList";
 import { SystemSummary } from "./configurator/SystemSummary";
 import type { Product, SystemConfig } from "./configurator/types";
 
-export const SystemConfigurator = () => {
+interface SystemConfiguratorProps {
+  initialMetrics?: {
+    monthlyProduction: number;
+    annualSavings: number;
+    roofArea: number;
+    possiblePanels: number;
+    kWp: number;
+  };
+  address?: string;
+}
+
+export const SystemConfigurator = ({ initialMetrics, address }: SystemConfiguratorProps) => {
   const [yearlyConsumption, setYearlyConsumption] = useState(4000);
   const [products, setProducts] = useState<Product[]>([]);
   const [systemConfig, setSystemConfig] = useState<SystemConfig>({
@@ -19,11 +30,12 @@ export const SystemConfigurator = () => {
 
   useEffect(() => {
     loadProducts();
-  }, []);
-
-  useEffect(() => {
-    calculateAutarky();
-  }, [systemConfig, yearlyConsumption]);
+    if (initialMetrics) {
+      // Set initial consumption based on metrics if available
+      const estimatedConsumption = Math.round(initialMetrics.monthlyProduction * 12);
+      setYearlyConsumption(estimatedConsumption);
+    }
+  }, [initialMetrics]);
 
   const loadProducts = async () => {
     const { data: productsData, error } = await supabase
@@ -110,6 +122,13 @@ export const SystemConfigurator = () => {
 
   return (
     <div className="space-y-6 p-4">
+      {address && (
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold mb-2">Installationsadresse</h2>
+          <p className="text-gray-600">{address}</p>
+        </div>
+      )}
+      
       <ConsumptionInput 
         yearlyConsumption={yearlyConsumption}
         onChange={setYearlyConsumption}
