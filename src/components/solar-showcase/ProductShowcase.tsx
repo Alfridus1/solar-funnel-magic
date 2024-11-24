@@ -30,9 +30,11 @@ export const ProductShowcase = () => {
       const { data: { session } } = await supabase.auth.getSession();
       setIsAuthenticated(!!session);
 
-      // If user is authenticated, save the request with a UID
+      // If user is authenticated, save the request
       if (session?.user) {
         try {
+          console.log('Starting to save calculation...');
+          
           // First get user profile data
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
@@ -40,25 +42,43 @@ export const ProductShowcase = () => {
             .eq('id', session.user.id)
             .single();
 
-          if (profileError) throw profileError;
-          if (!profile) throw new Error('Profile not found');
+          if (profileError) {
+            console.error('Profile error:', profileError);
+            throw profileError;
+          }
+          
+          if (!profile) {
+            console.error('No profile found');
+            throw new Error('Profile not found');
+          }
+
+          console.log('Profile found:', profile);
 
           const calculationId = uuidv4();
+          const leadData = {
+            name: `${profile.first_name} ${profile.last_name}`,
+            email: profile.email,
+            phone: profile.phone || '',
+            type: 'calculation',
+            metrics,
+            address,
+            user_id: session.user.id,
+            calculation_id: calculationId,
+            status: 'new'
+          };
+
+          console.log('Attempting to insert lead with data:', leadData);
+
           const { error: leadError } = await supabase
             .from('leads')
-            .insert({
-              name: `${profile.first_name} ${profile.last_name}`,
-              email: profile.email,
-              phone: profile.phone,
-              type: 'solar_analysis',
-              metrics,
-              address,
-              user_id: session.user.id,
-              calculation_id: calculationId,
-              status: 'new'
-            });
+            .insert(leadData);
 
-          if (leadError) throw leadError;
+          if (leadError) {
+            console.error('Lead insert error:', leadError);
+            throw leadError;
+          }
+
+          console.log('Lead saved successfully');
 
           toast({
             title: "Anfrage gespeichert",
