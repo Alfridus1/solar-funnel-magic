@@ -39,7 +39,7 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
   const estimatedSystemCost = Math.round(systemKWp * SYSTEM_COST_PER_KWP);
   const roiYears = Math.round((estimatedSystemCost / totalYearlySavings) * 10) / 10;
   const thirtyYearSavings = totalYearlySavings * 30;
-
+  
   return (
     <div className="w-full xl:w-3/4 mx-auto space-y-8 p-8 bg-gradient-to-br from-blue-50 to-white rounded-2xl shadow-lg">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -116,7 +116,7 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="flex flex-col space-y-4">
         <Card className="p-6 bg-gradient-to-br from-blue-50 to-white transition-all hover:shadow-lg">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-3 bg-blue-100 rounded-xl">
