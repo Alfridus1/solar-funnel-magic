@@ -54,38 +54,31 @@ export const ShowcaseContent = ({
 
         <Card className="p-4 md:p-6 lg:p-8 bg-white/90 backdrop-blur shadow-lg rounded-2xl">
           <div className="space-y-6 lg:space-y-8">
-            <h2 className="text-xl md:text-2xl font-bold text-gray-900">Unser Rundum-Sorglos-Paket</h2>
-            
-            <div className="space-y-6">
-              <p className="text-base md:text-lg text-gray-700">
-                Ihre Solaranlage mit {metrics.kWp.toFixed(1)} kWp Leistung
+            <div className="bg-solar-orange/10 p-4 md:p-6 rounded-xl">
+              <p className="text-lg font-semibold mb-2">Geschätzte Investition:</p>
+              <p className="text-2xl md:text-3xl font-bold text-solar-orange">
+                {estimatedPriceMin.toLocaleString()}€ - {estimatedPriceMax.toLocaleString()}€
               </p>
-              <div className="bg-solar-orange/10 p-4 md:p-6 rounded-xl">
-                <p className="text-lg font-semibold mb-2">Geschätzte Investition:</p>
-                <p className="text-2xl md:text-3xl font-bold text-solar-orange">
-                  {estimatedPriceMin.toLocaleString()}€ - {estimatedPriceMax.toLocaleString()}€
-                </p>
-                <p className="text-sm text-gray-600 mt-2">
-                  Komplettpreis inkl. MwSt.
-                </p>
-              </div>
+              <p className="text-sm text-gray-600 mt-2">
+                Komplettpreis inkl. MwSt.
+              </p>
+            </div>
 
-              <Benefits />
+            <Benefits />
 
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button
-                  onClick={onQuoteRequest}
-                  className="flex-1 bg-solar-orange text-white px-6 py-3 rounded-lg hover:bg-solar-orange/90 transition-colors text-base md:text-lg"
-                >
-                  Angebot anfordern
-                </button>
-                <button
-                  onClick={onConsultationRequest}
-                  className="flex-1 border border-solar-orange text-solar-orange px-6 py-3 rounded-lg hover:bg-solar-orange/10 transition-colors text-base md:text-lg"
-                >
-                  Beratungstermin
-                </button>
-              </div>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button
+                onClick={onQuoteRequest}
+                className="flex-1 bg-solar-orange text-white px-6 py-3 rounded-lg hover:bg-solar-orange/90 transition-colors text-base md:text-lg"
+              >
+                Angebot anfordern
+              </button>
+              <button
+                onClick={onConsultationRequest}
+                className="flex-1 border border-solar-orange text-solar-orange px-6 py-3 rounded-lg hover:bg-solar-orange/10 transition-colors text-base md:text-lg"
+              >
+                Beratungstermin
+              </button>
             </div>
           </div>
         </Card>
