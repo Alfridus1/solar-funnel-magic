@@ -101,7 +101,7 @@ export const ShowcaseSidebar = () => {
         <Button
           variant="ghost"
           size="icon"
-          className="absolute -right-3 top-6 h-8 w-8 rounded-full border-2 border-blue-500 bg-white shadow-lg hover:bg-blue-50 transition-colors"
+          className="absolute -right-4 top-6 h-8 w-8 rounded-full border-2 border-blue-500 bg-white shadow-lg hover:bg-blue-50 transition-colors z-10"
           onClick={() => setIsCollapsed(!isCollapsed)}
         >
           {isCollapsed ? (
