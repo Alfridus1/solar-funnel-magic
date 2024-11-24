@@ -47,8 +47,8 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
   const thirtyYearSavings = totalYearlySavings * 30;
   
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="space-y-6 w-full md:w-1/2">
+      <div className="grid grid-cols-1 gap-6">
         <Card className="p-6">
           <div className="flex justify-between items-center mb-6">
             <span className="text-gray-700">Jährliche Produktion:</span>
@@ -131,7 +131,7 @@ export const SavingsCalculator = ({ yearlyProduction }: SavingsCalculatorProps) 
         </Card>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2 bg-solar-orange/10 rounded-lg">
