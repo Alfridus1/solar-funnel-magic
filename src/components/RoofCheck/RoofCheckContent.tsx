@@ -8,6 +8,7 @@ import { ProgressBar } from "@/components/ProgressBar";
 interface RoofCheckContentProps {
   address: string;
   handleRoofOutlineComplete: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number; kWp: number }[]) => void;
+  handleFinish: () => void;
   paths: google.maps.LatLng[][];
   metrics: any;
   onLog?: (message: string) => void;
@@ -16,6 +17,7 @@ interface RoofCheckContentProps {
 export const RoofCheckContent = ({
   address,
   handleRoofOutlineComplete,
+  handleFinish,
   paths,
   metrics,
   onLog
@@ -38,16 +40,26 @@ export const RoofCheckContent = ({
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold mb-2">Zeichnen Sie Ihr Dach ein</h1>
-              <Button 
-                onClick={() => setIsDrawingEnabled(true)}
-                className="bg-blue-600 hover:bg-blue-700"
-                disabled={isDrawingEnabled}
-              >
-                Dach einzeichnen
-              </Button>
+              <div className="flex gap-4">
+                <Button 
+                  onClick={() => setIsDrawingEnabled(true)}
+                  className="bg-blue-600 hover:bg-blue-700"
+                  disabled={isDrawingEnabled}
+                >
+                  Dach einzeichnen
+                </Button>
+                {paths.length > 0 && (
+                  <Button 
+                    onClick={handleFinish}
+                    className="bg-solar-orange hover:bg-solar-orange/90"
+                  >
+                    Weiter zur Analyse
+                  </Button>
+                )}
+              </div>
             </div>
             <p className="text-gray-600 mb-4">
-              Klicken Sie auf die Ecken Ihres Daches, um die Fläche einzuzeichnen
+              Klicken Sie auf die Ecken Ihres Daches, um die Fläche einzuzeichnen. Sie können mehrere Dachflächen hinzufügen.
             </p>
 
             {isDrawingEnabled && (
