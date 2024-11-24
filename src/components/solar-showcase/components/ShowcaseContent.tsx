@@ -10,18 +10,10 @@ import { PremiumProductsSection } from "./PremiumProductsSection";
 import { CallToAction } from "./CallToAction";
 
 interface ShowcaseContentProps {
-  metrics: {
-    kWp: number;
-    moduleCount: number;
-    annualProduction: number;
-    roofArea: number;
-  };
+  metrics: any;
   address: string;
   products: any[];
-  priceSettings: {
-    price_per_kwp_min: number;
-    price_per_kwp_max: number;
-  };
+  priceSettings: any;
   onQuoteRequest: () => void;
   onConsultationRequest: () => void;
   isAuthenticated: boolean;
@@ -50,9 +42,9 @@ export const ShowcaseContent = ({
             </div>
 
             <SystemMetrics
-              moduleCount={metrics.moduleCount}
+              moduleCount={Math.round(metrics.kWp * 2)}
               kWp={metrics.kWp}
-              annualProduction={metrics.annualProduction}
+              annualProduction={Math.round(metrics.kWp * 950)}
               roofArea={metrics.roofArea}
             />
 
