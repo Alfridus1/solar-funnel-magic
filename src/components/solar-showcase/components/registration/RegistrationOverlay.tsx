@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
-import { LoginForm } from "../LoginForm";
+import { LoginForm } from "../../LoginForm";
 import { RegistrationForm } from "./RegistrationForm";
 import { RegistrationHeader } from "./RegistrationHeader";
 import { supabase } from "@/integrations/supabase/client";
