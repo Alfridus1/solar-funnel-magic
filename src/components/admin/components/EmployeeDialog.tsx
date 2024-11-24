@@ -86,26 +86,42 @@ export const EmployeeDialog = ({
 
         if (profileError) throw profileError;
       } else {
-        // Create new profile first
-        const { data: profileData, error: profileError } = await supabase
+        // Check if profile with email already exists
+        const { data: existingProfile, error: checkError } = await supabase
           .from('profiles')
-          .insert({
-            first_name: data.first_name,
-            last_name: data.last_name,
-            email: data.email,
-            phone: data.phone,
-            role: data.role,
-          })
-          .select()
+          .select('id, email')
+          .eq('email', data.email)
           .single();
 
-        if (profileError) throw profileError;
+        if (checkError && checkError.code !== 'PGRST116') throw checkError;
 
-        // Then create employee
+        let profileId;
+        
+        if (existingProfile) {
+          profileId = existingProfile.id;
+        } else {
+          // Create new profile
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .insert({
+              first_name: data.first_name,
+              last_name: data.last_name,
+              email: data.email,
+              phone: data.phone,
+              role: data.role,
+            })
+            .select()
+            .single();
+
+          if (profileError) throw profileError;
+          profileId = profileData.id;
+        }
+
+        // Create employee
         const { error: employeeError } = await supabase
           .from('employees')
           .insert({
-            profile_id: profileData.id,
+            profile_id: profileId,
             role: data.role,
             email: data.email,
             first_name: data.first_name,
@@ -123,9 +139,10 @@ export const EmployeeDialog = ({
       onSuccess();
       onOpenChange(false);
     } catch (error: any) {
+      console.error('Error:', error);
       toast({
         title: "Fehler",
-        description: error.message,
+        description: error.message || "Ein unerwarteter Fehler ist aufgetreten",
         variant: "destructive",
       });
     }
