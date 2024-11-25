@@ -69,7 +69,6 @@ export const UnifiedDashboard = () => {
 
   const renderContent = () => {
     switch (currentTab) {
-      // Customer views
       case "dashboard":
         return <DashboardOverview />;
       case "requests":
@@ -84,8 +83,6 @@ export const UnifiedDashboard = () => {
         return <ProfileOverview />;
       case "settings":
         return <SettingsOverview />;
-      
-      // Employee views
       case "tasks":
         return userRoles?.isEmployee ? <Tasks /> : null;
       case "team":
@@ -94,8 +91,6 @@ export const UnifiedDashboard = () => {
         return userRoles?.isEmployee ? <Calendar /> : null;
       case "time":
         return userRoles?.isEmployee ? <TimeTracking /> : null;
-      
-      // Admin views
       case "overview":
         return userRoles?.isAdmin ? <Overview /> : null;
       case "leads":
@@ -116,7 +111,6 @@ export const UnifiedDashboard = () => {
         return userRoles?.isAdmin ? <SystemSettings /> : null;
       case "admins":
         return userRoles?.isAdmin ? <AdminManagement /> : null;
-      
       default:
         return <DashboardOverview />;
     }
