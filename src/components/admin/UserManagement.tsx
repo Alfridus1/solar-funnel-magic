@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UserDetailsDialog } from "./UserDetailsDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -13,6 +14,7 @@ export const UserManagement = () => {
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
   const [affiliateInfo, setAffiliateInfo] = useState<AffiliateInfo | null>(null);
   const [isResettingPasswords, setIsResettingPasswords] = useState(false);
+  const [userTypeFilter, setUserTypeFilter] = useState<string>("all");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -51,7 +53,6 @@ export const UserManagement = () => {
         });
       }
 
-      // If we have affiliate data, use the first record, otherwise set to null
       setAffiliateInfo(affiliateData && affiliateData.length > 0 ? affiliateData[0] : null);
     } catch (error: any) {
       console.error('Error fetching affiliate info:', error);
@@ -139,11 +140,33 @@ export const UserManagement = () => {
     }
   };
 
+  const filteredUsers = users.filter(user => {
+    if (userTypeFilter === "all") return true;
+    const userType = getUserTypeLabel(user.role);
+    return userTypeFilter === userType;
+  });
+
   return (
     <Card className="p-6">
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-semibold text-gray-900">Benutzerverwaltung</h2>
+          <div className="flex items-center gap-4">
+            <h2 className="text-2xl font-semibold text-gray-900">Benutzerverwaltung</h2>
+            <Select
+              value={userTypeFilter}
+              onValueChange={setUserTypeFilter}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Benutzertyp filtern" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle Benutzer</SelectItem>
+                <SelectItem value="Kunde">Kunden</SelectItem>
+                <SelectItem value="Mitarbeiter">Mitarbeiter</SelectItem>
+                <SelectItem value="Administrator">Administratoren</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <Button 
             onClick={handleResetAllPasswords}
             disabled={isResettingPasswords}
@@ -166,7 +189,7 @@ export const UserManagement = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users.map((user) => (
+              {filteredUsers.map((user) => (
                 <UserTableRow 
                   key={user.id}
                   user={user}
