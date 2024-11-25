@@ -9,8 +9,7 @@ import {
   Crown,
   Shield,
   UserPlus,
-  Bug,
-  ShieldCheck
+  Bug
 } from "lucide-react";
 
 export const AdminSidebar = () => {
@@ -120,19 +119,6 @@ export const AdminSidebar = () => {
             >
               <Package className="w-5 h-5 mr-3" />
               Products
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/dashboard#premium"
-              className={({ isActive }) =>
-                `flex items-center p-2 rounded-lg ${
-                  isActive ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50"
-                }`
-              }
-            >
-              <Shield className="w-5 h-5 mr-3" />
-              Premium
             </NavLink>
           </li>
           <li>
