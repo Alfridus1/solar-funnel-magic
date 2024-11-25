@@ -27,21 +27,21 @@ export const ShowcaseContent = ({
   onConsultationRequest,
   isAuthenticated
 }: ShowcaseContentProps) => {
-  const estimatedPriceMin = priceSettings ? Math.round(metrics.kWp * priceSettings.price_per_kwp_min) : 0;
-  const estimatedPriceMax = priceSettings ? Math.round(metrics.kWp * priceSettings.price_per_kwp_max) : 0;
+  const estimatedPriceMin = priceSettings && metrics?.kWp ? Math.round(metrics.kWp * priceSettings.price_per_kwp_min) : 0;
+  const estimatedPriceMax = priceSettings && metrics?.kWp ? Math.round(metrics.kWp * priceSettings.price_per_kwp_max) : 0;
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8 lg:space-y-16">
       <SystemMetrics
-        moduleCount={Math.round(metrics.kWp * 2)}
-        kWp={metrics.kWp}
-        annualProduction={Math.round(metrics.kWp * 950)}
-        roofArea={metrics.roofArea}
+        moduleCount={Math.round(metrics?.kWp * 2) || 0}
+        kWp={metrics?.kWp || 0}
+        annualProduction={Math.round(metrics?.kWp * 950) || 0}
+        roofArea={metrics?.roofArea || 0}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
         <div className="p-4 md:p-6 lg:p-8 bg-white/90 backdrop-blur shadow-lg rounded-2xl h-full">
-          <SavingsCalculator yearlyProduction={Math.round(metrics.kWp * 950)} />
+          <SavingsCalculator yearlyProduction={Math.round(metrics?.kWp * 950) || 0} />
         </div>
 
         <div className="p-4 md:p-6 lg:p-8 bg-white/90 backdrop-blur shadow-lg rounded-2xl h-full">
