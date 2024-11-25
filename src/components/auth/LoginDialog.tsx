@@ -103,22 +103,6 @@ export const LoginDialog = ({ open, onOpenChange, metrics, address }: LoginDialo
     return () => subscription.unsubscribe();
   }, [navigate, onOpenChange, toast, metrics, address]);
 
-  const handleError = (error: any) => {
-    let errorMessage = "Ein unerwarteter Fehler ist aufgetreten.";
-    
-    if (error.message.includes("Invalid login credentials")) {
-      errorMessage = "Ungültige Anmeldedaten. Bitte überprüfen Sie Ihre E-Mail und Ihr Passwort.";
-    } else if (error.message.includes("Email not confirmed")) {
-      errorMessage = "Bitte bestätigen Sie zuerst Ihre E-Mail-Adresse.";
-    }
-
-    toast({
-      title: "Fehler bei der Anmeldung",
-      description: errorMessage,
-      variant: "destructive",
-    });
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -175,7 +159,6 @@ export const LoginDialog = ({ open, onOpenChange, metrics, address }: LoginDialo
           }}
           providers={[]}
           redirectTo={`${window.location.origin}/auth/callback`}
-          onError={handleError}
         />
       </DialogContent>
     </Dialog>
