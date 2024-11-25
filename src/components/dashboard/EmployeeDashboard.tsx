@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { EmployeeLayout } from "./layout/EmployeeLayout";
+import { UnifiedLayout } from "./layout/UnifiedLayout";
 import { Overview } from "@/components/employee/Overview";
 import { Tasks } from "@/components/employee/Tasks";
 import { Team } from "@/components/employee/Team";
@@ -39,8 +39,8 @@ export const EmployeeDashboard = () => {
   };
 
   return (
-    <EmployeeLayout>
+    <UnifiedLayout>
       {renderContent()}
-    </EmployeeLayout>
+    </UnifiedLayout>
   );
 };
