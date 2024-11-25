@@ -10,7 +10,7 @@ import { PremiumProductsManagement } from "@/components/admin/PremiumProductsMan
 import { SystemSettings } from "@/components/admin/SystemSettings";
 import { TaskTypeManagement } from "@/components/admin/TaskTypeManagement";
 
-export const Dashboard = () => {
+export const AdminDashboard = () => {
   const location = useLocation();
   const currentTab = location.hash.replace("#", "") || "overview";
 
