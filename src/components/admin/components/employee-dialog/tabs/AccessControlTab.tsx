@@ -68,13 +68,16 @@ export const AccessControlTab = ({ employeeId }: AccessControlTabProps) => {
         .from('employee_permissions')
         .select('*')
         .eq('employee_id', employeeId)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
       
       if (data) {
         setPermissions(data.permissions as Record<string, boolean>);
       } else {
+        // Set default permissions if none exist
         const defaultPermissions = ACCESS_PERMISSIONS.reduce((acc, { feature }) => ({
           ...acc,
           [feature]: false
