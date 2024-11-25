@@ -1,64 +1,39 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Copy, LogIn } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
-import { Profile, AffiliateInfo } from "./types/userManagement";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Auth } from "@supabase/auth-ui-react";
+import { ThemeSupa } from "@supabase/auth-ui-shared";
 
 interface UserDetailsDialogProps {
-  user: Profile | null;
-  affiliateInfo: AffiliateInfo | null;
+  user: {
+    id: string;
+    email: string;
+    first_name?: string;
+    last_name?: string;
+    phone?: string;
+  } | null;
   onOpenChange: (open: boolean) => void;
 }
 
-export const UserDetailsDialog = ({ user, affiliateInfo, onOpenChange }: UserDetailsDialogProps) => {
+export const UserDetailsDialog = ({ user, onOpenChange }: UserDetailsDialogProps) => {
+  const [showLogin, setShowLogin] = useState(false);
   const { toast } = useToast();
+  const [impersonatedUser, setImpersonatedUser] = useState<string | null>(null);
 
-  const copyAffiliateLink = () => {
-    if (!affiliateInfo?.referral_code) return;
-    
-    const baseUrl = window.location.origin;
-    const affiliateLink = `${baseUrl}/?ref=${affiliateInfo.referral_code}`;
-    
-    navigator.clipboard.writeText(affiliateLink);
-    toast({
-      title: "Link kopiert!",
-      description: "Der Affiliate-Link wurde in die Zwischenablage kopiert.",
-    });
-  };
-
-  const handleLoginAs = async () => {
-    if (!user?.email) return;
-
+  const handleLogin = async () => {
     try {
-      // First, invoke the reset-password function to set a temporary password
-      const { error: resetError } = await supabase.functions.invoke('reset-password', {
-        body: { email: user.email }
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: user?.email || '',
+        password: 'password123', // Temporary password for testing
       });
 
-      if (resetError) throw resetError;
-
-      // Add a small delay to ensure the password reset is processed
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Then attempt to sign in with the temporary password
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email: user.email,
-        password: '123456' // This matches the password set in the reset-password function
-      });
-
-      if (signInError) {
-        console.error('Sign in error:', signInError);
-        throw signInError;
+      if (error) {
+        throw error;
       }
 
-      if (!data?.user) {
+      if (!data.user) {
         throw new Error('No user data returned after login');
       }
 
@@ -73,9 +48,11 @@ export const UserDetailsDialog = ({ user, affiliateInfo, onOpenChange }: UserDet
         throw profileError;
       }
 
+      setImpersonatedUser(user?.email || null);
+
       toast({
         title: "Erfolgreich eingeloggt",
-        description: `Sie sind jetzt als ${user.email} eingeloggt.`,
+        description: `Sie sind jetzt als ${user?.email} eingeloggt.`,
       });
 
       // Redirect based on user role
@@ -88,89 +65,87 @@ export const UserDetailsDialog = ({ user, affiliateInfo, onOpenChange }: UserDet
       console.error('Login error:', error);
       toast({
         title: "Login fehlgeschlagen",
-        description: error.message || "Ein unerwarteter Fehler ist aufgetreten",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+
+      setImpersonatedUser(null);
+      toast({
+        title: "Erfolgreich ausgeloggt",
+        description: "Sie wurden erfolgreich ausgeloggt.",
+      });
+
+      // Redirect to login page
+      window.location.href = '/login';
+    } catch (error: any) {
+      toast({
+        title: "Fehler beim Ausloggen",
+        description: error.message,
         variant: "destructive",
       });
     }
   };
 
   return (
-    <Dialog open={!!user} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Benutzerdetails</DialogTitle>
-        </DialogHeader>
-        
-        {user && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
+    <>
+      {impersonatedUser && (
+        <div className="fixed top-0 left-0 right-0 bg-[#F75c03] text-white py-2 px-4 flex justify-between items-center z-50">
+          <span>Sie sind als {impersonatedUser} eingeloggt</span>
+          <Button 
+            variant="outline" 
+            onClick={handleLogout}
+            className="bg-white text-[#F75c03] hover:bg-white/90"
+          >
+            Ausloggen
+          </Button>
+        </div>
+      )}
+      <Dialog open={!!user} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Benutzerdetails</DialogTitle>
+          </DialogHeader>
+
+          {showLogin ? (
+            <Auth 
+              supabaseClient={supabase} 
+              appearance={{ theme: ThemeSupa }}
+              theme="light"
+            />
+          ) : (
+            <div className="space-y-4">
               <div>
-                <p className="text-sm text-gray-500">Name</p>
-                <p className="font-medium">{`${user.first_name} ${user.last_name}`}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Email</p>
-                <p className="font-medium">{user.email}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Telefon</p>
-                <p className="font-medium">{user.phone}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Registriert am</p>
-                <p className="font-medium">
-                  {new Date(user.created_at).toLocaleDateString('de-DE')}
+                <p className="text-sm font-medium">Name</p>
+                <p className="text-sm text-gray-500">
+                  {user?.first_name} {user?.last_name}
                 </p>
               </div>
-            </div>
-
-            <Card className="p-4 bg-gray-50">
-              <h3 className="font-semibold mb-4">Affiliate Informationen</h3>
-              {affiliateInfo?.referral_code ? (
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-500">Referral Code</span>
-                    <div className="flex items-center gap-2">
-                      <code className="bg-gray-100 px-2 py-1 rounded">
-                        {affiliateInfo.referral_code}
-                      </code>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={copyAffiliateLink}
-                        className="flex items-center gap-2"
-                      >
-                        <Copy className="h-4 w-4" />
-                        Link kopieren
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-500">Vermittlungen</p>
-                      <p className="font-medium">{affiliateInfo.referral_count || 0}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Leads</p>
-                      <p className="font-medium">{affiliateInfo.total_leads || 0}</p>
-                    </div>
-                  </div>
+              <div>
+                <p className="text-sm font-medium">Email</p>
+                <p className="text-sm text-gray-500">{user?.email}</p>
+              </div>
+              {user?.phone && (
+                <div>
+                  <p className="text-sm font-medium">Telefon</p>
+                  <p className="text-sm text-gray-500">{user.phone}</p>
                 </div>
-              ) : (
-                <p className="text-sm text-gray-500">Kein Affiliate-Konto</p>
               )}
-            </Card>
-
-            <Button 
-              onClick={handleLoginAs}
-              className="w-full bg-blue-600 hover:bg-blue-700"
-            >
-              <LogIn className="mr-2 h-4 w-4" />
-              Als dieser Benutzer einloggen
-            </Button>
-          </div>
-        )}
-      </DialogContent>
-    </Dialog>
+              <div className="flex justify-end gap-2">
+                <Button onClick={handleLogin}>
+                  Als Benutzer einloggen
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
