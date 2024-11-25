@@ -38,16 +38,26 @@ export const UserManagement = () => {
 
   const handleUserSelect = async (user: Profile) => {
     setSelectedUser(user);
-    // Fetch affiliate info when user is selected
-    const { data: affiliateData, error } = await supabase
-      .from('affiliates')
-      .select('*')
-      .eq('email', user.email)
-      .maybeSingle();
+    try {
+      // Fetch affiliate info when user is selected
+      const { data: affiliateData, error } = await supabase
+        .from('affiliates')
+        .select('*')
+        .eq('email', user.email)
+        .single();
 
-    if (!error && affiliateData) {
-      setAffiliateInfo(affiliateData);
-    } else {
+      if (error && error.code !== 'PGRST116') {
+        // Only show error if it's not a "no rows returned" error
+        toast({
+          title: "Fehler beim Laden der Affiliate-Informationen",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+
+      setAffiliateInfo(affiliateData || null);
+    } catch (error: any) {
+      console.error('Error fetching affiliate info:', error);
       setAffiliateInfo(null);
     }
   };
