@@ -1,36 +1,8 @@
 import { Card } from "@/components/ui/card";
-import { Users, MessageSquare, Package, Crown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LeadSourceChart } from "./LeadSourceChart";
-
-const StatCard = ({ label, value, icon: Icon, change, isLoading }: {
-  label: string;
-  value: string;
-  icon: any;
-  change?: string;
-  isLoading?: boolean;
-}) => (
-  <Card className="p-6">
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-sm font-medium text-muted-foreground">
-          {label}
-        </p>
-        {isLoading ? (
-          <Skeleton className="h-8 w-24 mt-2" />
-        ) : (
-          <>
-            <h3 className="text-2xl font-bold mt-2">{value}</h3>
-            {change && <p className="text-sm text-green-600 mt-1">{change}</p>}
-          </>
-        )}
-      </div>
-      <Icon className="h-8 w-8 text-muted-foreground" />
-    </div>
-  </Card>
-);
+import { Users, FileText, Package, Star } from "lucide-react";
 
 export const Overview = () => {
   const { data: customersCount, isLoading: isLoadingCustomers } = useQuery({
@@ -40,7 +12,10 @@ export const Overview = () => {
         .from('customers')
         .select('*', { count: 'exact', head: true });
         
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching customers:', error);
+        throw error;
+      }
       return count || 0;
     }
   });
@@ -53,7 +28,10 @@ export const Overview = () => {
         .select('*', { count: 'exact', head: true })
         .is('deleted_at', null);
         
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching leads:', error);
+        throw error;
+      }
       return count || 0;
     }
   });
@@ -65,7 +43,10 @@ export const Overview = () => {
         .from('solar_products')
         .select('*', { count: 'exact', head: true });
         
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching products:', error);
+        throw error;
+      }
       return count || 0;
     }
   });
@@ -77,55 +58,71 @@ export const Overview = () => {
         .from('premium_products')
         .select('*', { count: 'exact', head: true });
         
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching premium products:', error);
+        throw error;
+      }
       return count || 0;
     }
   });
 
   const stats = [
     {
-      label: "Aktive Benutzer",
-      value: customersCount?.toString() || "0",
+      title: "Kunden",
+      value: customersCount,
+      isLoading: isLoadingCustomers,
       icon: Users,
-      isLoading: isLoadingCustomers
+      color: "text-blue-500"
     },
     {
-      label: "Neue Anfragen",
-      value: leadsCount?.toString() || "0",
-      icon: MessageSquare,
-      isLoading: isLoadingLeads
+      title: "Anfragen",
+      value: leadsCount,
+      isLoading: isLoadingLeads,
+      icon: FileText,
+      color: "text-green-500"
     },
     {
-      label: "Produkte",
-      value: productsCount?.toString() || "0",
+      title: "Produkte",
+      value: productsCount,
+      isLoading: isLoadingProducts,
       icon: Package,
-      isLoading: isLoadingProducts
+      color: "text-orange-500"
     },
     {
-      label: "Premium Produkte",
-      value: premiumProductsCount?.toString() || "0",
-      icon: Crown,
-      isLoading: isLoadingPremium
-    },
+      title: "Premium Produkte",
+      value: premiumProductsCount,
+      isLoading: isLoadingPremium,
+      icon: Star,
+      color: "text-purple-500"
+    }
   ];
 
   return (
-    <div className="space-y-8">
-      <h1 className="text-3xl font-bold">Dashboard</h1>
+    <div className="space-y-6">
+      <h2 className="text-2xl font-semibold">Übersicht</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat) => (
-          <StatCard
-            key={stat.label}
-            label={stat.label}
-            value={stat.value}
-            icon={stat.icon}
-            isLoading={stat.isLoading}
-          />
-        ))}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {stats.map((stat, index) => {
+          const Icon = stat.icon;
+          return (
+            <Card key={index} className="p-6">
+              <div className="flex items-center gap-4">
+                <div className={`p-3 rounded-full bg-gray-100 ${stat.color}`}>
+                  <Icon className="h-6 w-6" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">{stat.title}</p>
+                  {stat.isLoading ? (
+                    <Skeleton className="h-8 w-16" />
+                  ) : (
+                    <p className="text-2xl font-bold">{stat.value}</p>
+                  )}
+                </div>
+              </div>
+            </Card>
+          );
+        })}
       </div>
-
-      <LeadSourceChart />
     </div>
   );
 };

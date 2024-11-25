@@ -9,6 +9,9 @@ export const useEmployees = () => {
 
   const fetchEmployees = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
       const { data, error } = await supabase
         .from('employees')
         .select(`
@@ -22,7 +25,10 @@ export const useEmployees = () => {
           )
         `);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching employees:', error);
+        throw error;
+      }
 
       if (!data) {
         setEmployees([]);
@@ -56,8 +62,10 @@ export const useEmployees = () => {
         } : undefined
       }));
 
+      console.log('Fetched employees:', transformedData);
       setEmployees(transformedData);
     } catch (error: any) {
+      console.error('Error in useEmployees:', error);
       toast({
         title: "Fehler beim Laden der Mitarbeiter",
         description: error.message,
