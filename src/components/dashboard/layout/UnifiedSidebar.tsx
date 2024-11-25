@@ -1,78 +1,137 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
+import { menuItems } from "./config/menuItems";
+import { SidebarNav } from "./components/SidebarNav";
+import { UserPermission } from "@/types/permissions";
 
-interface UnifiedSidebarProps {
-  children: React.ReactNode;
-}
-
-export const UnifiedSidebar = ({ children }: UnifiedSidebarProps) => {
+export const UnifiedSidebar = () => {
+  const location = useLocation();
+  const currentTab = location.hash.replace("#", "") || "dashboard";
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [userName, setUserName] = useState<string>("");
-  const navigate = useNavigate();
+  const [userPermissions, setUserPermissions] = useState<UserPermission[]>(['customer_access']);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    const loadUserPermissions = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (!session?.user) {
-          navigate('/login');
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          navigate("/");
           return;
         }
 
-        const { data: profile, error } = await supabase
+        // Get profile permissions and role
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('first_name, last_name')
-          .eq('id', session.user.id)
+          .select('*')
+          .eq('id', user.id)
           .maybeSingle();
 
-        if (error) {
-          throw error;
+        if (profileError) {
+          console.error('Profile fetch error:', profileError);
+          toast({
+            title: "Fehler beim Laden des Profils",
+            description: "Bitte versuchen Sie es später erneut",
+            variant: "destructive",
+          });
+          return;
         }
 
+        // If no profile exists, create one
         if (!profile) {
-          // Create a default profile if none exists
-          const { error: createError } = await supabase
+          const { error: insertError } = await supabase
             .from('profiles')
-            .insert([
-              {
-                id: session.user.id,
-                first_name: 'User',
-                last_name: session.user.email?.split('@')[0] || 'Unknown',
-                email: session.user.email,
-                phone: ''
-              }
-            ]);
+            .insert({
+              id: user.id,
+              email: user.email,
+              first_name: '',
+              last_name: '',
+              phone: '',
+              permissions: ['customer_access'] as UserPermission[],
+              role: 'customer'
+            });
 
-          if (createError) {
-            throw createError;
+          if (insertError) {
+            console.error('Profile creation error:', insertError);
+            toast({
+              title: "Fehler beim Erstellen des Profils",
+              description: "Bitte versuchen Sie es später erneut",
+              variant: "destructive",
+            });
+            return;
           }
 
-          setUserName('User');
-        } else {
-          setUserName(`${profile.first_name} ${profile.last_name}`);
+          setUserPermissions(['customer_access']);
+          return;
         }
-      } catch (error: any) {
-        console.error('Error fetching profile:', error);
+
+        // Get employee status if exists
+        const { data: employee } = await supabase
+          .from('employees')
+          .select('role')
+          .eq('profile_id', user.id)
+          .maybeSingle();
+
+        // Set permissions based on role and employee status
+        let permissions = profile?.permissions || ['customer_access'];
+        
+        // If user is an admin, add all admin permissions
+        if (profile?.role === 'admin') {
+          permissions = [
+            'customer_access',
+            'employee_access',
+            'admin_access',
+            'leads_management',
+            'customer_management',
+            'project_management',
+            'inventory_management',
+            'financial_access',
+            'employee_management',
+            'reporting'
+          ] as UserPermission[];
+        }
+        // If user is an employee, add employee permissions
+        else if (employee) {
+          permissions = [...new Set([...permissions, 'employee_access'])] as UserPermission[];
+        }
+
+        setUserPermissions(permissions);
+      } catch (error) {
+        console.error('Error loading permissions:', error);
         toast({
-          title: "Error loading profile",
-          description: error.message,
+          title: "Fehler beim Laden der Berechtigungen",
+          description: "Bitte versuchen Sie es später erneut",
           variant: "destructive",
         });
       }
     };
 
-    fetchUserProfile();
+    loadUserPermissions();
   }, [navigate, toast]);
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({
+        title: "Fehler beim Ausloggen",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+    navigate("/");
+  };
 
   return (
     <div className={cn(
-      "relative bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 h-screen",
+      "relative bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300",
       isCollapsed ? "w-20" : "w-64"
     )}>
       <Button
@@ -81,7 +140,11 @@ export const UnifiedSidebar = ({ children }: UnifiedSidebarProps) => {
         className="absolute -right-3 top-6 h-6 w-6 rounded-full border shadow-md"
         onClick={() => setIsCollapsed(!isCollapsed)}
       >
-        {isCollapsed ? ">" : "<"}
+        {isCollapsed ? (
+          <ChevronRight className="h-4 w-4" />
+        ) : (
+          <ChevronLeft className="h-4 w-4" />
+        )}
       </Button>
 
       <div className="p-6">
@@ -89,13 +152,17 @@ export const UnifiedSidebar = ({ children }: UnifiedSidebarProps) => {
           "text-2xl font-bold text-gray-800 dark:text-white transition-all duration-300",
           isCollapsed && "text-center text-xl"
         )}>
-          {isCollapsed ? userName.charAt(0) : userName}
+          {isCollapsed ? "D" : "Dashboard"}
         </h2>
       </div>
 
-      <nav className="space-y-1 px-3">
-        {children}
-      </nav>
+      <SidebarNav
+        menuItems={menuItems}
+        userPermissions={userPermissions}
+        currentTab={currentTab}
+        isCollapsed={isCollapsed}
+        handleLogout={handleLogout}
+      />
     </div>
   );
 };
