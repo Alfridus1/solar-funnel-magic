@@ -37,7 +37,19 @@ export const EmployeeManagement = () => {
         throw error;
       }
 
-      setEmployees(data || []);
+      // Transform the data to match the Employee type
+      const transformedData: Employee[] = data.map(employee => ({
+        ...employee,
+        profiles: employee.profiles ? {
+          first_name: employee.profiles.first_name,
+          last_name: employee.profiles.last_name,
+          email: employee.profiles.email,
+          role: employee.profiles.role,
+          phone: employee.profiles.phone
+        } : undefined
+      }));
+
+      setEmployees(transformedData);
     } catch (error: any) {
       toast({
         title: "Fehler beim Laden der Mitarbeiter",

@@ -1,35 +1,14 @@
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Employee } from "../../types/employee";
-
-const formSchema = z.object({
-  first_name: z.string().min(2, "Vorname muss mindestens 2 Zeichen lang sein"),
-  last_name: z.string().min(2, "Nachname muss mindestens 2 Zeichen lang sein"),
-  email: z.string().email("Ungültige E-Mail-Adresse"),
-  role: z.string(),
-});
-
-type EmployeeFormData = z.infer<typeof formSchema>;
+import { EmployeeForm } from "./EmployeeForm";
+import { EmployeeFormData } from "./types";
 
 interface EmployeeDialogProps {
   employee: Employee | null;
@@ -45,35 +24,8 @@ export const EmployeeDialog = ({
   onSuccess,
 }: EmployeeDialogProps) => {
   const { toast } = useToast();
-  const form = useForm<EmployeeFormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      first_name: "",
-      last_name: "",
-      email: "",
-      role: "sales_employee",
-    },
-  });
 
-  useEffect(() => {
-    if (employee && employee.profiles) {
-      form.reset({
-        first_name: employee.profiles.first_name,
-        last_name: employee.profiles.last_name,
-        email: employee.profiles.email,
-        role: employee.role as EmployeeFormData["role"],
-      });
-    } else {
-      form.reset({
-        first_name: "",
-        last_name: "",
-        email: "",
-        role: "sales_employee",
-      });
-    }
-  }, [employee, form]);
-
-  const onSubmit = async (data: EmployeeFormData) => {
+  const handleSubmit = async (data: EmployeeFormData) => {
     try {
       if (employee) {
         // Update existing employee
@@ -118,13 +70,15 @@ export const EmployeeDialog = ({
 
         if (profileError) throw profileError;
 
-        const { error: employeeError } = await supabase.from("employees").insert({
-          profile_id: profileData.id,
-          role: data.role,
-          email: data.email,
-          first_name: data.first_name,
-          last_name: data.last_name,
-        });
+        const { error: employeeError } = await supabase
+          .from("employees")
+          .insert({
+            profile_id: profileData.id,
+            role: data.role,
+            first_name: data.first_name,
+            last_name: data.last_name,
+            email: data.email,
+          });
 
         if (employeeError) throw employeeError;
 
@@ -154,64 +108,16 @@ export const EmployeeDialog = ({
           </DialogTitle>
         </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="first_name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Vorname</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="last_name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nachname</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>E-Mail</FormLabel>
-                  <FormControl>
-                    <Input {...field} type="email" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-              >
-                Abbrechen
-              </Button>
-              <Button type="submit">
-                {employee ? "Speichern" : "Erstellen"}
-              </Button>
-            </div>
-          </form>
-        </Form>
+        <EmployeeForm
+          defaultValues={employee ? {
+            first_name: employee.first_name,
+            last_name: employee.last_name,
+            email: employee.email,
+            role: employee.role,
+          } : undefined}
+          onSubmit={handleSubmit}
+          onCancel={() => onOpenChange(false)}
+        />
       </DialogContent>
     </Dialog>
   );

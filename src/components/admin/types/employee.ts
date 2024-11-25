@@ -1,9 +1,24 @@
+export type EmployeeRole = 
+  | "sales_employee" 
+  | "customer" 
+  | "external_sales"
+  | "customer_service"
+  | "planning"
+  | "accountant"
+  | "construction_manager"
+  | "installation_manager"
+  | "installer"
+  | "executive"
+  | "admin"
+  | "sales_team_leader"
+  | "sales_director";
+
 export interface Employee {
   id: string;
   first_name: string;
   last_name: string;
   email: string;
-  role: string;
+  role: EmployeeRole;
   team_id?: string;
   profile_id?: string;
   address?: string;
