@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Calendar as CalendarIcon } from "lucide-react";
 
 const MICROSOFT_CLIENT_ID = import.meta.env.VITE_MICROSOFT_CLIENT_ID;
+const MICROSOFT_TENANT_ID = import.meta.env.VITE_MICROSOFT_TENANT_ID;
 const REDIRECT_URI = `${window.location.origin}/employee#calendar`;
 
 export const Calendar = () => {
@@ -86,7 +87,7 @@ export const Calendar = () => {
 
   const connectCalendar = () => {
     const scope = 'Calendars.ReadWrite offline_access';
-    const authUrl = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=${MICROSOFT_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(scope)}`;
+    const authUrl = `https://login.microsoftonline.com/${MICROSOFT_TENANT_ID}/oauth2/v2.0/authorize?client_id=${MICROSOFT_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(scope)}`;
     window.location.href = authUrl;
   };
 
