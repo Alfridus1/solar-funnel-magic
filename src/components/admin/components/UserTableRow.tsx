@@ -1,16 +1,30 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Profile } from "../types/userManagement";
-import { Trash2, FileSearch } from "lucide-react";
+import { Employee } from "../types/employee";
+import { Trash2, FileSearch, KeyRound, LogIn, FileEdit } from "lucide-react";
 
 interface UserTableRowProps {
   user: Profile;
+  employee: Employee | undefined;
   userType: string;
   onSelect: (user: Profile) => void;
   onDelete: (userId: string) => void;
+  onEdit: (employee: Employee) => void;
+  onResetPassword: (email: string) => void;
+  onLoginAs: (email: string) => void;
 }
 
-export const UserTableRow = ({ user, userType, onSelect, onDelete }: UserTableRowProps) => {
+export const UserTableRow = ({
+  user,
+  employee,
+  userType,
+  onSelect,
+  onDelete,
+  onEdit,
+  onResetPassword,
+  onLoginAs,
+}: UserTableRowProps) => {
   return (
     <TableRow className="hover:bg-gray-50">
       <TableCell>{`${user.first_name} ${user.last_name}`}</TableCell>
@@ -27,6 +41,31 @@ export const UserTableRow = ({ user, userType, onSelect, onDelete }: UserTableRo
           >
             <FileSearch className="h-4 w-4" />
           </Button>
+          {employee && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onEdit(employee)}
+              >
+                <FileEdit className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onResetPassword(user.email)}
+              >
+                <KeyRound className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onLoginAs(user.email)}
+              >
+                <LogIn className="h-4 w-4" />
+              </Button>
+            </>
+          )}
           <Button
             variant="destructive"
             size="sm"

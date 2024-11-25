@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { UserDetailsDialog } from "./UserDetailsDialog";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
-import { Profile, AffiliateInfo } from "./types/userManagement";
-import { UserTableRow } from "./components/UserTableRow";
 import { Card } from "@/components/ui/card";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { Profile, AffiliateInfo } from "./types/userManagement";
+import { Employee } from "./types/employee";
+import { UserDetailsDialog } from "./UserDetailsDialog";
+import { EmployeeDialog } from "./components/employee-dialog/EmployeeDialog";
+import { UserTable } from "./components/UserTableRow";
+import { UserFilters } from "./components/user-management/UserFilters";
+import { UserActions } from "./components/user-management/UserActions";
+import { useEmployees } from "./hooks/useEmployees";
 
 export const UserManagement = () => {
   const [users, setUsers] = useState<Profile[]>([]);
@@ -15,7 +17,10 @@ export const UserManagement = () => {
   const [affiliateInfo, setAffiliateInfo] = useState<AffiliateInfo | null>(null);
   const [isResettingPasswords, setIsResettingPasswords] = useState(false);
   const [userTypeFilter, setUserTypeFilter] = useState<string>("all");
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
   const { toast } = useToast();
+  const { employees, fetchEmployees, isLoading } = useEmployees();
 
   useEffect(() => {
     fetchUsers();
@@ -88,9 +93,7 @@ export const UserManagement = () => {
     try {
       const { data, error } = await supabase.functions.invoke('reset-passwords');
       
-      if (error) {
-        throw new Error('Fehler beim Zurücksetzen der Passwörter');
-      }
+      if (error) throw new Error('Fehler beim Zurücksetzen der Passwörter');
 
       if (data?.results) {
         const successCount = data.results.filter((r: any) => r.success).length;
@@ -117,34 +120,84 @@ export const UserManagement = () => {
     }
   };
 
-  const getUserTypeLabel = (role: string | null) => {
-    switch (role) {
-      case 'admin':
-        return 'Administrator';
-      case 'sales_employee':
-      case 'external_sales':
-      case 'customer_service':
-      case 'planning':
-      case 'accountant':
-      case 'construction_manager':
-      case 'installation_manager':
-      case 'installer':
-      case 'executive':
-      case 'sales_team_leader':
-      case 'sales_director':
-        return 'Mitarbeiter';
-      case 'customer':
-        return 'Kunde';
-      default:
-        return 'Unbekannt';
+  const handleAddEmployee = () => {
+    setSelectedEmployee(null);
+    setIsEmployeeDialogOpen(true);
+  };
+
+  const handleEditEmployee = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setIsEmployeeDialogOpen(true);
+  };
+
+  const handleResetPassword = async (email: string) => {
+    if (!email) return;
+    
+    try {
+      const { error } = await supabase.functions.invoke('reset-employee-password', {
+        body: { email }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Passwort zurückgesetzt",
+        description: "Das Passwort wurde erfolgreich auf 'Coppen2023!' zurückgesetzt.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Fehler beim Zurücksetzen",
+        description: error.message || "Ein unerwarteter Fehler ist aufgetreten",
+        variant: "destructive",
+      });
     }
   };
 
-  const filteredUsers = users.filter(user => {
-    if (userTypeFilter === "all") return true;
-    const userType = getUserTypeLabel(user.role);
-    return userTypeFilter === userType;
-  });
+  const handleLoginAs = async (email: string) => {
+    if (!email) return;
+
+    try {
+      const { error: resetError } = await supabase.functions.invoke('reset-employee-password', {
+        body: { email }
+      });
+
+      if (resetError) throw resetError;
+
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: 'Coppen2023!'
+      });
+
+      if (signInError) throw signInError;
+
+      if (!data?.user) {
+        throw new Error('No user data returned after login');
+      }
+
+      toast({
+        title: "Erfolgreich eingeloggt",
+        description: `Sie sind jetzt als ${email} eingeloggt.`,
+      });
+
+      window.location.href = '/employee';
+    } catch (error: any) {
+      toast({
+        title: "Login fehlgeschlagen",
+        description: error.message || "Ein unerwarteter Fehler ist aufgetreten",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+      </div>
+    );
+  }
 
   return (
     <Card className="p-6">
@@ -152,60 +205,40 @@ export const UserManagement = () => {
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">
             <h2 className="text-2xl font-semibold text-gray-900">Benutzerverwaltung</h2>
-            <Select
-              value={userTypeFilter}
-              onValueChange={setUserTypeFilter}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Benutzertyp filtern" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle Benutzer</SelectItem>
-                <SelectItem value="Kunde">Kunden</SelectItem>
-                <SelectItem value="Mitarbeiter">Mitarbeiter</SelectItem>
-                <SelectItem value="Administrator">Administratoren</SelectItem>
-              </SelectContent>
-            </Select>
+            <UserFilters 
+              userTypeFilter={userTypeFilter}
+              onFilterChange={setUserTypeFilter}
+            />
           </div>
-          <Button 
-            onClick={handleResetAllPasswords}
-            disabled={isResettingPasswords}
-            variant="outline"
-            className="bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700"
-          >
-            {isResettingPasswords ? "Wird zurückgesetzt..." : "Alle Passwörter zurücksetzen"}
-          </Button>
+          <UserActions 
+            onAddEmployee={handleAddEmployee}
+            onResetAllPasswords={handleResetAllPasswords}
+            isResettingPasswords={isResettingPasswords}
+          />
         </div>
 
-        <div className="rounded-lg border">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-gray-50">
-                <TableHead className="font-semibold">Name</TableHead>
-                <TableHead className="font-semibold">Email</TableHead>
-                <TableHead className="font-semibold">Telefon</TableHead>
-                <TableHead className="font-semibold">Typ</TableHead>
-                <TableHead className="font-semibold text-right">Aktionen</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredUsers.map((user) => (
-                <UserTableRow 
-                  key={user.id}
-                  user={user}
-                  userType={getUserTypeLabel(user.role)}
-                  onSelect={handleUserSelect}
-                  onDelete={handleDeleteUser}
-                />
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <UserTable
+          users={users}
+          employees={employees}
+          onUserSelect={handleUserSelect}
+          onDeleteUser={handleDeleteUser}
+          onEditEmployee={handleEditEmployee}
+          onResetPassword={handleResetPassword}
+          onLoginAs={handleLoginAs}
+          userTypeFilter={userTypeFilter}
+        />
 
         <UserDetailsDialog
           user={selectedUser}
           affiliateInfo={affiliateInfo}
           onOpenChange={(open) => !open && setSelectedUser(null)}
+        />
+
+        <EmployeeDialog
+          employee={selectedEmployee}
+          open={isEmployeeDialogOpen}
+          onOpenChange={setIsEmployeeDialogOpen}
+          onSuccess={fetchEmployees}
         />
       </div>
     </Card>
