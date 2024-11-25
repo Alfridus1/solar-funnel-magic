@@ -1,11 +1,10 @@
 import { useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import { roleTranslations } from "@/utils/roleTranslations";
 
 export function Login() {
   const navigate = useNavigate();
@@ -17,28 +16,34 @@ export function Login() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
         try {
-          const { data: profile, error } = await supabase
+          // Get user's profile to check their role
+          const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('role')
             .eq('id', session.user.id)
-            .maybeSingle();
+            .single();
 
-          if (error) {
-            throw error;
-          }
+          if (profileError) throw profileError;
+
+          // Get employee data if it exists
+          const { data: employee } = await supabase
+            .from('employees')
+            .select('role')
+            .eq('profile_id', session.user.id)
+            .single();
 
           toast({
             title: "Erfolgreich angemeldet",
             description: "Willkommen zurück!",
           });
 
-          // Weiterleitung basierend auf der Benutzerrolle
+          // Redirect based on role hierarchy
           if (profile?.role === 'admin') {
             navigate("/admin");
-          } else if (profile?.role && Object.keys(roleTranslations).includes(profile.role)) {
+          } else if (employee?.role) {
             navigate("/employee/dashboard");
           } else {
-            // Wenn keine Mitarbeiterrolle vorhanden ist, zum Kundendashboard weiterleiten
+            // Regular customer
             if (returnTo && metrics) {
               navigate(returnTo, { state: { metrics, address } });
             } else {
@@ -121,8 +126,7 @@ export function Login() {
             },
           }}
           providers={[]}
-          theme="light"
-          view="sign_in"
+          redirectTo={`${window.location.origin}/auth/callback`}
         />
       </Card>
     </div>

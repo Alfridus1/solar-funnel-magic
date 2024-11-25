@@ -43,12 +43,22 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/admin/*" element={<AdminDashboard />} />
-        <Route path="/employee/*" element={
-          <ProtectedRoute>
-            <EmployeeDashboard />
-          </ProtectedRoute>
-        } />
+        <Route 
+          path="/admin/*" 
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/employee/*" 
+          element={
+            <ProtectedRoute>
+              <EmployeeDashboard />
+            </ProtectedRoute>
+          }
+        />
         <Route 
           path="/dashboard/*" 
           element={
