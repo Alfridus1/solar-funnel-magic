@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { LoginDialog } from "@/components/auth/LoginDialog";
@@ -40,21 +40,18 @@ export function Index() {
 
       if (session?.user) {
         try {
-          // Get profile data with maybeSingle() to handle no results
           const { data: profile } = await supabase
             .from('profiles')
             .select('role')
             .eq('id', session.user.id)
             .maybeSingle();
 
-          // Get employee data with maybeSingle() to handle no results
           const { data: employee } = await supabase
             .from('employees')
             .select('role')
             .eq('profile_id', session.user.id)
             .maybeSingle();
 
-          // Set role based on profile and employee status
           if (profile?.role === 'admin') {
             setUserRole('admin');
           } else if (employee?.role) {
@@ -64,7 +61,6 @@ export function Index() {
           }
         } catch (error) {
           console.error('Error checking user role:', error);
-          // Default to customer role if there's an error
           setUserRole('customer');
         }
       }
@@ -135,7 +131,6 @@ export function Index() {
           handleDashboardNavigation={() => navigate('/dashboard')}
         />
         
-        {/* Hero Section */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -149,7 +144,6 @@ export function Index() {
             Berechnen Sie in nur 2 Minuten Ihr persönliches Solardach und erhalten Sie ein unverbindliches Angebot
           </p>
 
-          {/* Main CTA */}
           <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-6 mb-12">
             <div className="flex flex-col md:flex-row gap-4">
               <input
@@ -170,7 +164,6 @@ export function Index() {
           </div>
         </motion.div>
 
-        {/* Trust Indicators */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-12">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -206,7 +199,6 @@ export function Index() {
           </motion.div>
         </div>
 
-        {/* Social Proof */}
         <div className="py-16 bg-gradient-to-br from-solar-orange/5 to-white rounded-3xl my-12">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">
@@ -219,7 +211,6 @@ export function Index() {
           <Testimonials />
         </div>
 
-        {/* Final CTA */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
