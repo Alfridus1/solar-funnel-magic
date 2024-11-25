@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AdminLayout } from "./components/admin/layout/AdminLayout";
 import { Overview } from "./components/admin/Overview";
 import { UserManagement } from "./components/admin/UserManagement";
@@ -17,10 +17,6 @@ import { Team } from "./components/employee/Team";
 import { Calendar } from "./components/employee/Calendar";
 import { TimeTracking } from "./components/employee/TimeTracking";
 import { Settings } from "./components/employee/Settings";
-import { Landing } from "./components/landing/Landing";
-import { EmployeeLogin } from "./components/auth/EmployeeLogin";
-import { AuthCallback } from "./components/auth/AuthCallback";
-import { PrivateRoute } from "./components/auth/PrivateRoute";
 import { Toaster } from "./components/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -31,11 +27,9 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/employee-login" element={<EmployeeLogin />} />
-          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
 
-          <Route path="/admin" element={<AdminLayout />}>
+          <Route path="/admin" element={<AdminLayout><Outlet /></AdminLayout>}>
             <Route path="dashboard" element={<Overview />} />
             <Route path="users" element={<UserManagement />} />
             <Route path="leads" element={<LeadManagement />} />
@@ -48,14 +42,7 @@ function App() {
             <Route path="settings" element={<SystemSettings />} />
           </Route>
 
-          <Route
-            path="/employee"
-            element={
-              <PrivateRoute>
-                <EmployeeLayout />
-              </PrivateRoute>
-            }
-          >
+          <Route path="/employee" element={<EmployeeLayout><Outlet /></EmployeeLayout>}>
             <Route index element={<EmployeeOverview />} />
             <Route path="tasks" element={<Tasks />} />
             <Route path="team" element={<Team />} />
