@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { LeadSourceChart } from "./LeadSourceChart";
-import { EmployeeSimulator } from "./EmployeeSimulator";
+import { RoleSimulator } from "./RoleSimulator";
 
 export const Overview = () => {
   const { data: leadsCount } = useQuery({
@@ -39,7 +39,7 @@ export const Overview = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-start">
         <h1 className="text-2xl font-bold">Dashboard</h1>
-        <EmployeeSimulator />
+        <RoleSimulator />
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

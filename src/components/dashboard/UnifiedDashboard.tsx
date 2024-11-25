@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { UnifiedSidebar } from "./layout/UnifiedSidebar";
@@ -24,6 +23,7 @@ import { Tasks } from "@/components/employee/Tasks";
 import { Team } from "@/components/employee/Team";
 import { Calendar } from "@/components/employee/Calendar";
 import { TimeTracking } from "@/components/employee/TimeTracking";
+import { useLocation } from "react-router-dom";
 
 export const UnifiedDashboard = () => {
   const location = useLocation();
@@ -37,11 +37,9 @@ export const UnifiedDashboard = () => {
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('role, simulated_employee_id')
+        .select('role, simulated_role')
         .eq('id', user.id)
         .single();
-
-      if (!profile) return null;
 
       const { data: employees } = await supabase
         .from('employees')
@@ -49,12 +47,13 @@ export const UnifiedDashboard = () => {
         .eq('profile_id', user.id);
 
       const employee = employees?.[0];
+      const effectiveRole = profile?.simulated_role || profile?.role;
 
       return {
-        isAdmin: profile.role === 'admin',
-        isEmployee: !!employee || profile.role === 'admin',
-        simulatedEmployeeId: profile.simulated_employee_id,
-        actualRole: profile.role,
+        isAdmin: profile?.role === 'admin',
+        isEmployee: !!employee || profile?.role === 'admin',
+        simulatedRole: profile?.simulated_role,
+        actualRole: profile?.role,
         employeeRole: employee?.role
       };
     }
@@ -70,6 +69,7 @@ export const UnifiedDashboard = () => {
 
   const renderContent = () => {
     switch (currentTab) {
+      // Customer views
       case "dashboard":
         return <DashboardOverview />;
       case "requests":
@@ -84,6 +84,8 @@ export const UnifiedDashboard = () => {
         return <ProfileOverview />;
       case "settings":
         return <SettingsOverview />;
+      
+      // Employee views
       case "tasks":
         return userRoles?.isEmployee ? <Tasks /> : null;
       case "team":
@@ -92,6 +94,8 @@ export const UnifiedDashboard = () => {
         return userRoles?.isEmployee ? <Calendar /> : null;
       case "time":
         return userRoles?.isEmployee ? <TimeTracking /> : null;
+      
+      // Admin views
       case "overview":
         return userRoles?.isAdmin ? <Overview /> : null;
       case "leads":
@@ -108,10 +112,11 @@ export const UnifiedDashboard = () => {
         return userRoles?.isAdmin ? <TaskTypeManagement /> : null;
       case "premium":
         return userRoles?.isAdmin ? <PremiumProductsManagement /> : null;
-      case "settings":
+      case "system-settings":
         return userRoles?.isAdmin ? <SystemSettings /> : null;
       case "admins":
         return userRoles?.isAdmin ? <AdminManagement /> : null;
+      
       default:
         return <DashboardOverview />;
     }

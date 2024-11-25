@@ -67,33 +67,33 @@ export const UserDetailsDialog = ({ user, affiliateInfo, onOpenChange }: UserDet
           <div className="grid gap-2">
             <Label>Rolle</Label>
             <Select
-              value={user.role || "customer"}
+              value={user.role || undefined}
               onValueChange={handleRoleChange}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Rolle auswählen" />
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(roleTranslations)
-                  .filter(([value]) => value && value.length > 0)
-                  .map(([value, label]) => (
-                    <SelectItem key={value} value={value}>
-                      {label}
-                    </SelectItem>
-                  ))}
+                {Object.entries(roleTranslations).map(([value, label]) => (
+                  <SelectItem key={value} value={value as UserRole}>
+                    {label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
 
           {affiliateInfo && (
-            <div className="grid gap-2">
-              <Label>Affiliate Informationen</Label>
-              <div className="text-sm text-gray-500">
-                <p>Referral Code: {affiliateInfo.referral_code}</p>
-                <p>Anzahl Referrals: {affiliateInfo.referral_count}</p>
-                <p>Gesamte Leads: {affiliateInfo.total_leads}</p>
+            <>
+              <div className="grid gap-2">
+                <Label>Affiliate Informationen</Label>
+                <div className="text-sm text-gray-500">
+                  <p>Referral Code: {affiliateInfo.referral_code}</p>
+                  <p>Anzahl Referrals: {affiliateInfo.referral_count}</p>
+                  <p>Gesamte Leads: {affiliateInfo.total_leads}</p>
+                </div>
               </div>
-            </div>
+            </>
           )}
         </div>
       </DialogContent>
