@@ -1,31 +1,99 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import { Login } from "@/pages/Login";
-import { UnifiedDashboard } from "@/components/dashboard/UnifiedDashboard";
+import { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet, useNavigate } from 'react-router-dom';
 import { Toaster } from "@/components/ui/toaster";
-import { Index } from "@/pages/Index";
-import { AffiliateLanding } from "@/pages/AffiliateLanding";
-import { ProductShowcase } from "@/components/solar-showcase/ProductShowcase";
-import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { UserManagement } from "@/components/admin/UserManagement";
+import { Login } from "@/pages/Login";
+import { EmployeeLogin } from "@/pages/EmployeeLogin";
+import { Index } from "@/pages/Index";
+import { AdminLayout } from "@/components/admin/layout/AdminLayout";
+import { EmployeeLayout } from "@/components/employee/layout/EmployeeLayout";
+import { UnifiedLayout } from "@/components/dashboard/layout/UnifiedLayout";
+import { Debug } from "@/pages/Debug";
 
-// Protected Route Component
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
+function App() {
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsAuthenticated(!!session);
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        // Handle sign out
+        console.log('User signed out');
+      } else if (event === 'SIGNED_IN') {
+        // Handle sign in
+        console.log('User signed in:', session?.user?.id);
+      }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/employee-login" element={<EmployeeLogin />} />
+        <Route path="/debug" element={<Debug />} />
+        
+        <Route path="/admin/*" element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <Outlet />
+            </AdminLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/employee/*" element={
+          <ProtectedRoute>
+            <EmployeeLayout>
+              <Outlet />
+            </EmployeeLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/dashboard/*" element={
+          <ProtectedRoute>
+            <UnifiedLayout>
+              <Outlet />
+            </UnifiedLayout>
+          </ProtectedRoute>
+        } />
+      </Routes>
+      <Toaster />
+    </Router>
+  );
+}
+
+// Protected Route component
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setIsAuthenticated(!!session);
+      } catch (error) {
+        console.error('Error checking auth status:', error);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsAuthenticated(!!session);
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [navigate]);
 
-  if (isAuthenticated === null) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
@@ -34,30 +102,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   return <>{children}</>;
-};
-
-export default function App() {
-  return (
-    <>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/login" element={<Login />} />
-        <Route 
-          path="/dashboard/*" 
-          element={
-            <ProtectedRoute>
-              <UnifiedDashboard />
-            </ProtectedRoute>
-          } 
-        />
-        <Route path="/solar-showcase" element={<ProductShowcase />} />
-        <Route path="/affiliate" element={<AffiliateLanding />} />
-        <Route 
-          path="/recommended-config" 
-          element={<Navigate to="/solar-showcase" replace />} 
-        />
-      </Routes>
-      <Toaster />
-    </>
-  );
 }
+
+export default App;
