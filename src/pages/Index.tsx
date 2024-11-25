@@ -27,6 +27,7 @@ export function Index() {
   const navigate = useNavigate();
   const { isLoaded, loadError } = useGoogleMaps();
 
+  // Store referral code in localStorage when the page loads
   useEffect(() => {
     const refCode = searchParams.get('ref');
     if (refCode) {
@@ -128,13 +129,22 @@ export function Index() {
           >
             Affiliate werden
           </Button>
-          <Button 
-            variant="outline"
-            onClick={() => isLoggedIn ? navigate("/dashboard") : setShowLoginDialog(true)}
-            className="bg-white hover:bg-solar-orange hover:text-white transition-colors"
-          >
-            {isLoggedIn ? "Zum Dashboard" : "Login"}
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline"
+              onClick={() => navigate("/employee-login")}
+              className="bg-white hover:bg-solar-orange hover:text-white transition-colors"
+            >
+              Mitarbeiter-Login
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => isLoggedIn ? navigate("/dashboard") : setShowLoginDialog(true)}
+              className="bg-white hover:bg-solar-orange hover:text-white transition-colors"
+            >
+              {isLoggedIn ? "Zum Dashboard" : "Login"}
+            </Button>
+          </div>
         </div>
         
         <div className="py-12">

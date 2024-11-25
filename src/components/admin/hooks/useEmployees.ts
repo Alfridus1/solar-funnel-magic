@@ -25,23 +25,6 @@ export const useEmployees = () => {
         return;
       }
 
-      // Überprüfe, ob der Benutzer ein Admin ist
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', session.session.user.id)
-        .single();
-
-      if (profileError || profile?.role !== 'admin') {
-        toast({
-          title: "Zugriff verweigert",
-          description: "Sie haben keine Berechtigung für den Admin-Bereich.",
-          variant: "destructive",
-        });
-        navigate('/');
-        return;
-      }
-
       const { data, error } = await supabase
         .from('employees')
         .select(`
@@ -112,53 +95,19 @@ export const useEmployees = () => {
         navigate('/login');
         return;
       }
-
-      // Überprüfe Admin-Rolle beim initialen Laden
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', session.user.id)
-        .single();
-
-      if (profile?.role !== 'admin') {
-        toast({
-          title: "Zugriff verweigert",
-          description: "Sie haben keine Berechtigung für den Admin-Bereich.",
-          variant: "destructive",
-        });
-        navigate('/');
-        return;
-      }
-
       fetchEmployees();
     };
 
     checkAuthAndFetch();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT') {
         navigate('/login');
-      } else if (event === 'SIGNED_IN' && session) {
-        // Überprüfe Admin-Rolle bei Anmeldung
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
-
-        if (profile?.role !== 'admin') {
-          toast({
-            title: "Zugriff verweigert",
-            description: "Sie haben keine Berechtigung für den Admin-Bereich.",
-            variant: "destructive",
-          });
-          navigate('/');
-        }
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, toast]);
+  }, [navigate]);
 
   return { employees, fetchEmployees, isLoading };
 };

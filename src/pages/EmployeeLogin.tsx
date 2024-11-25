@@ -1,52 +1,72 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
+import { useToast } from "@/components/ui/use-toast";
 
-export const EmployeeLogin = () => {
+export function EmployeeLogin() {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        try {
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .maybeSingle();
 
-        if (profile?.role === 'admin') {
-          navigate('/admin');
-        } else if (profile?.role !== 'customer') {
-          navigate('/employee');
+          if (error) {
+            throw error;
+          }
+
+          if (profile?.role && profile.role !== 'customer') {
+            toast({
+              title: "Erfolgreich angemeldet",
+              description: "Willkommen im Mitarbeiterbereich!",
+            });
+            navigate("/admin");
+          } else {
+            await supabase.auth.signOut();
+            toast({
+              title: "Zugriff verweigert",
+              description: "Sie haben keine Berechtigung für den Mitarbeiterbereich.",
+              variant: "destructive",
+            });
+          }
+        } catch (error: any) {
+          console.error('Profile check error:', error);
+          await supabase.auth.signOut();
+          toast({
+            title: "Fehler beim Anmelden",
+            description: "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
+            variant: "destructive",
+          });
         }
+      } else if (event === 'SIGNED_OUT') {
+        toast({
+          title: "Abgemeldet",
+          description: "Sie wurden erfolgreich abgemeldet.",
+        });
       }
-      setIsLoading(false);
-    };
+    });
 
-    checkSession();
-  }, [navigate]);
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
-      </div>
-    );
-  }
+    return () => subscription.unsubscribe();
+  }, [navigate, toast]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md p-8">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-center">Mitarbeiter Login</h1>
-          <p className="text-center text-gray-600 mt-2">
-            Bitte melden Sie sich mit Ihren Mitarbeiter-Zugangsdaten an
+    <div className="min-h-screen bg-gradient-to-br from-solar-blue to-white flex items-center justify-center p-4">
+      <Card className="w-full max-w-md p-6 bg-white/95 backdrop-blur shadow-xl">
+        <div className="mb-8 text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Mitarbeiter-Login
+          </h1>
+          <p className="text-gray-600">
+            Bitte melden Sie sich mit Ihren Mitarbeiterdaten an
           </p>
         </div>
         
@@ -57,35 +77,42 @@ export const EmployeeLogin = () => {
             variables: {
               default: {
                 colors: {
-                  brand: '#F75c03',
-                  brandAccent: '#F75c03',
+                  brand: '#F75C03',
+                  brandAccent: '#FF8A3D',
                 }
               }
+            },
+            className: {
+              container: 'w-full',
+              button: 'w-full bg-solar-orange hover:bg-solar-orange-light text-white',
+              input: 'w-full rounded border-gray-300',
+              label: 'text-gray-700',
+              message: 'text-red-600',
             }
           }}
-          providers={[]}
           localization={{
             variables: {
               sign_in: {
-                email_label: 'E-Mail',
+                email_label: 'E-Mail Adresse',
                 password_label: 'Passwort',
                 button_label: 'Anmelden',
-                loading_button_label: 'Anmeldung...',
-                social_provider_text: 'Anmelden mit {{provider}}',
-                link_text: 'Sie haben bereits ein Konto? Anmelden',
+                loading_button_label: 'Anmeldung läuft...',
+                email_input_placeholder: 'Ihre E-Mail Adresse',
+                password_input_placeholder: 'Ihr Passwort',
               },
-              sign_up: {
-                email_label: 'E-Mail',
-                password_label: 'Passwort',
-                button_label: 'Registrieren',
-                loading_button_label: 'Registrierung...',
-                social_provider_text: 'Registrieren mit {{provider}}',
-                link_text: 'Kein Konto? Registrieren',
+              forgotten_password: {
+                link_text: 'Passwort vergessen?',
+                button_label: 'Passwort zurücksetzen',
+                loading_button_label: 'Sende Anweisungen...',
+                email_input_placeholder: 'Ihre E-Mail Adresse',
+                confirmation_text: 'Überprüfen Sie Ihre E-Mails für den Bestätigungslink',
               },
             },
           }}
+          providers={[]}
+          view="sign_in"
         />
       </Card>
     </div>
   );
-};
+}

@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { User, Phone, Mail, Home, Zap, Pencil } from "lucide-react";
+import { User, Phone, Mail, Home, Zap } from "lucide-react";
 import { Profile, ProfileFormData } from "./types/Profile";
 import { ProfileForm } from "./components/ProfileForm";
 
@@ -14,15 +14,14 @@ interface PageHeaderProps {
 
 const PageHeader = ({ heading, text }: PageHeaderProps) => (
   <div className="flex flex-col gap-2">
-    <h1 className="text-3xl font-bold tracking-tight">{heading}</h1>
-    {text && <p className="text-muted-foreground">{text}</p>}
+    <h1 className="text-3xl font-bold">{heading}</h1>
+    {text && <p className="text-gray-600">{text}</p>}
   </div>
 );
 
 export const ProfileOverview = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState<ProfileFormData>({
     first_name: "",
     last_name: "",
@@ -41,95 +40,66 @@ export const ProfileOverview = () => {
   }, []);
 
   const fetchProfile = async () => {
-    try {
-      setIsLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          title: "Fehler",
-          description: "Benutzer nicht eingeloggt",
-          variant: "destructive",
-        });
-        return;
-      }
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
 
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
 
-      if (error) throw error;
-
-      setProfile(data);
-      if (data) {
-        setFormData({
-          first_name: data.first_name || "",
-          last_name: data.last_name || "",
-          email: data.email || "",
-          phone: data.phone || "",
-          street: data.street || "",
-          house_number: data.house_number || "",
-          postal_code: data.postal_code || "",
-          city: data.city || "",
-          annual_consumption: data.annual_consumption?.toString() || "",
-        });
-      }
-    } catch (error: any) {
+    if (error) {
       toast({
         title: "Fehler beim Laden des Profils",
         description: error.message,
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
+      return;
     }
+
+    setProfile(data);
+    setFormData({
+      first_name: data.first_name || "",
+      last_name: data.last_name || "",
+      email: data.email || "",
+      phone: data.phone || "",
+      street: data.street || "",
+      house_number: data.house_number || "",
+      postal_code: data.postal_code || "",
+      city: data.city || "",
+      annual_consumption: data.annual_consumption?.toString() || "",
+    });
   };
 
   const handleSave = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          title: "Fehler",
-          description: "Benutzer nicht eingeloggt",
-          variant: "destructive",
-        });
-        return;
-      }
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
 
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          ...formData,
-          annual_consumption: formData.annual_consumption ? parseInt(formData.annual_consumption) : null,
-        })
-        .eq('id', user.id);
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        ...formData,
+        annual_consumption: formData.annual_consumption ? parseInt(formData.annual_consumption) : null,
+      })
+      .eq('id', user.id);
 
-      if (error) throw error;
-
-      toast({
-        title: "Erfolgreich gespeichert",
-        description: "Ihre Profildaten wurden aktualisiert.",
-      });
-      setIsEditing(false);
-      await fetchProfile();
-    } catch (error: any) {
+    if (error) {
       toast({
         title: "Fehler beim Speichern",
         description: error.message,
         variant: "destructive",
       });
+      return;
     }
-  };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
-      </div>
-    );
-  }
+    toast({
+      title: "Erfolgreich gespeichert",
+      description: "Ihre Profildaten wurden aktualisiert.",
+    });
+    setIsEditing(false);
+    fetchProfile();
+  };
 
   return (
     <div className="space-y-6">
@@ -139,64 +109,36 @@ export const ProfileOverview = () => {
       />
 
       <Card className="p-6">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-semibold">Persönliche Informationen</h3>
           <Button
             variant={isEditing ? "outline" : "default"}
             onClick={() => setIsEditing(!isEditing)}
-            className="gap-2"
           >
-            <Pencil className="h-4 w-4" />
             {isEditing ? "Abbrechen" : "Bearbeiten"}
           </Button>
         </div>
 
-        <div className="grid gap-8">
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <User className="h-4 w-4" />
-                <span className="text-sm font-medium">Name</span>
-              </div>
-              <p className="text-lg">
-                {formData.first_name} {formData.last_name}
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Mail className="h-4 w-4" />
-                <span className="text-sm font-medium">E-Mail</span>
-              </div>
-              <p className="text-lg">{formData.email}</p>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Phone className="h-4 w-4" />
-                <span className="text-sm font-medium">Telefon</span>
-              </div>
-              <p className="text-lg">{formData.phone || "-"}</p>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Zap className="h-4 w-4" />
-                <span className="text-sm font-medium">Jährlicher Stromverbrauch</span>
-              </div>
-              <p className="text-lg">{formData.annual_consumption ? `${formData.annual_consumption} kWh` : "-"}</p>
-            </div>
+        <div className="grid gap-6">
+          <div className="flex items-center gap-2 text-gray-600">
+            <User className="h-4 w-4" />
+            <span>Name</span>
           </div>
-
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Home className="h-4 w-4" />
-              <span className="text-sm font-medium">Adresse</span>
-            </div>
-            <p className="text-lg">
-              {formData.street} {formData.house_number}<br />
-              {formData.postal_code} {formData.city}
-            </p>
+          <div className="flex items-center gap-2 text-gray-600">
+            <Mail className="h-4 w-4" />
+            <span>E-Mail</span>
+          </div>
+          <div className="flex items-center gap-2 text-gray-600">
+            <Phone className="h-4 w-4" />
+            <span>Telefon</span>
+          </div>
+          <div className="flex items-center gap-2 text-gray-600">
+            <Zap className="h-4 w-4" />
+            <span>Jährlicher Stromverbrauch (kWh)</span>
+          </div>
+          <div className="flex items-center gap-2 text-gray-600">
+            <Home className="h-4 w-4" />
+            <span>Adresse</span>
           </div>
         </div>
 
