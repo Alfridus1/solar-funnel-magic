@@ -10,6 +10,7 @@ import { PremiumProductsManagement } from "@/components/admin/PremiumProductsMan
 import { SystemSettings } from "@/components/admin/SystemSettings";
 import { TaskTypeManagement } from "@/components/admin/TaskTypeManagement";
 import { AdminManagement } from "@/components/admin/AdminManagement";
+import { APIDebugger } from "@/components/admin/APIDebugger";
 
 export const AdminDashboard = () => {
   const location = useLocation();
@@ -37,6 +38,8 @@ export const AdminDashboard = () => {
         return <SystemSettings />;
       case "admins":
         return <AdminManagement />;
+      case "api-debug":
+        return <APIDebugger />;
       default:
         return <Overview />;
     }
