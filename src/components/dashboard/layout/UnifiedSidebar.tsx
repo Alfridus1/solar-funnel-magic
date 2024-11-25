@@ -1,56 +1,56 @@
-import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { ChevronLeft, ChevronRight, Users, Building2, ShieldCheck } from "lucide-react";
+import { 
+  ChevronLeft, 
+  ChevronRight,
+  ChevronDown,
+  ChevronUp,
+  Home,
+  FileText,
+  Users,
+  Calendar,
+  Clock,
+  Settings,
+  LogOut,
+  Building2,
+  ShieldCheck,
+  Briefcase,
+  FileBox,
+  UserCircle,
+  Award,
+  Package
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { useNavigate } from "react-router-dom";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
-export const UnifiedSidebar = () => {
+interface UnifiedSidebarProps {
+  userRoles?: {
+    isAdmin: boolean;
+    isEmployee: boolean;
+  };
+}
+
+export const UnifiedSidebar = ({ userRoles }: UnifiedSidebarProps) => {
   const location = useLocation();
-  const currentPath = location.pathname + location.hash;
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [userRoles, setUserRoles] = useState({
-    isAdmin: false,
-    isEmployee: false
-  });
-  const { toast } = useToast();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [openSections, setOpenSections] = useState<string[]>(['customer']);
 
-  useEffect(() => {
-    const loadUserRoles = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate("/");
-        return;
-      }
-
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single();
-
-      const { data: employee } = await supabase
-        .from('employees')
-        .select('role')
-        .eq('profile_id', user.id)
-        .single();
-
-      setUserRoles({
-        isAdmin: profile?.role === 'admin',
-        isEmployee: !!employee || profile?.role === 'admin' // Admin is also an employee
-      });
-    };
-
-    loadUserRoles();
-  }, [navigate]);
+  const toggleSection = (section: string) => {
+    setOpenSections(prev => 
+      prev.includes(section) 
+        ? prev.filter(s => s !== section)
+        : [...prev, section]
+    );
+  };
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -62,8 +62,132 @@ export const UnifiedSidebar = () => {
       });
       return;
     }
-    navigate("/");
+    navigate("/login");
   };
+
+  const customerMenuItems = [
+    { 
+      label: "Dashboard", 
+      icon: Home, 
+      path: "/dashboard/customer#dashboard"
+    },
+    { 
+      label: "Meine Anfragen", 
+      icon: FileText, 
+      path: "/dashboard/customer#requests"
+    },
+    { 
+      label: "Meine Projekte", 
+      icon: Briefcase, 
+      path: "/dashboard/customer#projects"
+    },
+    { 
+      label: "Empfehlungsprogramm", 
+      icon: Award, 
+      path: "/dashboard/customer#referral"
+    },
+    { 
+      label: "Dokumente", 
+      icon: FileBox, 
+      path: "/dashboard/customer#documents"
+    },
+    { 
+      label: "Profil", 
+      icon: UserCircle, 
+      path: "/dashboard/customer#profile"
+    },
+    { 
+      label: "Einstellungen", 
+      icon: Settings, 
+      path: "/dashboard/customer#settings"
+    },
+  ];
+
+  const employeeMenuItems = [
+    { 
+      label: "Übersicht", 
+      icon: Home, 
+      path: "/dashboard/employee#overview"
+    },
+    { 
+      label: "Aufgaben", 
+      icon: FileText, 
+      path: "/dashboard/employee#tasks"
+    },
+    { 
+      label: "Team", 
+      icon: Users, 
+      path: "/dashboard/employee#team"
+    },
+    { 
+      label: "Kalender", 
+      icon: Calendar, 
+      path: "/dashboard/employee#calendar"
+    },
+    { 
+      label: "Zeiterfassung", 
+      icon: Clock, 
+      path: "/dashboard/employee#time"
+    },
+    { 
+      label: "Einstellungen", 
+      icon: Settings, 
+      path: "/dashboard/employee#settings"
+    },
+  ];
+
+  const adminMenuItems = [
+    { 
+      label: "Übersicht", 
+      icon: Home, 
+      path: "/dashboard/admin#overview"
+    },
+    { 
+      label: "Leads", 
+      icon: FileText, 
+      path: "/dashboard/admin#leads"
+    },
+    { 
+      label: "Benutzer", 
+      icon: Users, 
+      path: "/dashboard/admin#users"
+    },
+    { 
+      label: "Partner", 
+      icon: Award, 
+      path: "/dashboard/admin#affiliates"
+    },
+    { 
+      label: "Mitarbeiter", 
+      icon: Users, 
+      path: "/dashboard/admin#employees"
+    },
+    { 
+      label: "Produkte", 
+      icon: Package, 
+      path: "/dashboard/admin#products"
+    },
+    { 
+      label: "Aufgabentypen", 
+      icon: FileText, 
+      path: "/dashboard/admin#task-types"
+    },
+    { 
+      label: "Premium Produkte", 
+      icon: Award, 
+      path: "/dashboard/admin#premium"
+    },
+    { 
+      label: "Administratoren", 
+      icon: ShieldCheck, 
+      path: "/dashboard/admin#admins"
+    },
+    { 
+      label: "Einstellungen", 
+      icon: Settings, 
+      path: "/dashboard/admin#settings"
+    },
+  ];
 
   return (
     <div className={cn(
@@ -88,78 +212,143 @@ export const UnifiedSidebar = () => {
           "text-2xl font-bold text-gray-800 dark:text-white transition-all duration-300",
           isCollapsed && "text-center text-xl"
         )}>
-          {isCollapsed ? "D" : "Dashboard"}
+          {isCollapsed ? "DB" : "Dashboard"}
         </h2>
       </div>
 
-      <div className="space-y-2 px-3">
-        {/* Kundenbereich */}
-        <Collapsible>
+      <nav className="space-y-1 px-3">
+        {/* Customer Section */}
+        <Collapsible
+          open={openSections.includes('customer')}
+          onOpenChange={() => !isCollapsed && toggleSection('customer')}
+        >
           <CollapsibleTrigger className="flex items-center w-full px-3 py-2 text-left">
             <Building2 className="h-5 w-5 mr-3" />
-            {!isCollapsed && <span>Kundenbereich</span>}
+            {!isCollapsed && (
+              <>
+                <span className="flex-1">Kundenbereich</span>
+                {openSections.includes('customer') ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+              </>
+            )}
           </CollapsibleTrigger>
           <CollapsibleContent>
-            <div className="ml-8 space-y-1">
-              <Button variant="ghost" className="w-full justify-start">
-                Übersicht
-              </Button>
-              <Button variant="ghost" className="w-full justify-start">
-                Meine Projekte
-              </Button>
-              <Button variant="ghost" className="w-full justify-start">
-                Dokumente
-              </Button>
-            </div>
+            {!isCollapsed && customerMenuItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={cn(
+                    "flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ml-6",
+                    location.pathname + location.hash === item.path
+                      ? "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
+                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
+                  )}
+                >
+                  <Icon className="h-4 w-4 mr-3" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
           </CollapsibleContent>
         </Collapsible>
 
-        {/* Mitarbeiterbereich */}
-        {userRoles.isEmployee && (
-          <Collapsible>
+        {/* Employee Section */}
+        {userRoles?.isEmployee && (
+          <Collapsible
+            open={openSections.includes('employee')}
+            onOpenChange={() => !isCollapsed && toggleSection('employee')}
+          >
             <CollapsibleTrigger className="flex items-center w-full px-3 py-2 text-left">
               <Users className="h-5 w-5 mr-3" />
-              {!isCollapsed && <span>Mitarbeiterbereich</span>}
+              {!isCollapsed && (
+                <>
+                  <span className="flex-1">Mitarbeiterbereich</span>
+                  {openSections.includes('employee') ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </>
+              )}
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <div className="ml-8 space-y-1">
-                <Button variant="ghost" className="w-full justify-start">
-                  Aufgaben
-                </Button>
-                <Button variant="ghost" className="w-full justify-start">
-                  Kalender
-                </Button>
-                <Button variant="ghost" className="w-full justify-start">
-                  Team
-                </Button>
-              </div>
+              {!isCollapsed && employeeMenuItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={cn(
+                      "flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ml-6",
+                      location.pathname + location.hash === item.path
+                        ? "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
+                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
+                    )}
+                  >
+                    <Icon className="h-4 w-4 mr-3" />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
             </CollapsibleContent>
           </Collapsible>
         )}
 
-        {/* Administrationsbereich */}
-        {userRoles.isAdmin && (
-          <Collapsible>
+        {/* Admin Section */}
+        {userRoles?.isAdmin && (
+          <Collapsible
+            open={openSections.includes('admin')}
+            onOpenChange={() => !isCollapsed && toggleSection('admin')}
+          >
             <CollapsibleTrigger className="flex items-center w-full px-3 py-2 text-left">
               <ShieldCheck className="h-5 w-5 mr-3" />
-              {!isCollapsed && <span>Administration</span>}
+              {!isCollapsed && (
+                <>
+                  <span className="flex-1">Administrationsbereich</span>
+                  {openSections.includes('admin') ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </>
+              )}
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <div className="ml-8 space-y-1">
-                <Button variant="ghost" className="w-full justify-start">
-                  Benutzer
-                </Button>
-                <Button variant="ghost" className="w-full justify-start">
-                  Einstellungen
-                </Button>
-                <Button variant="ghost" className="w-full justify-start">
-                  Statistiken
-                </Button>
-              </div>
+              {!isCollapsed && adminMenuItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={cn(
+                      "flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ml-6",
+                      location.pathname + location.hash === item.path
+                        ? "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
+                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
+                    )}
+                  >
+                    <Icon className="h-4 w-4 mr-3" />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
             </CollapsibleContent>
           </Collapsible>
         )}
-      </div>
+
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors mt-4"
+        >
+          <LogOut className="h-5 w-5 mr-3" />
+          {!isCollapsed && <span>Ausloggen</span>}
+        </button>
+      </nav>
     </div>
   );
 };

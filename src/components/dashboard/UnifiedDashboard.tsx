@@ -3,8 +3,15 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { UnifiedSidebar } from "./layout/UnifiedSidebar";
+import { CustomerDashboard } from "./CustomerDashboard";
+import { EmployeeDashboard } from "./EmployeeDashboard";
+import { AdminDashboard } from "./AdminDashboard";
+import { useLocation } from "react-router-dom";
 
 export const UnifiedDashboard = () => {
+  const location = useLocation();
+  const section = location.pathname.split('/')[2] || 'customer'; // Default to customer
+
   const { data: userRoles, isLoading } = useQuery({
     queryKey: ['user-roles'],
     queryFn: async () => {
@@ -40,12 +47,23 @@ export const UnifiedDashboard = () => {
     );
   }
 
+  const renderDashboard = () => {
+    switch (section) {
+      case 'admin':
+        return userRoles?.isAdmin ? <AdminDashboard /> : null;
+      case 'employee':
+        return userRoles?.isEmployee ? <EmployeeDashboard /> : null;
+      case 'customer':
+      default:
+        return <CustomerDashboard />;
+    }
+  };
+
   return (
     <div className="flex h-screen">
-      <UnifiedSidebar />
+      <UnifiedSidebar userRoles={userRoles} />
       <main className="flex-1 overflow-y-auto p-8">
-        <h1 className="text-2xl font-bold mb-6">Willkommen im Dashboard</h1>
-        {/* Content will be rendered based on selected section */}
+        {renderDashboard()}
       </main>
     </div>
   );
