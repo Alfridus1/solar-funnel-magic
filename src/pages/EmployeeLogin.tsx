@@ -52,12 +52,6 @@ export function EmployeeLogin() {
           title: "Abgemeldet",
           description: "Sie wurden erfolgreich abgemeldet.",
         });
-      } else if (event === 'USER_DELETED') {
-        toast({
-          title: "Fehler",
-          description: "Benutzer nicht gefunden.",
-          variant: "destructive",
-        });
       }
     });
 
