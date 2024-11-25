@@ -48,7 +48,7 @@ export const SystemSettings = () => {
     }
   };
 
-  const updatePixel = async (id: string, updates: Partial<TrackingPixel>) => {
+  const updatePixel = async (id: string, updates: { pixel_id?: string; is_active?: boolean; conversion_label?: string }) => {
     try {
       const { error } = await supabase
         .from('tracking_pixels')
@@ -74,13 +74,15 @@ export const SystemSettings = () => {
 
   const addPixel = async (platform: 'meta' | 'google') => {
     try {
+      const newPixel = {
+        platform,
+        pixel_id: '',
+        is_active: false
+      };
+
       const { error } = await supabase
         .from('tracking_pixels')
-        .insert([{
-          platform,
-          pixel_id: '',
-          is_active: false
-        }]);
+        .insert([newPixel]);
 
       if (error) throw error;
 
