@@ -26,8 +26,41 @@ export const UnifiedSidebar = () => {
           return;
         }
 
+        // First check if profile exists
+        const { data: existingProfile, error: checkError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (checkError) {
+          console.error('Profile check error:', checkError);
+          return;
+        }
+
+        // If profile doesn't exist, create it
+        if (!existingProfile) {
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert([
+              {
+                id: user.id,
+                email: user.email,
+                first_name: '',
+                last_name: '',
+                phone: '',
+                permissions: ['customer_access']
+              }
+            ]);
+
+          if (insertError) {
+            console.error('Profile creation error:', insertError);
+            return;
+          }
+        }
+
         // Get profile permissions
-        const { data: profiles, error: profileError } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('permissions')
           .eq('id', user.id)
@@ -39,7 +72,7 @@ export const UnifiedSidebar = () => {
         }
 
         // Get employee status
-        const { data: employees, error: employeeError } = await supabase
+        const { data: employee, error: employeeError } = await supabase
           .from('employees')
           .select('*')
           .eq('profile_id', user.id)
@@ -50,10 +83,10 @@ export const UnifiedSidebar = () => {
           return;
         }
 
-        let permissions = profiles?.permissions || ['customer_access'];
+        let permissions = profile?.permissions || ['customer_access'];
         
         // If user is an employee, add employee permissions
-        if (employees) {
+        if (employee) {
           permissions = [...permissions, 'employee_access'];
         }
 
