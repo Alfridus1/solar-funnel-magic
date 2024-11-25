@@ -74,14 +74,14 @@ export const AccessControlTab = ({ employeeId }: AccessControlTabProps) => {
         throw error;
       }
 
-      if (data) {
-        setPermissions(data.permissions);
+      if (data?.permissions && typeof data.permissions === 'object') {
+        setPermissions(data.permissions as Record<string, boolean>);
       } else {
         // Set default permissions if none exist
         const defaultPermissions = ACCESS_PERMISSIONS.reduce((acc, { feature }) => ({
           ...acc,
           [feature]: false
-        }), {});
+        }), {} as Record<string, boolean>);
         setPermissions(defaultPermissions);
       }
     } catch (error: any) {
