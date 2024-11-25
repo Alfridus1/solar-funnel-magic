@@ -12,7 +12,7 @@ export const ReferralLink = ({ referralCode }: ReferralLinkProps) => {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
   
-  const referralLink = `https://coppen.app/?ref=${referralCode}`;
+  const referralLink = `${window.location.origin}/?ref=${referralCode}`;
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(referralLink);
