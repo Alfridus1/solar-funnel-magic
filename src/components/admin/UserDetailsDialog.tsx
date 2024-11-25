@@ -86,16 +86,14 @@ export const UserDetailsDialog = ({ user, affiliateInfo, onOpenChange }: UserDet
           </div>
 
           {affiliateInfo && (
-            <>
-              <div className="grid gap-2">
-                <Label>Affiliate Informationen</Label>
-                <div className="text-sm text-gray-500">
-                  <p>Referral Code: {affiliateInfo.referral_code}</p>
-                  <p>Anzahl Referrals: {affiliateInfo.referral_count}</p>
-                  <p>Gesamte Leads: {affiliateInfo.total_leads}</p>
-                </div>
+            <div className="grid gap-2">
+              <Label>Affiliate Informationen</Label>
+              <div className="text-sm text-gray-500">
+                <p>Referral Code: {affiliateInfo.referral_code}</p>
+                <p>Anzahl Referrals: {affiliateInfo.referral_count}</p>
+                <p>Gesamte Leads: {affiliateInfo.total_leads}</p>
               </div>
-            </>
+            </div>
           )}
         </div>
       </DialogContent>

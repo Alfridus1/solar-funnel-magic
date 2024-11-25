@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { UserDetailsDialog } from "./UserDetailsDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Profile, AffiliateInfo } from "./types/userManagement";
 import { UserTableRow } from "./components/UserTableRow";
 import { Card } from "@/components/ui/card";
+import { UserFilterControls } from "./components/UserFilterControls";
 
 export const UserManagement = () => {
   const [users, setUsers] = useState<Profile[]>([]);
@@ -149,33 +148,12 @@ export const UserManagement = () => {
   return (
     <Card className="p-6">
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <h2 className="text-2xl font-semibold text-gray-900">Benutzerverwaltung</h2>
-            <Select
-              value={userTypeFilter}
-              onValueChange={setUserTypeFilter}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Benutzertyp filtern" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle Benutzer</SelectItem>
-                <SelectItem value="Kunde">Kunden</SelectItem>
-                <SelectItem value="Mitarbeiter">Mitarbeiter</SelectItem>
-                <SelectItem value="Administrator">Administratoren</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <Button 
-            onClick={handleResetAllPasswords}
-            disabled={isResettingPasswords}
-            variant="outline"
-            className="bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700"
-          >
-            {isResettingPasswords ? "Wird zurückgesetzt..." : "Alle Passwörter zurücksetzen"}
-          </Button>
-        </div>
+        <UserFilterControls
+          userTypeFilter={userTypeFilter}
+          setUserTypeFilter={setUserTypeFilter}
+          onResetPasswords={handleResetAllPasswords}
+          isResettingPasswords={isResettingPasswords}
+        />
 
         <div className="rounded-lg border">
           <Table>
