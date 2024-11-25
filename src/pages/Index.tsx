@@ -42,23 +42,32 @@ export function Index() {
       setIsLoggedIn(!!session);
 
       if (session?.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
+        try {
+          // Get profile data with maybeSingle() to handle no results
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .maybeSingle();
 
-        const { data: employee } = await supabase
-          .from('employees')
-          .select('role')
-          .eq('profile_id', session.user.id)
-          .single();
+          // Get employee data with maybeSingle() to handle no results
+          const { data: employee } = await supabase
+            .from('employees')
+            .select('role')
+            .eq('profile_id', session.user.id)
+            .maybeSingle();
 
-        if (profile?.role === 'admin') {
-          setUserRole('admin');
-        } else if (employee?.role) {
-          setUserRole('employee');
-        } else {
+          // Set role based on profile and employee status
+          if (profile?.role === 'admin') {
+            setUserRole('admin');
+          } else if (employee?.role) {
+            setUserRole('employee');
+          } else {
+            setUserRole('customer');
+          }
+        } catch (error) {
+          console.error('Error checking user role:', error);
+          // Default to customer role if there's an error
           setUserRole('customer');
         }
       }
