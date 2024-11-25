@@ -95,13 +95,13 @@ export const BasicInfoTab = ({ form }: BasicInfoTabProps) => {
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                {Object.entries(roleTranslations).map(([value, label]) => 
-                  value && (
+                {Object.entries(roleTranslations)
+                  .filter(([value]) => value && value.length > 0)
+                  .map(([value, label]) => (
                     <SelectItem key={value} value={value}>
                       {label}
                     </SelectItem>
-                  )
-                )}
+                  ))}
               </SelectContent>
             </Select>
             <FormMessage />
