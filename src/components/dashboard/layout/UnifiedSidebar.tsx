@@ -34,7 +34,7 @@ export const UnifiedSidebar = () => {
           .eq('id', user.id)
           .maybeSingle();
 
-        if (profileError) {
+        if (profileError && profileError.code !== 'PGRST116') {
           console.error('Profile fetch error:', profileError);
           toast({
             title: "Fehler beim Laden des Profils",
