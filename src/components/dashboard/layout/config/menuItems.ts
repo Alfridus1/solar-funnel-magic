@@ -13,12 +13,12 @@ import {
   ShieldCheck,
   Cog,
   Clock,
-  Calendar
+  Calendar,
+  Shield
 } from "lucide-react";
 import { MenuItem } from "../types";
 
 export const menuItems: MenuItem[] = [
-  // Customer menu items
   { 
     label: "Dashboard", 
     icon: LayoutDashboard, 
@@ -55,7 +55,6 @@ export const menuItems: MenuItem[] = [
     value: "profile",
     requiredPermission: "customer_access"
   },
-  // Employee menu items
   { 
     label: "Aufgaben", 
     icon: CheckSquare, 
@@ -121,6 +120,12 @@ export const menuItems: MenuItem[] = [
     label: "Premium Produkte", 
     icon: Crown, 
     value: "premium",
+    requiredPermission: "admin_access"
+  },
+  { 
+    label: "Rollen", 
+    icon: Shield, 
+    value: "roles",
     requiredPermission: "admin_access"
   },
   { 

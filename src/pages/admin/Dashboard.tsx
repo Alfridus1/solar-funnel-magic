@@ -11,6 +11,7 @@ import { SystemSettings } from "@/components/admin/SystemSettings";
 import { TaskTypeManagement } from "@/components/admin/TaskTypeManagement";
 import { AdminManagement } from "@/components/admin/AdminManagement";
 import { APIDebugger } from "@/components/admin/APIDebugger";
+import { RoleManagement } from "@/components/admin/RoleManagement";
 
 export const AdminDashboard = () => {
   const location = useLocation();
@@ -38,6 +39,8 @@ export const AdminDashboard = () => {
         return <SystemSettings />;
       case "admins":
         return <AdminManagement />;
+      case "roles":
+        return <RoleManagement />;
       case "api-debug":
         return <APIDebugger />;
       default:

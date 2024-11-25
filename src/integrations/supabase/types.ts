@@ -218,6 +218,33 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_roles: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          permissions: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          permissions?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          permissions?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       customers: {
         Row: {
           city: string
