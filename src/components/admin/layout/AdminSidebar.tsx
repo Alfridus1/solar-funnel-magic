@@ -40,7 +40,7 @@ export const AdminSidebar = () => {
               }
             >
               <Users className="w-5 h-5 mr-3" />
-              Users
+              Benutzer
             </NavLink>
           </li>
           <li>
@@ -92,7 +92,7 @@ export const AdminSidebar = () => {
               }
             >
               <Crown className="w-5 h-5 mr-3" />
-              Affiliates
+              Partner
             </NavLink>
           </li>
           <li>
@@ -105,7 +105,7 @@ export const AdminSidebar = () => {
               }
             >
               <UserCog className="w-5 h-5 mr-3" />
-              Employees
+              Mitarbeiter
             </NavLink>
           </li>
           <li>
@@ -118,7 +118,7 @@ export const AdminSidebar = () => {
               }
             >
               <Package className="w-5 h-5 mr-3" />
-              Products
+              Produkte
             </NavLink>
           </li>
           <li>
@@ -131,20 +131,7 @@ export const AdminSidebar = () => {
               }
             >
               <Settings className="w-5 h-5 mr-3" />
-              Settings
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/dashboard#task-types"
-              className={({ isActive }) =>
-                `flex items-center p-2 rounded-lg ${
-                  isActive ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50"
-                }`
-              }
-            >
-              <ListTodo className="w-5 h-5 mr-3" />
-              Task Types
+              Einstellungen
             </NavLink>
           </li>
         </ul>
