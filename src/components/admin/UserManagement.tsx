@@ -22,8 +22,7 @@ export const UserManagement = () => {
   const fetchUsers = async () => {
     const { data: profiles, error } = await supabase
       .from('profiles')
-      .select('*')
-      .eq('role', 'customer');
+      .select('*');
 
     if (error) {
       toast({
@@ -119,11 +118,34 @@ export const UserManagement = () => {
     }
   };
 
+  const getUserTypeLabel = (role: string | null) => {
+    switch (role) {
+      case 'admin':
+        return 'Administrator';
+      case 'sales_employee':
+      case 'external_sales':
+      case 'customer_service':
+      case 'planning':
+      case 'accountant':
+      case 'construction_manager':
+      case 'installation_manager':
+      case 'installer':
+      case 'executive':
+      case 'sales_team_leader':
+      case 'sales_director':
+        return 'Mitarbeiter';
+      case 'customer':
+        return 'Kunde';
+      default:
+        return 'Unbekannt';
+    }
+  };
+
   return (
     <Card className="p-6">
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-semibold text-gray-900">Kundenverwaltung</h2>
+          <h2 className="text-2xl font-semibold text-gray-900">Benutzerverwaltung</h2>
           <Button 
             onClick={handleResetAllPasswords}
             disabled={isResettingPasswords}
@@ -141,6 +163,7 @@ export const UserManagement = () => {
                 <TableHead className="font-semibold">Name</TableHead>
                 <TableHead className="font-semibold">Email</TableHead>
                 <TableHead className="font-semibold">Telefon</TableHead>
+                <TableHead className="font-semibold">Typ</TableHead>
                 <TableHead className="font-semibold text-right">Aktionen</TableHead>
               </TableRow>
             </TableHeader>
@@ -149,6 +172,7 @@ export const UserManagement = () => {
                 <UserTableRow 
                   key={user.id}
                   user={user}
+                  userType={getUserTypeLabel(user.role)}
                   onSelect={handleUserSelect}
                   onDelete={handleDeleteUser}
                 />

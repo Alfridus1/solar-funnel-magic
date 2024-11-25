@@ -5,16 +5,18 @@ import { Trash2, FileSearch } from "lucide-react";
 
 interface UserTableRowProps {
   user: Profile;
+  userType: string;
   onSelect: (user: Profile) => void;
   onDelete: (userId: string) => void;
 }
 
-export const UserTableRow = ({ user, onSelect, onDelete }: UserTableRowProps) => {
+export const UserTableRow = ({ user, userType, onSelect, onDelete }: UserTableRowProps) => {
   return (
     <TableRow className="hover:bg-gray-50">
       <TableCell>{`${user.first_name} ${user.last_name}`}</TableCell>
       <TableCell>{user.email}</TableCell>
       <TableCell>{user.phone}</TableCell>
+      <TableCell>{userType}</TableCell>
       <TableCell>
         <div className="flex justify-end gap-2">
           <Button
