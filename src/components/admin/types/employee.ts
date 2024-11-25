@@ -31,6 +31,9 @@ export interface Employee {
   has_company_car?: boolean;
   created_at?: string;
   updated_at?: string;
+  ms_calendar_connected?: boolean;
+  ms_refresh_token?: string;
+  ms_calendar_id?: string;
   profiles?: {
     first_name: string;
     last_name: string;

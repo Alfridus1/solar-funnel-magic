@@ -129,6 +129,56 @@ export type Database = {
         }
         Relationships: []
       }
+      calendar_events: {
+        Row: {
+          attendees: Json | null
+          created_at: string | null
+          description: string | null
+          employee_id: string | null
+          end_time: string
+          event_id: string
+          id: string
+          location: string | null
+          start_time: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          attendees?: Json | null
+          created_at?: string | null
+          description?: string | null
+          employee_id?: string | null
+          end_time: string
+          event_id: string
+          id?: string
+          location?: string | null
+          start_time: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          attendees?: Json | null
+          created_at?: string | null
+          description?: string | null
+          employee_id?: string | null
+          end_time?: string
+          event_id?: string
+          id?: string
+          location?: string | null
+          start_time?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calendar_events_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_settings: {
         Row: {
           address: string | null
@@ -309,6 +359,9 @@ export type Database = {
           id: string
           last_name: string
           location: string | null
+          ms_calendar_connected: boolean | null
+          ms_calendar_id: string | null
+          ms_refresh_token: string | null
           personio_id: string | null
           profile_id: string | null
           role: string
@@ -329,6 +382,9 @@ export type Database = {
           id?: string
           last_name: string
           location?: string | null
+          ms_calendar_connected?: boolean | null
+          ms_calendar_id?: string | null
+          ms_refresh_token?: string | null
           personio_id?: string | null
           profile_id?: string | null
           role: string
@@ -349,6 +405,9 @@ export type Database = {
           id?: string
           last_name?: string
           location?: string | null
+          ms_calendar_connected?: boolean | null
+          ms_calendar_id?: string | null
+          ms_refresh_token?: string | null
           personio_id?: string | null
           profile_id?: string | null
           role?: string
