@@ -74,7 +74,14 @@ export const ProfileOverview = () => {
 
   const handleSave = async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+      toast({
+        title: "Fehler",
+        description: "Benutzer nicht eingeloggt",
+        variant: "destructive",
+      });
+      return;
+    }
 
     const { error } = await supabase
       .from('profiles')
