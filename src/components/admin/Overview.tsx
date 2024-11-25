@@ -36,9 +36,11 @@ export const Overview = () => {
   const { data: customersCount, isLoading: isLoadingCustomers } = useQuery({
     queryKey: ['customers-count'],
     queryFn: async () => {
-      const { count } = await supabase
+      const { count, error } = await supabase
         .from('customers')
         .select('*', { count: 'exact', head: true });
+        
+      if (error) throw error;
       return count || 0;
     }
   });
@@ -46,9 +48,12 @@ export const Overview = () => {
   const { data: leadsCount, isLoading: isLoadingLeads } = useQuery({
     queryKey: ['leads-count'],
     queryFn: async () => {
-      const { count } = await supabase
+      const { count, error } = await supabase
         .from('leads')
-        .select('*', { count: 'exact', head: true });
+        .select('*', { count: 'exact', head: true })
+        .is('deleted_at', null);
+        
+      if (error) throw error;
       return count || 0;
     }
   });
@@ -56,9 +61,11 @@ export const Overview = () => {
   const { data: productsCount, isLoading: isLoadingProducts } = useQuery({
     queryKey: ['products-count'],
     queryFn: async () => {
-      const { count } = await supabase
+      const { count, error } = await supabase
         .from('solar_products')
         .select('*', { count: 'exact', head: true });
+        
+      if (error) throw error;
       return count || 0;
     }
   });
@@ -66,9 +73,11 @@ export const Overview = () => {
   const { data: premiumProductsCount, isLoading: isLoadingPremium } = useQuery({
     queryKey: ['premium-products-count'],
     queryFn: async () => {
-      const { count } = await supabase
+      const { count, error } = await supabase
         .from('premium_products')
         .select('*', { count: 'exact', head: true });
+        
+      if (error) throw error;
       return count || 0;
     }
   });

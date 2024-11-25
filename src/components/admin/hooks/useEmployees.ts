@@ -34,7 +34,7 @@ export const useEmployees = () => {
         first_name: employee.profiles?.first_name || '',
         last_name: employee.profiles?.last_name || '',
         email: employee.profiles?.email || '',
-        role: employee.role,
+        role: employee.role as Employee['role'],
         team_id: employee.team_id,
         profile_id: employee.profile_id,
         address: employee.address,
