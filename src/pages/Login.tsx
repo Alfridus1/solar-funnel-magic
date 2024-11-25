@@ -48,7 +48,7 @@ export const Login = () => {
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-center">Willkommen zurück</h1>
           <p className="text-center text-gray-600 mt-2">
-            Melden Sie sich an, um fortzufahren
+            Melden Sie sich mit Ihren Zugangsdaten an
           </p>
         </div>
         

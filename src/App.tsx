@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Index } from "@/pages/Index";
 import { Login } from "@/pages/Login";
-import { EmployeeLogin } from "@/pages/EmployeeLogin";
 import { CustomerDashboard } from "@/components/dashboard/CustomerDashboard";
 import { EmployeeDashboard } from "@/pages/employee/Dashboard";
 import { AdminDashboard } from "@/pages/admin/Dashboard";
@@ -92,7 +91,6 @@ function App() {
         {/* Public routes */}
         <Route path="/" element={<Index />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/employee-login" element={<EmployeeLogin />} />
 
         {/* Customer routes */}
         <Route
