@@ -75,7 +75,7 @@ export const UserDetailsDialog = ({ user, affiliateInfo, onOpenChange }: UserDet
               </SelectTrigger>
               <SelectContent>
                 {Object.entries(roleTranslations).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
+                  <SelectItem key={value} value={value as UserRole}>
                     {label}
                   </SelectItem>
                 ))}
