@@ -33,7 +33,7 @@ export const EmployeeManagement = () => {
             phone
           )
         `)
-        .neq('profiles.role', 'customer');
+        .eq('profiles.role', 'employee');
 
       if (error) {
         toast({
@@ -41,7 +41,10 @@ export const EmployeeManagement = () => {
           description: error.message,
           variant: "destructive",
         });
-      } else if (data) {
+        return;
+      }
+
+      if (data) {
         setEmployees(data);
       }
     } catch (error: any) {
