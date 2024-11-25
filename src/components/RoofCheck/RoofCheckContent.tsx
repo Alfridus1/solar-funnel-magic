@@ -40,7 +40,8 @@ export const RoofCheckContent = ({
               <h1 className="text-2xl font-bold mb-2">Zeichnen Sie Ihr Dach ein</h1>
               <Button 
                 onClick={handleFinish}
-                className="bg-solar-orange hover:bg-solar-orange/90"
+                className={paths.length > 0 ? "bg-solar-orange hover:bg-solar-orange/90" : "bg-gray-300 hover:bg-gray-300 cursor-not-allowed"}
+                disabled={paths.length === 0}
               >
                 Weiter zur Analyse
               </Button>
