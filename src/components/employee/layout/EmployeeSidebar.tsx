@@ -9,7 +9,8 @@ import {
   Settings,
   LogOut,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  CheckSquare
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,12 @@ const menuItems = [
     icon: LayoutDashboard, 
     value: "overview",
     path: "/employee#overview"
+  },
+  { 
+    label: "Aufgaben", 
+    icon: CheckSquare, 
+    value: "tasks",
+    path: "/employee#tasks"
   },
   { 
     label: "Meine Aufträge", 
