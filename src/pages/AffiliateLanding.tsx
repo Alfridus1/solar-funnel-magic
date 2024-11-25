@@ -46,7 +46,7 @@ export function AffiliateLanding() {
 
       if (authError) throw authError;
 
-      // Create affiliate record
+      // Create affiliate record with referral code
       const { data, error } = await supabase
         .from('affiliates')
         .insert([
@@ -54,7 +54,8 @@ export function AffiliateLanding() {
             email,
             first_name: '',
             last_name: '',
-            user_id: authData.user?.id
+            user_id: authData.user?.id,
+            referral_code: Math.random().toString(36).substring(2, 8) // Generate 6-character referral code
           }
         ])
         .select()

@@ -4,6 +4,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { RegistrationFields } from "./components/RegistrationFields";
 import { saveInitialLead } from "./utils/saveInitialLead";
+import { handleReferral } from "./utils/handleReferral";
 
 interface RegistrationFormProps {
   onComplete: () => void;
@@ -32,6 +33,9 @@ export const RegistrationForm = ({ onComplete, onShowLogin, metrics, address }: 
     setIsSubmitting(true);
 
     try {
+      // Get referral code from localStorage
+      const referralCode = localStorage.getItem('referralCode');
+
       // Check if email already exists in profiles
       const { data: existingProfiles } = await supabase
         .from('profiles')
@@ -46,23 +50,6 @@ export const RegistrationForm = ({ onComplete, onShowLogin, metrics, address }: 
         });
         onShowLogin();
         return;
-      }
-
-      // Get referral code from localStorage
-      const referralCode = localStorage.getItem('referralCode');
-      
-      // If there's a referral code, get the affiliate's ID
-      let affiliateId: string | null = null;
-      if (referralCode) {
-        const { data: affiliate } = await supabase
-          .from('affiliates')
-          .select('id')
-          .eq('referral_code', referralCode)
-          .single();
-        
-        if (affiliate) {
-          affiliateId = affiliate.id;
-        }
       }
 
       // Sign up the user
@@ -96,26 +83,14 @@ export const RegistrationForm = ({ onComplete, onShowLogin, metrics, address }: 
 
       if (profileError) throw profileError;
 
-      // Create lead for tracking the referral
-      if (affiliateId) {
-        const { error: leadError } = await supabase
-          .from('leads')
-          .insert([{
-            name: `${formData.firstName} ${formData.lastName}`,
-            email: formData.email,
-            phone: formData.phone,
-            type: 'registration',
-            affiliate_id: affiliateId,
-            user_id: authData.user.id,
-            status: 'converted'
-          }]);
-
-        if (leadError) throw leadError;
+      // Handle referral tracking
+      if (referralCode) {
+        await handleReferral(authData.user.id, referralCode);
       }
 
       // Save the initial lead with the calculation data if present
       if (metrics && address) {
-        await saveInitialLead(authData.user.id, formData, metrics, address, affiliateId);
+        await saveInitialLead(authData.user.id, formData, metrics, address);
       }
 
       // Clear the referral code from localStorage after successful registration
