@@ -6,10 +6,9 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Calendar as CalendarIcon } from "lucide-react";
 
-// These should be environment variables in your .env file
 const MICROSOFT_CLIENT_ID = import.meta.env.VITE_MICROSOFT_CLIENT_ID;
 const MICROSOFT_TENANT_ID = import.meta.env.VITE_MICROSOFT_TENANT_ID;
-const REDIRECT_URI = `${window.location.origin}/dashboard/employee#calendar`;
+const REDIRECT_URI = `${import.meta.env.VITE_APP_URL}/auth/callback`;
 
 export const Calendar = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -52,7 +51,7 @@ export const Calendar = () => {
   };
 
   const handleOAuthCallback = async () => {
-    const urlParams = new URLSearchParams(window.location.hash.replace('#calendar?', ''));
+    const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
     
     if (!code) return;
@@ -113,7 +112,7 @@ export const Calendar = () => {
       `&response_type=code` +
       `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
       `&scope=${scope}` +
-      `&response_mode=fragment`;
+      `&response_mode=query`;
 
     window.location.href = authUrl;
   };
