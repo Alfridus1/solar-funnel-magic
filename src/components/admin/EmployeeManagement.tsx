@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { UserPlus, FileEdit, Trash2, KeyRound } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { UserPlus } from "lucide-react";
 import { EmployeeDialog } from "./components/EmployeeDialog";
 import { Employee } from "./types/employee";
-import { roleTranslations } from "@/utils/roleTranslations";
+import { EmployeeTable } from "./components/employee-management/EmployeeTable";
 
 export const EmployeeManagement = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -125,55 +124,13 @@ export const EmployeeManagement = () => {
         </Button>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Rolle</TableHead>
-            <TableHead>Team</TableHead>
-            <TableHead>Aktionen</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {employees.map((employee) => (
-            <TableRow key={employee.id}>
-              <TableCell>
-                {employee.profiles?.first_name} {employee.profiles?.last_name}
-              </TableCell>
-              <TableCell>{employee.profiles?.email}</TableCell>
-              <TableCell>{roleTranslations[employee.role] || employee.role}</TableCell>
-              <TableCell>{employee.team_id || '-'}</TableCell>
-              <TableCell>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEditEmployee(employee)}
-                  >
-                    <FileEdit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleResetPassword(employee.profiles?.email || '')}
-                    disabled={isResetting || !employee.profiles?.email}
-                  >
-                    <KeyRound className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleDeleteEmployee(employee.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <EmployeeTable
+        employees={employees}
+        onEdit={handleEditEmployee}
+        onDelete={handleDeleteEmployee}
+        onResetPassword={handleResetPassword}
+        isResetting={isResetting}
+      />
 
       <EmployeeDialog
         employee={selectedEmployee}
