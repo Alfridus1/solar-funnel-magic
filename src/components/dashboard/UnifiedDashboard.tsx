@@ -16,27 +16,31 @@ export const UnifiedDashboard = () => {
       try {
         const { data: profile } = await supabase
           .from('profiles')
-          .select('role, permissions')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        const { data: employee } = await supabase
-          .from('employees')
           .select('role')
-          .eq('profile_id', user.id)
-          .maybeSingle();
+          .eq('id', user.id)
+          .single();
 
         return {
           isAdmin: profile?.role === 'admin',
-          isEmployee: !!employee?.role,
-          permissions: profile?.permissions || ['customer_access']
+          isEmployee: profile?.role === 'sales_employee' || 
+                     profile?.role === 'external_sales' || 
+                     profile?.role === 'customer_service' ||
+                     profile?.role === 'planning' ||
+                     profile?.role === 'accountant' ||
+                     profile?.role === 'construction_manager' ||
+                     profile?.role === 'installation_manager' ||
+                     profile?.role === 'installer' ||
+                     profile?.role === 'executive' ||
+                     profile?.role === 'sales_team_leader' ||
+                     profile?.role === 'sales_director',
+          role: profile?.role
         };
       } catch (error) {
         console.error('Error fetching user roles:', error);
         return {
           isAdmin: false,
           isEmployee: false,
-          permissions: ['customer_access']
+          role: 'customer'
         };
       }
     }
@@ -52,9 +56,13 @@ export const UnifiedDashboard = () => {
 
   return (
     <div className="flex flex-col gap-8">
-      <CustomerDashboard />
-      {userRoles?.isEmployee && <EmployeeDashboard />}
-      {userRoles?.isAdmin && <AdminDashboard />}
+      {userRoles?.isAdmin ? (
+        <AdminDashboard />
+      ) : userRoles?.isEmployee ? (
+        <EmployeeDashboard />
+      ) : (
+        <CustomerDashboard />
+      )}
     </div>
   );
 };
