@@ -1,6 +1,6 @@
+import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,7 +39,7 @@ export const UnifiedSidebar = () => {
           return;
         }
 
-        // If profile doesn't exist, create it with upsert to handle potential race conditions
+        // If profile doesn't exist, create it with upsert
         if (!existingProfile) {
           const { error: upsertError } = await supabase
             .from('profiles')
@@ -63,7 +63,7 @@ export const UnifiedSidebar = () => {
           }
         }
 
-        // Get profile permissions
+        // Get profile permissions and role
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('permissions, role')
@@ -75,14 +75,14 @@ export const UnifiedSidebar = () => {
           return;
         }
 
-        // Get employee status
+        // Get employee status if exists
         const { data: employee, error: employeeError } = await supabase
           .from('employees')
-          .select('*')
+          .select('role')
           .eq('profile_id', user.id)
           .maybeSingle();
 
-        if (employeeError) {
+        if (employeeError && employeeError.code !== 'PGRST116') {
           console.error('Employee fetch error:', employeeError);
           return;
         }
