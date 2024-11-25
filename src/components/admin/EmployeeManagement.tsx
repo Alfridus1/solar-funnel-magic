@@ -3,9 +3,9 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { UserPlus } from "lucide-react";
-import { EmployeeDialog } from "./components/EmployeeDialog";
 import { Employee } from "./types/employee";
 import { EmployeeTable } from "./components/employee-management/EmployeeTable";
+import { EmployeeDialog } from "./components/employee-dialog/EmployeeDialog";
 
 export const EmployeeManagement = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
