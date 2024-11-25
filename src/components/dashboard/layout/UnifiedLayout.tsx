@@ -8,7 +8,9 @@ interface UnifiedLayoutProps {
 export const UnifiedLayout = ({ children }: UnifiedLayoutProps) => {
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
-      <UnifiedSidebar />
+      <UnifiedSidebar>
+        {/* Navigation items will be passed as children to UnifiedSidebar */}
+      </UnifiedSidebar>
       <main className="flex-1 overflow-y-auto p-8">
         {children}
       </main>
