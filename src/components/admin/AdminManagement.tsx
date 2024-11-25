@@ -15,23 +15,45 @@ export const AdminManagement = () => {
     setIsSubmitting(true);
 
     try {
-      // Create profile with admin role
-      const { error: profileError } = await supabase
+      // First check if profile already exists
+      const { data: existingProfile } = await supabase
         .from('profiles')
-        .insert([{
-          email: email,
-          role: 'admin',
-          first_name: 'Admin',
-          last_name: 'User',
-          phone: ''
-        }]);
+        .select('id')
+        .eq('email', email)
+        .single();
 
-      if (profileError) throw profileError;
+      if (existingProfile) {
+        // If profile exists, just update the role to admin
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ role: 'admin' })
+          .eq('id', existingProfile.id);
 
-      toast({
-        title: "Admin hinzugefügt",
-        description: "Der neue Admin wurde erfolgreich angelegt.",
-      });
+        if (updateError) throw updateError;
+
+        toast({
+          title: "Admin aktualisiert",
+          description: "Der Benutzer wurde erfolgreich zum Admin gemacht.",
+        });
+      } else {
+        // If profile doesn't exist, create new admin profile
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([{
+            email: email,
+            role: 'admin',
+            first_name: 'Admin',
+            last_name: 'User',
+            phone: ''
+          }]);
+
+        if (profileError) throw profileError;
+
+        toast({
+          title: "Admin hinzugefügt",
+          description: "Der neue Admin wurde erfolgreich angelegt.",
+        });
+      }
 
       setEmail("");
     } catch (error: any) {
@@ -51,7 +73,7 @@ export const AdminManagement = () => {
         <div>
           <h2 className="text-2xl font-semibold text-gray-900">Admin hinzufügen</h2>
           <p className="text-gray-600 mt-1">
-            Fügen Sie einen neuen Administrator hinzu
+            Fügen Sie einen neuen Administrator hinzu oder machen Sie einen bestehenden Benutzer zum Admin
           </p>
         </div>
 
