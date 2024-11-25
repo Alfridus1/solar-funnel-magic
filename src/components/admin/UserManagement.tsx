@@ -43,7 +43,7 @@ export const UserManagement = () => {
       .from('affiliates')
       .select('*')
       .eq('email', user.email)
-      .single();
+      .maybeSingle();
 
     if (!error && affiliateData) {
       setAffiliateInfo(affiliateData);

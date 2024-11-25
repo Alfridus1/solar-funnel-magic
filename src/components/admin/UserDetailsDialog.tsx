@@ -5,19 +5,15 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
+import { Profile, AffiliateInfo } from "./types/userManagement";
 
 interface UserDetailsDialogProps {
-  user: {
-    id: string;
-    email: string;
-    first_name?: string;
-    last_name?: string;
-    phone?: string;
-  } | null;
+  user: Profile | null;
+  affiliateInfo: AffiliateInfo | null;
   onOpenChange: (open: boolean) => void;
 }
 
-export const UserDetailsDialog = ({ user, onOpenChange }: UserDetailsDialogProps) => {
+export const UserDetailsDialog = ({ user, affiliateInfo, onOpenChange }: UserDetailsDialogProps) => {
   const [showLogin, setShowLogin] = useState(false);
   const { toast } = useToast();
   const [impersonatedUser, setImpersonatedUser] = useState<string | null>(null);
@@ -135,6 +131,16 @@ export const UserDetailsDialog = ({ user, onOpenChange }: UserDetailsDialogProps
                 <div>
                   <p className="text-sm font-medium">Telefon</p>
                   <p className="text-sm text-gray-500">{user.phone}</p>
+                </div>
+              )}
+              {affiliateInfo && (
+                <div>
+                  <p className="text-sm font-medium">Affiliate Info</p>
+                  <p className="text-sm text-gray-500">
+                    Referral Code: {affiliateInfo.referral_code}<br />
+                    Referrals: {affiliateInfo.referral_count}<br />
+                    Total Leads: {affiliateInfo.total_leads}
+                  </p>
                 </div>
               )}
               <div className="flex justify-end gap-2">
