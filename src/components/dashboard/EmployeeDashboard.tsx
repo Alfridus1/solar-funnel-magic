@@ -7,6 +7,7 @@ import { Team } from "@/components/employee/Team";
 import { Calendar } from "@/components/employee/Calendar";
 import { TimeTracking } from "@/components/employee/TimeTracking";
 import { Settings } from "@/components/employee/Settings";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const EmployeeDashboard = () => {
   const location = useLocation();
@@ -39,8 +40,15 @@ export const EmployeeDashboard = () => {
   };
 
   return (
-    <UnifiedLayout>
-      {renderContent()}
-    </UnifiedLayout>
+    <div className="space-y-8">
+      <Card>
+        <CardHeader>
+          <CardTitle>Mitarbeiterbereich</CardTitle>
+        </CardHeader>
+        <UnifiedLayout>
+          {renderContent()}
+        </UnifiedLayout>
+      </Card>
+    </div>
   );
 };

@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { AdminLayout } from "@/components/admin/layout/AdminLayout";
 import { Overview } from "@/components/admin/Overview";
 import { LeadManagement } from "@/components/admin/LeadManagement";
@@ -11,17 +10,11 @@ import { PremiumProductsManagement } from "@/components/admin/PremiumProductsMan
 import { SystemSettings } from "@/components/admin/SystemSettings";
 import { TaskTypeManagement } from "@/components/admin/TaskTypeManagement";
 import { AdminManagement } from "@/components/admin/AdminManagement";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const AdminDashboard = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const currentTab = location.hash.replace("#", "") || "overview";
-
-  useEffect(() => {
-    if (!location.hash) {
-      navigate("#overview", { replace: true });
-    }
-  }, [location, navigate]);
 
   const renderContent = () => {
     switch (currentTab) {
@@ -51,8 +44,15 @@ export const AdminDashboard = () => {
   };
 
   return (
-    <AdminLayout>
-      {renderContent()}
-    </AdminLayout>
+    <div className="space-y-8">
+      <Card>
+        <CardHeader>
+          <CardTitle>Administrationsbereich</CardTitle>
+        </CardHeader>
+        <AdminLayout>
+          {renderContent()}
+        </AdminLayout>
+      </Card>
+    </div>
   );
 };

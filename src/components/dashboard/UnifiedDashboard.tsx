@@ -6,10 +6,11 @@ import { AdminDashboard } from "./AdminDashboard";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+import { UserPermission } from "@/types/permissions";
 
 export const UnifiedDashboard = () => {
-  const { data: userRole, isLoading } = useQuery({
-    queryKey: ['user-role'],
+  const { data: userRoles, isLoading } = useQuery({
+    queryKey: ['user-roles'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
@@ -17,7 +18,7 @@ export const UnifiedDashboard = () => {
       try {
         const { data: profile } = await supabase
           .from('profiles')
-          .select('role')
+          .select('role, permissions')
           .eq('id', user.id)
           .maybeSingle();
 
@@ -27,12 +28,18 @@ export const UnifiedDashboard = () => {
           .eq('profile_id', user.id)
           .maybeSingle();
 
-        if (profile?.role === 'admin') return 'admin';
-        if (employee?.role) return 'employee';
-        return 'customer';
+        return {
+          isAdmin: profile?.role === 'admin',
+          isEmployee: !!employee?.role,
+          permissions: profile?.permissions || ['customer_access']
+        };
       } catch (error) {
-        console.error('Error fetching user role:', error);
-        return 'customer';
+        console.error('Error fetching user roles:', error);
+        return {
+          isAdmin: false,
+          isEmployee: false,
+          permissions: ['customer_access'] as UserPermission[]
+        };
       }
     }
   });
@@ -45,12 +52,11 @@ export const UnifiedDashboard = () => {
     );
   }
 
-  switch (userRole) {
-    case 'admin':
-      return <AdminDashboard />;
-    case 'employee':
-      return <EmployeeDashboard />;
-    default:
-      return <CustomerDashboard />;
-  }
+  return (
+    <div className="flex flex-col gap-8">
+      <CustomerDashboard />
+      {userRoles?.isEmployee && <EmployeeDashboard />}
+      {userRoles?.isAdmin && <AdminDashboard />}
+    </div>
+  );
 };

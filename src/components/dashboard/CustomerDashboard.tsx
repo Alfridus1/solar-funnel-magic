@@ -8,6 +8,7 @@ import { ReferralOverview } from "./views/ReferralOverview";
 import { DocumentsOverview } from "./views/DocumentsOverview";
 import { SettingsOverview } from "./views/SettingsOverview";
 import { ProfileOverview } from "./views/ProfileOverview";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const CustomerDashboard = () => {
   const location = useLocation();
@@ -42,8 +43,15 @@ export const CustomerDashboard = () => {
   };
 
   return (
-    <CustomerLayout>
-      {renderContent()}
-    </CustomerLayout>
+    <div className="space-y-8">
+      <Card>
+        <CardHeader>
+          <CardTitle>Kundenbereich</CardTitle>
+        </CardHeader>
+        <CustomerLayout>
+          {renderContent()}
+        </CustomerLayout>
+      </Card>
+    </div>
   );
 };
