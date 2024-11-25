@@ -31,20 +31,14 @@ export const EmployeeManagement = () => {
             role,
             phone
           )
-        `)
-        .maybeSingle();
+        `);
 
-      if (error && error.code !== 'PGRST116') {
-        toast({
-          title: "Fehler beim Laden der Mitarbeiter",
-          description: error.message,
-          variant: "destructive",
-        });
-        return;
+      if (error) {
+        throw error;
       }
 
       if (data) {
-        setEmployees(Array.isArray(data) ? data : [data]);
+        setEmployees(data);
       }
     } catch (error: any) {
       toast({
