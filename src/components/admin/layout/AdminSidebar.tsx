@@ -9,7 +9,8 @@ import {
   Crown,
   Shield,
   UserPlus,
-  Bug
+  Bug,
+  Megaphone
 } from "lucide-react";
 
 export const AdminSidebar = () => {
@@ -106,6 +107,19 @@ export const AdminSidebar = () => {
             >
               <UserCog className="w-5 h-5 mr-3" />
               Mitarbeiter
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/dashboard/admin#marketing"
+              className={({ isActive }) =>
+                `flex items-center p-2 rounded-lg ${
+                  isActive ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50"
+                }`
+              }
+            >
+              <Megaphone className="w-5 h-5 mr-3" />
+              Marketing
             </NavLink>
           </li>
           <li>
