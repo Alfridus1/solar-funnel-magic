@@ -17,7 +17,9 @@ import {
   CheckSquare,
   Crown,
   ShieldCheck,
-  Cog
+  Cog,
+  Clock,
+  Calendar
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,6 +34,7 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
+  // Customer menu items
   { 
     label: "Dashboard", 
     icon: LayoutDashboard, 
@@ -68,6 +71,32 @@ const menuItems: MenuItem[] = [
     value: "profile",
     requiredPermission: "customer_access"
   },
+  // Employee menu items
+  { 
+    label: "Aufgaben", 
+    icon: CheckSquare, 
+    value: "tasks",
+    requiredPermission: "employee_access"
+  },
+  { 
+    label: "Kalender", 
+    icon: Calendar, 
+    value: "calendar",
+    requiredPermission: "employee_access"
+  },
+  { 
+    label: "Zeiterfassung", 
+    icon: Clock, 
+    value: "time",
+    requiredPermission: "employee_access"
+  },
+  { 
+    label: "Team", 
+    icon: Users, 
+    value: "team",
+    requiredPermission: "employee_access"
+  },
+  // Admin menu items
   { 
     label: "Leads", 
     icon: FileText, 
@@ -130,6 +159,9 @@ const menuItems: MenuItem[] = [
   },
 ];
 
+// Since this file is too long, let's extract the menu rendering logic
+import { renderMenu } from "./components/MenuRenderer";
+
 export const UnifiedSidebar = () => {
   const location = useLocation();
   const currentTab = location.hash.replace("#", "") || "dashboard";
@@ -142,15 +174,27 @@ export const UnifiedSidebar = () => {
     const loadUserPermissions = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+        // Get both profile permissions and employee permissions
         const { data: profile } = await supabase
           .from('profiles')
           .select('permissions')
           .eq('id', user.id)
           .single();
         
-        if (profile?.permissions) {
-          setUserPermissions(profile.permissions);
+        const { data: employee } = await supabase
+          .from('employees')
+          .select('*')
+          .eq('profile_id', user.id)
+          .single();
+
+        let permissions = profile?.permissions || [];
+        
+        // If user is an employee, add employee permissions
+        if (employee) {
+          permissions.push('employee_access');
         }
+
+        setUserPermissions(permissions);
       }
     };
 
@@ -169,10 +213,6 @@ export const UnifiedSidebar = () => {
     }
     navigate("/");
   };
-
-  const filteredMenuItems = menuItems.filter(item => 
-    userPermissions.includes(item.requiredPermission)
-  );
 
   return (
     <div className={cn(
@@ -201,44 +241,13 @@ export const UnifiedSidebar = () => {
         </h2>
       </div>
 
-      <nav className="space-y-1 px-3">
-        {filteredMenuItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.value}
-              to={`#${item.value}`}
-              className={cn(
-                "flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                currentTab === item.value
-                  ? "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
-                  : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
-              )}
-            >
-              <Icon className="h-5 w-5 mr-3" />
-              <span className={cn(
-                "transition-all duration-300",
-                isCollapsed && "hidden"
-              )}>
-                {item.label}
-              </span>
-            </Link>
-          );
-        })}
-
-        <button
-          onClick={handleLogout}
-          className="flex w-full items-center px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
-        >
-          <LogOut className="h-5 w-5 mr-3" />
-          <span className={cn(
-            "transition-all duration-300",
-            isCollapsed && "hidden"
-          )}>
-            Ausloggen
-          </span>
-        </button>
-      </nav>
+      {renderMenu({
+        menuItems,
+        userPermissions,
+        currentTab,
+        isCollapsed,
+        handleLogout
+      })}
     </div>
   );
 };
