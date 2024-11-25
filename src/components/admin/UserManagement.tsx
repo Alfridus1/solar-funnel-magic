@@ -22,7 +22,8 @@ export const UserManagement = () => {
   const fetchUsers = async () => {
     const { data: profiles, error } = await supabase
       .from('profiles')
-      .select('*');
+      .select('*')
+      .eq('role', 'customer');
 
     if (error) {
       toast({
@@ -112,7 +113,7 @@ export const UserManagement = () => {
     <Card className="p-6">
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-semibold text-gray-900">Benutzerverwaltung</h2>
+          <h2 className="text-2xl font-semibold text-gray-900">Kundenverwaltung</h2>
           <Button 
             onClick={handleResetAllPasswords}
             disabled={isResettingPasswords}
