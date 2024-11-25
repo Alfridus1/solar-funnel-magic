@@ -30,32 +30,14 @@ export const UnifiedSidebar = () => {
         // Get profile permissions and role
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('permissions, role')
+          .select('*')
           .eq('id', user.id)
           .maybeSingle();
 
-        // Only handle non-PGRST116 errors (PGRST116 means no rows found which we handle below)
         if (profileError && profileError.code !== 'PGRST116') {
           console.error('Profile fetch error:', profileError);
           toast({
             title: "Fehler beim Laden des Profils",
-            description: "Bitte versuchen Sie es später erneut",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        // Get employee status if exists
-        const { data: employee, error: employeeError } = await supabase
-          .from('employees')
-          .select('role')
-          .eq('profile_id', user.id)
-          .maybeSingle();
-
-        if (employeeError && employeeError.code !== 'PGRST116') {
-          console.error('Employee fetch error:', employeeError);
-          toast({
-            title: "Fehler beim Laden der Mitarbeiterdaten",
             description: "Bitte versuchen Sie es später erneut",
             variant: "destructive",
           });
@@ -86,10 +68,16 @@ export const UnifiedSidebar = () => {
             return;
           }
 
-          // Set default permissions for new profile
           setUserPermissions(['customer_access']);
           return;
         }
+
+        // Get employee status if exists
+        const { data: employee } = await supabase
+          .from('employees')
+          .select('role')
+          .eq('profile_id', user.id)
+          .maybeSingle();
 
         // Set permissions based on role and employee status
         let permissions = profile?.permissions || ['customer_access'];
