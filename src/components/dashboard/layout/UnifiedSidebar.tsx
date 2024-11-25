@@ -32,44 +32,43 @@ export const UnifiedSidebar = () => {
           .from('profiles')
           .select('*')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
 
-        // Handle case when profile doesn't exist
         if (profileError) {
-          if (profileError.code === 'PGRST116') {
-            // Create a new profile if one doesn't exist
-            const { error: insertError } = await supabase
-              .from('profiles')
-              .insert({
-                id: user.id,
-                email: user.email,
-                first_name: '',
-                last_name: '',
-                phone: '',
-                permissions: ['customer_access'] as UserPermission[],
-                role: 'customer'
-              });
-
-            if (insertError) {
-              console.error('Profile creation error:', insertError);
-              toast({
-                title: "Fehler beim Erstellen des Profils",
-                description: "Bitte versuchen Sie es später erneut",
-                variant: "destructive",
-              });
-              return;
-            }
-
-            setUserPermissions(['customer_access']);
-            return;
-          }
-
           console.error('Profile fetch error:', profileError);
           toast({
             title: "Fehler beim Laden des Profils",
             description: "Bitte versuchen Sie es später erneut",
             variant: "destructive",
           });
+          return;
+        }
+
+        // If no profile exists, create one
+        if (!profile) {
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert({
+              id: user.id,
+              email: user.email,
+              first_name: '',
+              last_name: '',
+              phone: '',
+              permissions: ['customer_access'] as UserPermission[],
+              role: 'customer'
+            });
+
+          if (insertError) {
+            console.error('Profile creation error:', insertError);
+            toast({
+              title: "Fehler beim Erstellen des Profils",
+              description: "Bitte versuchen Sie es später erneut",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          setUserPermissions(['customer_access']);
           return;
         }
 
