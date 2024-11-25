@@ -10,7 +10,7 @@ export function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { returnTo, metrics, address } = location.state || {};
+  const { returnTo } = location.state || {};
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -25,31 +25,14 @@ export function Login() {
 
           if (profileError) throw profileError;
 
-          // Get employee data if it exists
-          const { data: employee } = await supabase
-            .from('employees')
-            .select('role')
-            .eq('profile_id', session.user.id)
-            .single();
-
           toast({
             title: "Erfolgreich angemeldet",
             description: "Willkommen zurück!",
           });
 
-          // Redirect based on role hierarchy
-          if (profile?.role === 'admin') {
-            navigate("/admin");
-          } else if (employee?.role) {
-            navigate("/employee/dashboard");
-          } else {
-            // Regular customer
-            if (returnTo && metrics) {
-              navigate(returnTo, { state: { metrics, address } });
-            } else {
-              navigate("/dashboard");
-            }
-          }
+          // Always redirect to dashboard after successful login
+          navigate("/dashboard");
+          
         } catch (error: any) {
           console.error('Profile check error:', error);
           toast({
@@ -62,7 +45,7 @@ export function Login() {
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, toast, returnTo, metrics, address]);
+  }, [navigate, toast]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-solar-blue to-white flex items-center justify-center p-4">

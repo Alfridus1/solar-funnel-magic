@@ -56,14 +56,6 @@ export default function App() {
           path="/recommended-config" 
           element={<Navigate to="/solar-showcase" replace />} 
         />
-        <Route 
-          path="/user-management" 
-          element={
-            <ProtectedRoute>
-              <UserManagement />
-            </ProtectedRoute>
-          } 
-        />
       </Routes>
       <Toaster />
     </>

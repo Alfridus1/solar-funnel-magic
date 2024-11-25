@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { CustomerDashboard } from "./CustomerDashboard";
 import { EmployeeDashboard } from "./EmployeeDashboard";
 import { AdminDashboard } from "./AdminDashboard";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export const UnifiedDashboard = () => {
   const { data: userRoles, isLoading } = useQuery({
@@ -55,14 +56,33 @@ export const UnifiedDashboard = () => {
   }
 
   return (
-    <div className="flex flex-col gap-8">
-      {userRoles?.isAdmin ? (
-        <AdminDashboard />
-      ) : userRoles?.isEmployee ? (
-        <EmployeeDashboard />
-      ) : (
-        <CustomerDashboard />
-      )}
+    <div className="flex flex-col gap-8 p-4">
+      <Accordion type="single" collapsible className="w-full">
+        <AccordionItem value="customer">
+          <AccordionTrigger>Kundenbereich</AccordionTrigger>
+          <AccordionContent>
+            <CustomerDashboard />
+          </AccordionContent>
+        </AccordionItem>
+
+        {userRoles?.isEmployee && (
+          <AccordionItem value="employee">
+            <AccordionTrigger>Mitarbeiterbereich</AccordionTrigger>
+            <AccordionContent>
+              <EmployeeDashboard />
+            </AccordionContent>
+          </AccordionItem>
+        )}
+
+        {userRoles?.isAdmin && (
+          <AccordionItem value="admin">
+            <AccordionTrigger>Administrationsbereich</AccordionTrigger>
+            <AccordionContent>
+              <AdminDashboard />
+            </AccordionContent>
+          </AccordionItem>
+        )}
+      </Accordion>
     </div>
   );
 };
