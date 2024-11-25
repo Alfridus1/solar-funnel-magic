@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, Outlet, useNavigate } from 'react-router-dom';
+import { Routes, Route, Navigate, Outlet, useNavigate } from 'react-router-dom';
 import { Toaster } from "@/components/ui/toaster";
 import { supabase } from "@/integrations/supabase/client";
 import { Login } from "@/pages/Login";
@@ -29,7 +29,7 @@ function App() {
   }, []);
 
   return (
-    <Router>
+    <>
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/login" element={<Login />} />
@@ -61,7 +61,7 @@ function App() {
         } />
       </Routes>
       <Toaster />
-    </Router>
+    </>
   );
 }
 
