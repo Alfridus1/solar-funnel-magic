@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { AdminLayout } from "./components/admin/layout/AdminLayout";
 import { Overview } from "./components/admin/Overview";
 import { UserManagement } from "./components/admin/UserManagement";
