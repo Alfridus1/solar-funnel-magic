@@ -811,6 +811,7 @@ export type Database = {
           house_number: string | null
           id: string
           last_name: string
+          permissions: Database["public"]["Enums"]["user_permission"][] | null
           phone: string
           postal_code: string | null
           role: Database["public"]["Enums"]["user_role"] | null
@@ -826,6 +827,7 @@ export type Database = {
           house_number?: string | null
           id?: string
           last_name: string
+          permissions?: Database["public"]["Enums"]["user_permission"][] | null
           phone: string
           postal_code?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
@@ -841,6 +843,7 @@ export type Database = {
           house_number?: string | null
           id?: string
           last_name?: string
+          permissions?: Database["public"]["Enums"]["user_permission"][] | null
           phone?: string
           postal_code?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
@@ -1555,6 +1558,17 @@ export type Database = {
       }
     }
     Enums: {
+      user_permission:
+        | "customer_access"
+        | "employee_access"
+        | "admin_access"
+        | "leads_management"
+        | "customer_management"
+        | "project_management"
+        | "inventory_management"
+        | "financial_access"
+        | "employee_management"
+        | "reporting"
       user_role:
         | "customer"
         | "sales_employee"

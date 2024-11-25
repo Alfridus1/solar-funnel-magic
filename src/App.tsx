@@ -1,8 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Login } from "@/pages/Login";
-import { AdminDashboard } from "@/pages/admin/Dashboard";
-import { EmployeeDashboard } from "@/pages/employee/Dashboard";
-import { CustomerDashboard } from "@/components/dashboard/CustomerDashboard";
+import { UnifiedDashboard } from "@/components/dashboard/UnifiedDashboard";
 import { Toaster } from "@/components/ui/toaster";
 import { Index } from "@/pages/Index";
 import { AffiliateLanding } from "@/pages/AffiliateLanding";
@@ -44,26 +42,10 @@ export default function App() {
         <Route path="/" element={<Index />} />
         <Route path="/login" element={<Login />} />
         <Route 
-          path="/admin/*" 
-          element={
-            <ProtectedRoute>
-              <AdminDashboard />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="/employee/*" 
-          element={
-            <ProtectedRoute>
-              <EmployeeDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route 
           path="/dashboard/*" 
           element={
             <ProtectedRoute>
-              <CustomerDashboard />
+              <UnifiedDashboard />
             </ProtectedRoute>
           } 
         />
