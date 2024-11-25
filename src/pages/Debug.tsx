@@ -1,117 +1,119 @@
-import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { RoofCheck } from "@/components/RoofCheck";
-import { Input } from "@/components/ui/input";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 
-export const Debug = () => {
-  const [logs, setLogs] = useState<string[]>([]);
-  const [apiKey, setApiKey] = useState(import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "");
-  const defaultAddress = "Dornfelderweg 9 67157 Wachenheim an der Weinstraße";
+export function Debug() {
+  const [session, setSession] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [employee, setEmployee] = useState<any>(null);
   const { toast } = useToast();
 
-  const addLog = (message: string) => {
-    setLogs((prev) => [...prev, `${new Date().toISOString()}: ${message}`]);
-  };
-
-  const testApiKey = async () => {
-    try {
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?address=Berlin&key=${apiKey}`
-      );
-      const data = await response.json();
-      
-      if (data.status === "OK") {
-        toast({
-          title: "API-Key ist gültig",
-          description: "Die Verbindung zu Google Maps funktioniert.",
-        });
-        addLog("API-Key Test erfolgreich");
-      } else {
-        toast({
-          title: "API-Key ist ungültig",
-          description: `Fehler: ${data.status}`,
-          variant: "destructive",
-        });
-        addLog(`API-Key Test fehlgeschlagen: ${data.status}`);
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session?.user) {
+        fetchUserData(session.user.id);
       }
-    } catch (error) {
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session?.user) {
+        fetchUserData(session.user.id);
+      } else {
+        setProfile(null);
+        setEmployee(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const fetchUserData = async (userId: string) => {
+    try {
+      // Fetch profile data
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (profileError) throw profileError;
+      setProfile(profileData);
+
+      // Fetch employee data if it exists
+      const { data: employeeData, error: employeeError } = await supabase
+        .from('employees')
+        .select('*')
+        .eq('profile_id', userId)
+        .single();
+
+      if (!employeeError) {
+        setEmployee(employeeData);
+      }
+    } catch (error: any) {
       toast({
-        title: "Verbindungsfehler",
-        description: "Konnte keine Verbindung zu Google Maps herstellen",
+        title: "Fehler beim Laden der Benutzerdaten",
+        description: error.message,
         variant: "destructive",
       });
-      addLog(`API-Key Test fehlgeschlagen: ${error.message}`);
     }
   };
 
-  return (
-    <div className="container mx-auto p-4 space-y-4">
-      <h1 className="text-2xl font-bold mb-4">Debug Mode - Roof Analysis</h1>
-      
-      <Card>
-        <CardContent className="p-4">
-          <h2 className="text-xl font-semibold mb-4">API Konfiguration</h2>
-          <div className="flex gap-4 items-end mb-4">
-            <div className="flex-1">
-              <label className="block text-sm font-medium mb-1">
-                Google Maps API Key
-              </label>
-              <Input
-                type="text"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                placeholder="Geben Sie Ihren API-Key ein"
-                className="font-mono"
-              />
-            </div>
-            <Button onClick={testApiKey}>
-              API-Key testen
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div>
-          <Card>
-            <CardContent className="p-4">
-              <h2 className="text-xl font-semibold mb-4">Map View</h2>
-              <RoofCheck 
-                address={defaultAddress} 
-                onLog={addLog}
-              />
-            </CardContent>
-          </Card>
-        </div>
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+  };
 
-        <div>
-          <Card>
-            <CardContent className="p-4">
-              <h2 className="text-xl font-semibold mb-4">Debug Log</h2>
-              <ScrollArea className="h-[600px] w-full rounded-md border p-4">
-                {logs.map((log, index) => (
-                  <div
-                    key={index}
-                    className="text-sm font-mono mb-2 border-b border-gray-100 pb-2"
-                  >
-                    {log}
-                  </div>
-                ))}
-                {logs.length === 0 && (
-                  <div className="text-gray-500 italic">
-                    Warte auf Debug-Informationen...
-                  </div>
-                )}
-              </ScrollArea>
-            </CardContent>
+  return (
+    <div className="min-h-screen bg-gray-100 p-8">
+      <div className="max-w-4xl mx-auto space-y-8">
+        <h1 className="text-3xl font-bold">Debug Informationen</h1>
+        
+        <Card className="p-6">
+          <h2 className="text-xl font-semibold mb-4">Auth Status</h2>
+          <div className="space-y-2">
+            <p><strong>Angemeldet:</strong> {session ? "Ja" : "Nein"}</p>
+            <p><strong>User ID:</strong> {session?.user?.id || "Nicht angemeldet"}</p>
+            <p><strong>Email:</strong> {session?.user?.email || "Nicht angemeldet"}</p>
+            {session && (
+              <Button variant="destructive" onClick={handleSignOut}>
+                Abmelden
+              </Button>
+            )}
+          </div>
+        </Card>
+
+        {profile && (
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4">Profil Informationen</h2>
+            <div className="space-y-2">
+              <p><strong>Rolle:</strong> {profile.role || "Keine Rolle"}</p>
+              <p><strong>Name:</strong> {profile.first_name} {profile.last_name}</p>
+              <p><strong>Berechtigungen:</strong> {profile.permissions?.join(", ") || "Keine Berechtigungen"}</p>
+              <pre className="bg-gray-100 p-4 rounded-md mt-4 overflow-auto">
+                {JSON.stringify(profile, null, 2)}
+              </pre>
+            </div>
           </Card>
-        </div>
+        )}
+
+        {employee && (
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4">Mitarbeiter Informationen</h2>
+            <div className="space-y-2">
+              <p><strong>Rolle:</strong> {employee.role}</p>
+              <p><strong>Team ID:</strong> {employee.team_id || "Kein Team"}</p>
+              <pre className="bg-gray-100 p-4 rounded-md mt-4 overflow-auto">
+                {JSON.stringify(employee, null, 2)}
+              </pre>
+            </div>
+          </Card>
+        )}
       </div>
     </div>
   );
-};
-
-export default Debug;
+}

@@ -7,6 +7,7 @@ import { AffiliateLanding } from "@/pages/AffiliateLanding";
 import { ProductShowcase } from "@/components/solar-showcase/ProductShowcase";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Debug } from "@/pages/Debug";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -51,6 +52,7 @@ export default function App() {
         />
         <Route path="/solar-showcase" element={<ProductShowcase />} />
         <Route path="/affiliate" element={<AffiliateLanding />} />
+        <Route path="/debug" element={<Debug />} />
         <Route 
           path="/recommended-config" 
           element={<Navigate to="/solar-showcase" replace />} 
