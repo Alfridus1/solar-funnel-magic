@@ -59,8 +59,7 @@ export const AffiliateManagement = () => {
   };
 
   const copyToClipboard = (referralCode: string) => {
-    const baseUrl = window.location.origin;
-    const affiliateLink = `${baseUrl}/?ref=${referralCode}`;
+    const affiliateLink = `https://coppen.app/?ref=${referralCode}`;
     
     navigator.clipboard.writeText(affiliateLink);
     toast({
