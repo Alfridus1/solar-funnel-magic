@@ -119,26 +119,47 @@ export const ProfileOverview = () => {
           </Button>
         </div>
 
-        <div className="grid gap-6">
-          <div className="flex items-center gap-2 text-gray-600">
-            <User className="h-4 w-4" />
-            <span>Name</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center gap-3">
+            <User className="h-5 w-5 text-gray-500" />
+            <div className="flex flex-col">
+              <span className="text-sm text-gray-600">Name</span>
+              <span className="font-medium">{formData.first_name} {formData.last_name}</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2 text-gray-600">
-            <Mail className="h-4 w-4" />
-            <span>E-Mail</span>
+          
+          <div className="flex items-center gap-3">
+            <Mail className="h-5 w-5 text-gray-500" />
+            <div className="flex flex-col">
+              <span className="text-sm text-gray-600">E-Mail</span>
+              <span className="font-medium">{formData.email}</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2 text-gray-600">
-            <Phone className="h-4 w-4" />
-            <span>Telefon</span>
+          
+          <div className="flex items-center gap-3">
+            <Phone className="h-5 w-5 text-gray-500" />
+            <div className="flex flex-col">
+              <span className="text-sm text-gray-600">Telefon</span>
+              <span className="font-medium">{formData.phone || "-"}</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2 text-gray-600">
-            <Zap className="h-4 w-4" />
-            <span>Jährlicher Stromverbrauch (kWh)</span>
+          
+          <div className="flex items-center gap-3">
+            <Zap className="h-5 w-5 text-gray-500" />
+            <div className="flex flex-col">
+              <span className="text-sm text-gray-600">Jährlicher Stromverbrauch</span>
+              <span className="font-medium">{formData.annual_consumption || "-"} kWh</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2 text-gray-600">
-            <Home className="h-4 w-4" />
-            <span>Adresse</span>
+          
+          <div className="flex items-center gap-3 md:col-span-2">
+            <Home className="h-5 w-5 text-gray-500" />
+            <div className="flex flex-col">
+              <span className="text-sm text-gray-600">Adresse</span>
+              <span className="font-medium">
+                {formData.street} {formData.house_number}, {formData.postal_code} {formData.city}
+              </span>
+            </div>
           </div>
         </div>
 
