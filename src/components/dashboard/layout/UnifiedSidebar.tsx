@@ -8,12 +8,13 @@ import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { menuItems } from "./config/menuItems";
 import { SidebarNav } from "./components/SidebarNav";
+import { UserPermission } from "@/types/permissions";
 
 export const UnifiedSidebar = () => {
   const location = useLocation();
   const currentTab = location.hash.replace("#", "") || "dashboard";
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [userPermissions, setUserPermissions] = useState<string[]>(['customer_access']);
+  const [userPermissions, setUserPermissions] = useState<UserPermission[]>(['customer_access']);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -49,7 +50,8 @@ export const UnifiedSidebar = () => {
                 first_name: '',
                 last_name: '',
                 phone: '',
-                permissions: ['customer_access']
+                permissions: ['customer_access'] as UserPermission[],
+                role: 'customer'
               }
             ], {
               onConflict: 'id'
@@ -64,7 +66,7 @@ export const UnifiedSidebar = () => {
         // Get profile permissions
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('permissions')
+          .select('permissions, role')
           .eq('id', user.id)
           .maybeSingle();
 
@@ -87,9 +89,24 @@ export const UnifiedSidebar = () => {
 
         let permissions = profile?.permissions || ['customer_access'];
         
+        // If user is an admin, add all admin permissions
+        if (profile?.role === 'admin') {
+          permissions = [
+            'customer_access',
+            'employee_access',
+            'admin_access',
+            'leads_management',
+            'customer_management',
+            'project_management',
+            'inventory_management',
+            'financial_access',
+            'employee_management',
+            'reporting'
+          ] as UserPermission[];
+        }
         // If user is an employee, add employee permissions
-        if (employee) {
-          permissions = [...new Set([...permissions, 'employee_access'])];
+        else if (employee) {
+          permissions = [...new Set([...permissions, 'employee_access'])] as UserPermission[];
         }
 
         setUserPermissions(permissions);
