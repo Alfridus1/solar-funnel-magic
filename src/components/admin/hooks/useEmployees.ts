@@ -2,15 +2,28 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Employee } from "../types/employee";
+import { useNavigate } from "react-router-dom";
 
 export const useEmployees = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const fetchEmployees = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      setIsLoading(true);
+      const { data: session } = await supabase.auth.getSession();
+      
+      if (!session?.session?.user) {
+        toast({
+          title: "Nicht authentifiziert",
+          description: "Bitte melden Sie sich an, um fortzufahren.",
+          variant: "destructive",
+        });
+        navigate('/login');
+        return;
+      }
 
       const { data, error } = await supabase
         .from('employees')
@@ -62,7 +75,6 @@ export const useEmployees = () => {
         } : undefined
       }));
 
-      console.log('Fetched employees:', transformedData);
       setEmployees(transformedData);
     } catch (error: any) {
       console.error('Error in useEmployees:', error);
@@ -71,12 +83,31 @@ export const useEmployees = () => {
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchEmployees();
-  }, []);
+    const checkAuthAndFetch = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate('/login');
+        return;
+      }
+      fetchEmployees();
+    };
 
-  return { employees, fetchEmployees };
+    checkAuthAndFetch();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        navigate('/login');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  return { employees, fetchEmployees, isLoading };
 };

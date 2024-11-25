@@ -13,7 +13,7 @@ export const EmployeeManagement = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const { toast } = useToast();
-  const { employees, fetchEmployees } = useEmployees();
+  const { employees, fetchEmployees, isLoading } = useEmployees();
 
   const handleAddEmployee = () => {
     setSelectedEmployee(null);
@@ -116,6 +116,14 @@ export const EmployeeManagement = () => {
       });
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
