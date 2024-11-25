@@ -11,7 +11,6 @@ export const ReferralOverview = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Get or create affiliate record
       let { data: affiliate, error: affiliateError } = await supabase
         .from('affiliates')
         .select('*')
@@ -50,7 +49,6 @@ export const ReferralOverview = () => {
         affiliate = newAffiliate;
       }
 
-      // Get affiliate bonuses
       const { data: bonuses } = await supabase
         .from('affiliate_bonuses')
         .select('*')
@@ -69,24 +67,11 @@ export const ReferralOverview = () => {
     }
   });
 
-  if (!affiliateData) {
-    return null;
-  }
-
   return (
     <div className="space-y-6 p-4">
       <h1 className="text-2xl font-bold">Empfehlungsprogramm</h1>
-      
-      <ReferralStats
-        referralCount={affiliateData.referral_count || 0}
-        totalLeads={affiliateData.total_leads || 0}
-        totalCommission={affiliateData.totalCommission}
-        purchaseCount={affiliateData.purchaseCount}
-        totalPurchaseAmount={affiliateData.totalPurchaseAmount}
-      />
-
-      <ReferralLink referralCode={affiliateData.referral_code} />
-
+      <ReferralStats affiliateData={affiliateData} />
+      <ReferralLink referralCode={affiliateData?.referral_code} />
       <HowItWorks />
     </div>
   );

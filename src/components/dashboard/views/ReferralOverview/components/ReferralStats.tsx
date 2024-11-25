@@ -2,20 +2,10 @@ import { Card } from "@/components/ui/card";
 import { Users, Link, Euro } from "lucide-react";
 
 interface ReferralStatsProps {
-  referralCount: number;
-  totalLeads: number;
-  totalCommission: number;
-  purchaseCount: number;
-  totalPurchaseAmount: number;
+  affiliateData: any;
 }
 
-export const ReferralStats = ({
-  referralCount,
-  totalLeads,
-  totalCommission,
-  purchaseCount,
-  totalPurchaseAmount
-}: ReferralStatsProps) => {
+export const ReferralStats = ({ affiliateData }: ReferralStatsProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <Card className="p-6 bg-gradient-to-br from-blue-50 to-white">
@@ -23,7 +13,7 @@ export const ReferralStats = ({
           <Users className="h-8 w-8 text-blue-600" />
           <div>
             <p className="text-sm text-gray-600">Registrierungen</p>
-            <p className="text-2xl font-bold">{referralCount}</p>
+            <p className="text-2xl font-bold">{affiliateData?.referral_count || 0}</p>
           </div>
         </div>
         <p className="text-sm text-gray-600">
@@ -36,7 +26,7 @@ export const ReferralStats = ({
           <Link className="h-8 w-8 text-green-600" />
           <div>
             <p className="text-sm text-gray-600">Leads</p>
-            <p className="text-2xl font-bold">{totalLeads}</p>
+            <p className="text-2xl font-bold">{affiliateData?.total_leads || 0}</p>
           </div>
         </div>
         <p className="text-sm text-gray-600">
@@ -49,7 +39,7 @@ export const ReferralStats = ({
           <Euro className="h-8 w-8 text-yellow-600" />
           <div>
             <p className="text-sm text-gray-600">Provision</p>
-            <p className="text-2xl font-bold">{totalCommission?.toLocaleString('de-DE')} €</p>
+            <p className="text-2xl font-bold">{affiliateData?.totalCommission?.toLocaleString('de-DE')} €</p>
           </div>
         </div>
         <p className="text-sm text-gray-600">
@@ -62,11 +52,11 @@ export const ReferralStats = ({
           <Euro className="h-8 w-8 text-purple-600" />
           <div>
             <p className="text-sm text-gray-600">Verkäufe</p>
-            <p className="text-2xl font-bold">{purchaseCount}</p>
+            <p className="text-2xl font-bold">{affiliateData?.purchaseCount || 0}</p>
           </div>
         </div>
         <p className="text-sm text-gray-600">
-          Erfolgreiche Verkäufe: {totalPurchaseAmount?.toLocaleString('de-DE')} €
+          Erfolgreiche Verkäufe: {affiliateData?.totalPurchaseAmount?.toLocaleString('de-DE')} €
         </p>
       </Card>
     </div>

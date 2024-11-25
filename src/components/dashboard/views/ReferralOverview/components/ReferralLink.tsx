@@ -5,14 +5,16 @@ import { useToast } from "@/components/ui/use-toast";
 import { Copy } from "lucide-react";
 
 interface ReferralLinkProps {
-  referralCode: string;
+  referralCode?: string;
 }
 
 export const ReferralLink = ({ referralCode }: ReferralLinkProps) => {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
-  
-  const referralLink = `${window.location.origin}/?ref=${referralCode}`;
+
+  const referralLink = referralCode 
+    ? `${window.location.origin}/register?ref=${referralCode}`
+    : '';
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(referralLink);
@@ -29,7 +31,7 @@ export const ReferralLink = ({ referralCode }: ReferralLinkProps) => {
       <h2 className="text-xl font-semibold mb-4">Ihr persönlicher Empfehlungslink</h2>
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1 bg-gray-50 p-3 rounded-lg break-all">
-          <p className="text-sm">{referralLink}</p>
+          <p className="text-sm font-medium">{referralLink}</p>
         </div>
         <Button
           onClick={handleCopyLink}
