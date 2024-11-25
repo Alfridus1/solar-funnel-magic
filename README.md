@@ -4,6 +4,81 @@
 
 **URL**: https://lovable.dev/projects/fca6b835-9623-4274-a69a-094f57a964c5
 
+## Administrationsbereich Dokumentation
+
+Der Administrationsbereich bietet umfangreiche Funktionen zur Verwaltung der Plattform:
+
+### 1. Dashboard Übersicht
+- Zeigt wichtige KPIs und Metriken
+- Lead-Quellen Verlauf Visualisierung
+- Schnellzugriff auf wichtige Funktionen
+
+### 2. Lead Management
+- Verwaltung aller Kundenanfragen
+- Statusverfolgung (Neu/Bearbeitet)
+- Filterfunktionen nach Typ (Angebot/Beratung)
+- Löschfunktion mit Soft-Delete
+
+### 3. Benutzerverwaltung
+- Komplette Verwaltung aller Benutzerkonten
+- Rollenzuweisung (Kunde, Mitarbeiter, Admin)
+- Passwort-Reset Funktionen
+- Benutzerdetails und Profilinformationen
+
+### 4. Partner Management
+- Verwaltung des Affiliate-Programms
+- Tracking von Vermittlungen und Leads
+- Provisionsübersicht
+- Generierung und Verwaltung von Referral-Codes
+
+### 5. Mitarbeiterverwaltung
+- Anlegen und Verwalten von Mitarbeiterkonten
+- Teamzuordnung
+- Berechtigungsverwaltung
+- Arbeitszeiterfassung
+
+### 6. Produktverwaltung
+- Verwaltung des Produktkatalogs
+- Preisgestaltung
+- Produktspezifikationen
+- Lagerbestandsverwaltung
+
+### 7. Aufgabentypen
+- Definition verschiedener Aufgabenarten
+- Farbcodierung
+- Beschreibungen und Kategorisierung
+
+### 8. Premium Produkte
+- Verwaltung von Premium-Angeboten
+- Preisgestaltung und Finanzierungsoptionen
+- Feature-Management
+- Klimaauswirkungen
+
+### 9. Administratoren
+- Verwaltung von Admin-Zugängen
+- Berechtigungsstufen
+- Sicherheitseinstellungen
+
+### 10. Systemeinstellungen
+- Globale Konfigurationen
+- Tracking-Pixel Verwaltung
+- API-Einstellungen
+- Systemparameter
+
+## Berechtigungen
+
+Die folgenden Berechtigungen sind im System verfügbar:
+- customer_access: Zugriff auf Kundenbereich
+- employee_access: Zugriff auf Mitarbeiterbereich
+- admin_access: Voller Administratorzugriff
+- leads_management: Lead-Verwaltung
+- customer_management: Kundenverwaltung
+- project_management: Projektverwaltung
+- inventory_management: Lagerverwaltung
+- financial_access: Finanzzugriff
+- employee_management: Mitarbeiterverwaltung
+- reporting: Berichtswesen
+
 ## How can I edit this code?
 
 There are several ways of editing your application.
@@ -52,13 +127,14 @@ npm run dev
 
 ## What technologies are used for this project?
 
-This project is built with .
+This project is built with:
 
 - Vite
 - TypeScript
 - React
 - shadcn-ui
 - Tailwind CSS
+- Supabase
 
 ## How can I deploy this project?
 
