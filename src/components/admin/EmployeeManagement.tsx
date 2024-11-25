@@ -20,28 +20,36 @@ export const EmployeeManagement = () => {
   }, []);
 
   const fetchEmployees = async () => {
-    const { data, error } = await supabase
-      .from('employees')
-      .select(`
-        *,
-        profiles (
-          first_name,
-          last_name,
-          email,
-          role,
-          phone
-        )
-      `)
-      .neq('profiles.role', 'customer');
+    try {
+      const { data, error } = await supabase
+        .from('employees')
+        .select(`
+          *,
+          profiles (
+            first_name,
+            last_name,
+            email,
+            role,
+            phone
+          )
+        `)
+        .neq('profiles.role', 'customer');
 
-    if (error) {
+      if (error) {
+        toast({
+          title: "Fehler beim Laden der Mitarbeiter",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else if (data) {
+        setEmployees(data);
+      }
+    } catch (error: any) {
       toast({
         title: "Fehler beim Laden der Mitarbeiter",
         description: error.message,
         variant: "destructive",
       });
-    } else if (data) {
-      setEmployees(data);
     }
   };
 
@@ -56,27 +64,31 @@ export const EmployeeManagement = () => {
   };
 
   const handleDeleteEmployee = async (id: string) => {
-    const { error } = await supabase
-      .from('employees')
-      .delete()
-      .eq('id', id);
+    try {
+      const { error } = await supabase
+        .from('employees')
+        .delete()
+        .eq('id', id);
 
-    if (error) {
-      toast({
-        title: "Fehler beim Löschen",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
+      if (error) throw error;
+
       toast({
         title: "Mitarbeiter gelöscht",
         description: "Der Mitarbeiter wurde erfolgreich gelöscht.",
       });
       fetchEmployees();
+    } catch (error: any) {
+      toast({
+        title: "Fehler beim Löschen",
+        description: error.message,
+        variant: "destructive",
+      });
     }
   };
 
   const handleResetPassword = async (email: string) => {
+    if (!email) return;
+    
     setIsResetting(true);
     try {
       const { error } = await supabase.functions.invoke('reset-employee-password', {
