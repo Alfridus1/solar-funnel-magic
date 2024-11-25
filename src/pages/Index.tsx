@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { RoofCheck } from "@/components/RoofCheck";
 import { Testimonials } from "@/components/Testimonials";
@@ -10,23 +9,18 @@ import { HeroSection } from "@/components/landing/HeroSection";
 import { FinalCTA } from "@/components/landing/FinalCTA";
 import { TrustIndicators } from "@/components/landing/TrustIndicators";
 import { useGeolocation } from "@/components/RoofCheck/hooks/useGeolocation";
-import { Button } from "@/components/ui/button";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { LoginDialog } from "@/components/auth/LoginDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useGoogleMaps } from "@/hooks/useGoogleMaps";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { User } from "lucide-react";
+import { Header } from "@/components/landing/Header";
+import { RegistrationOverlay } from "@/components/solar-showcase/components/registration/RegistrationOverlay";
 
 export function Index() {
   const [address, setAddress] = useState("");
   const [showRoofCheck, setShowRoofCheck] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const [showRegistrationOverlay, setShowRegistrationOverlay] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
@@ -35,7 +29,6 @@ export function Index() {
   const navigate = useNavigate();
   const { isLoaded, loadError } = useGoogleMaps();
 
-  // Store referral code in localStorage when the page loads
   useEffect(() => {
     const refCode = searchParams.get('ref');
     if (refCode) {
@@ -44,7 +37,6 @@ export function Index() {
   }, [searchParams]);
 
   useEffect(() => {
-    // Check authentication status
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setIsLoggedIn(!!session);
@@ -74,7 +66,6 @@ export function Index() {
     
     checkAuth();
 
-    // Subscribe to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setIsLoggedIn(!!session);
     });
@@ -95,25 +86,21 @@ export function Index() {
     }
   };
 
-  const onGeolocationSuccess = (formattedAddress: string) => {
-    setAddress(formattedAddress);
-    toast({
-      title: "Erfolg",
-      description: "Ihr Standort wurde erfolgreich erkannt.",
-    });
-  };
-
-  const onGeolocationError = (errorMessage: string) => {
-    toast({
-      title: "Fehler",
-      description: errorMessage,
-      variant: "destructive",
-    });
-  };
-
   const { handleGeolocation } = useGeolocation({
-    onSuccess: onGeolocationSuccess,
-    onError: onGeolocationError,
+    onSuccess: (formattedAddress: string) => {
+      setAddress(formattedAddress);
+      toast({
+        title: "Erfolg",
+        description: "Ihr Standort wurde erfolgreich erkannt.",
+      });
+    },
+    onError: (errorMessage: string) => {
+      toast({
+        title: "Fehler",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    },
     toast
   });
 
@@ -138,11 +125,9 @@ export function Index() {
   if (loadError) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Card className="p-6">
-          <p className="text-red-600">
-            Fehler beim Laden der Karte. Bitte versuchen Sie es später erneut.
-          </p>
-        </Card>
+        <p className="text-red-600">
+          Fehler beim Laden der Karte. Bitte versuchen Sie es später erneut.
+        </p>
       </div>
     );
   }
@@ -150,9 +135,7 @@ export function Index() {
   if (!isLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Card className="p-6">
-          <p>Laden...</p>
-        </Card>
+        <p>Laden...</p>
       </div>
     );
   }
@@ -164,40 +147,13 @@ export function Index() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-solar-blue to-white">
       <div className="container mx-auto px-4">
-        <div className="flex justify-end gap-4 py-4">
-          {isLoggedIn ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  Profil
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={handleDashboardNavigation}>
-                  Dashboard
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={async () => {
-                  await supabase.auth.signOut();
-                  toast({
-                    title: "Erfolgreich ausgeloggt",
-                    description: "Auf Wiedersehen!",
-                  });
-                }}>
-                  Ausloggen
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Button 
-              variant="outline"
-              onClick={() => setShowLoginDialog(true)}
-              className="bg-white hover:bg-solar-orange hover:text-white transition-colors"
-            >
-              Login
-            </Button>
-          )}
-        </div>
+        <Header 
+          isLoggedIn={isLoggedIn}
+          userRole={userRole}
+          onShowLogin={() => setShowLoginDialog(true)}
+          onShowRegister={() => setShowRegistrationOverlay(true)}
+          handleDashboardNavigation={handleDashboardNavigation}
+        />
         
         <div className="py-12">
           <HeroSection
@@ -221,6 +177,12 @@ export function Index() {
         open={showLoginDialog} 
         onOpenChange={setShowLoginDialog}
       />
+
+      {showRegistrationOverlay && (
+        <RegistrationOverlay
+          onComplete={() => setShowRegistrationOverlay(false)}
+        />
+      )}
     </div>
   );
 }
