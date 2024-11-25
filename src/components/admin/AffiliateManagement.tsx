@@ -68,7 +68,6 @@ export const AffiliateManagement = () => {
     });
   };
 
-  // Calculate total stats
   const totalReferrals = affiliates.reduce((sum, affiliate) => sum + (affiliate.referral_count || 0), 0);
   const totalLeads = affiliates.reduce((sum, affiliate) => sum + (affiliate.total_leads || 0), 0);
   const activeAffiliates = affiliates.filter(a => a.referral_count > 0).length;
