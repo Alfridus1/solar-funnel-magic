@@ -15,12 +15,20 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { LoginDialog } from "@/components/auth/LoginDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useGoogleMaps } from "@/hooks/useGoogleMaps";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { User } from "lucide-react";
 
 export function Index() {
   const [address, setAddress] = useState("");
   const [showRoofCheck, setShowRoofCheck] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const { toast } = useToast();
@@ -40,6 +48,28 @@ export function Index() {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setIsLoggedIn(!!session);
+
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+
+        const { data: employee } = await supabase
+          .from('employees')
+          .select('role')
+          .eq('profile_id', session.user.id)
+          .single();
+
+        if (profile?.role === 'admin') {
+          setUserRole('admin');
+        } else if (employee?.role) {
+          setUserRole('employee');
+        } else {
+          setUserRole('customer');
+        }
+      }
     };
     
     checkAuth();
@@ -51,6 +81,19 @@ export function Index() {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const handleDashboardNavigation = () => {
+    switch (userRole) {
+      case 'admin':
+        navigate('/admin');
+        break;
+      case 'employee':
+        navigate('/employee/dashboard');
+        break;
+      default:
+        navigate('/dashboard');
+    }
+  };
 
   const onGeolocationSuccess = (formattedAddress: string) => {
     setAddress(formattedAddress);
@@ -122,29 +165,38 @@ export function Index() {
     <div className="min-h-screen bg-gradient-to-br from-solar-blue to-white">
       <div className="container mx-auto px-4">
         <div className="flex justify-end gap-4 py-4">
-          <Button 
-            variant="outline"
-            onClick={() => navigate("/affiliate")}
-            className="bg-white hover:bg-solar-orange hover:text-white transition-colors"
-          >
-            Affiliate werden
-          </Button>
-          <div className="flex gap-2">
+          {isLoggedIn ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  Profil
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleDashboardNavigation}>
+                  Dashboard
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={async () => {
+                  await supabase.auth.signOut();
+                  toast({
+                    title: "Erfolgreich ausgeloggt",
+                    description: "Auf Wiedersehen!",
+                  });
+                }}>
+                  Ausloggen
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
             <Button 
               variant="outline"
-              onClick={() => navigate("/employee-login")}
+              onClick={() => setShowLoginDialog(true)}
               className="bg-white hover:bg-solar-orange hover:text-white transition-colors"
             >
-              Mitarbeiter-Login
+              Login
             </Button>
-            <Button 
-              variant="outline"
-              onClick={() => isLoggedIn ? navigate("/dashboard") : setShowLoginDialog(true)}
-              className="bg-white hover:bg-solar-orange hover:text-white transition-colors"
-            >
-              {isLoggedIn ? "Zum Dashboard" : "Login"}
-            </Button>
-          </div>
+          )}
         </div>
         
         <div className="py-12">
