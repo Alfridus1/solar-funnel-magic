@@ -41,6 +41,8 @@ export const UnifiedDashboard = () => {
         .eq('id', user.id)
         .single();
 
+      if (!profile) return null;
+
       const { data: employees } = await supabase
         .from('employees')
         .select('role')
@@ -49,10 +51,10 @@ export const UnifiedDashboard = () => {
       const employee = employees?.[0];
 
       return {
-        isAdmin: profile?.role === 'admin',
-        isEmployee: !!employee || profile?.role === 'admin',
-        simulatedEmployeeId: profile?.simulated_employee_id,
-        actualRole: profile?.role,
+        isAdmin: profile.role === 'admin',
+        isEmployee: !!employee || profile.role === 'admin',
+        simulatedEmployeeId: profile.simulated_employee_id,
+        actualRole: profile.role,
         employeeRole: employee?.role
       };
     }
