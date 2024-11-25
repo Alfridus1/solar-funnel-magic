@@ -606,47 +606,6 @@ export type Database = {
           },
         ]
       }
-      news: {
-        Row: {
-          author_id: string | null
-          content: string
-          created_at: string | null
-          id: string
-          published_at: string | null
-          status: string | null
-          title: string
-          updated_at: string | null
-        }
-        Insert: {
-          author_id?: string | null
-          content: string
-          created_at?: string | null
-          id?: string
-          published_at?: string | null
-          status?: string | null
-          title: string
-          updated_at?: string | null
-        }
-        Update: {
-          author_id?: string | null
-          content?: string
-          created_at?: string | null
-          id?: string
-          published_at?: string | null
-          status?: string | null
-          title?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "news_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       opensolar_installations: {
         Row: {
           contract_value: number
