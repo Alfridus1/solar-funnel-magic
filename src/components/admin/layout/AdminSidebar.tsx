@@ -19,7 +19,7 @@ export const AdminSidebar = () => {
         <ul className="space-y-2">
           <li>
             <NavLink
-              to="/dashboard#overview"
+              to="/dashboard/admin#overview"
               className={({ isActive }) =>
                 `flex items-center p-2 rounded-lg ${
                   isActive ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50"
@@ -32,7 +32,7 @@ export const AdminSidebar = () => {
           </li>
           <li>
             <NavLink
-              to="/dashboard#users"
+              to="/dashboard/admin#users"
               className={({ isActive }) =>
                 `flex items-center p-2 rounded-lg ${
                   isActive ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50"
@@ -45,7 +45,7 @@ export const AdminSidebar = () => {
           </li>
           <li>
             <NavLink
-              to="/dashboard#leads"
+              to="/dashboard/admin#leads"
               className={({ isActive }) =>
                 `flex items-center p-2 rounded-lg ${
                   isActive ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50"
@@ -58,7 +58,7 @@ export const AdminSidebar = () => {
           </li>
           <li>
             <NavLink
-              to="/dashboard#roles"
+              to="/dashboard/admin#roles"
               className={({ isActive }) =>
                 `flex items-center p-2 rounded-lg ${
                   isActive ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50"
@@ -71,7 +71,7 @@ export const AdminSidebar = () => {
           </li>
           <li>
             <NavLink
-              to="/dashboard#api-debug"
+              to="/dashboard/admin#api-debug"
               className={({ isActive }) =>
                 `flex items-center p-2 rounded-lg ${
                   isActive ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50"
@@ -84,7 +84,7 @@ export const AdminSidebar = () => {
           </li>
           <li>
             <NavLink
-              to="/dashboard#affiliates"
+              to="/dashboard/admin#affiliates"
               className={({ isActive }) =>
                 `flex items-center p-2 rounded-lg ${
                   isActive ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50"
@@ -97,7 +97,7 @@ export const AdminSidebar = () => {
           </li>
           <li>
             <NavLink
-              to="/dashboard#employees"
+              to="/dashboard/admin#employees"
               className={({ isActive }) =>
                 `flex items-center p-2 rounded-lg ${
                   isActive ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50"
@@ -110,7 +110,7 @@ export const AdminSidebar = () => {
           </li>
           <li>
             <NavLink
-              to="/dashboard#products"
+              to="/dashboard/admin#products"
               className={({ isActive }) =>
                 `flex items-center p-2 rounded-lg ${
                   isActive ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50"
@@ -123,7 +123,7 @@ export const AdminSidebar = () => {
           </li>
           <li>
             <NavLink
-              to="/dashboard#settings"
+              to="/dashboard/admin#settings"
               className={({ isActive }) =>
                 `flex items-center p-2 rounded-lg ${
                   isActive ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50"
