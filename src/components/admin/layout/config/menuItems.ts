@@ -17,51 +17,51 @@ export const adminMenuItems: MenuItem[] = [
   { 
     icon: LayoutDashboard,
     label: "Dashboard",
-    path: "/dashboard/admin#overview"
+    path: "/admin/dashboard"
   },
   { 
     icon: Users,
     label: "Benutzer",
-    path: "/dashboard/admin#users"
+    path: "/admin/users"
   },
   { 
     icon: UserPlus,
     label: "Leads",
-    path: "/dashboard/admin#leads"
+    path: "/admin/leads"
   },
   { 
     icon: Shield,
     label: "Rollen",
-    path: "/dashboard/admin#roles"
+    path: "/admin/roles"
   },
   { 
     icon: Bug,
     label: "API Debug",
-    path: "/dashboard/admin#api-debug"
+    path: "/admin/api-debug"
   },
   { 
     icon: Crown,
     label: "Partner",
-    path: "/dashboard/admin#affiliates"
+    path: "/admin/affiliates"
   },
   { 
     icon: UserCog,
     label: "Mitarbeiter",
-    path: "/dashboard/admin#employees"
+    path: "/admin/employees"
   },
   { 
     icon: Megaphone,
     label: "Marketing",
-    path: "/dashboard/admin#marketing"
+    path: "/admin/marketing"
   },
   { 
     icon: Package,
     label: "Produkte",
-    path: "/dashboard/admin#products"
+    path: "/admin/products"
   },
   { 
     icon: Settings,
     label: "Einstellungen",
-    path: "/dashboard/admin#settings"
+    path: "/admin/settings"
   }
 ];
