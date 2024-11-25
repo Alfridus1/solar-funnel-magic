@@ -6,22 +6,20 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-import { TaskTables } from "./tables/task-tables";
-import { Tables } from "./tables";
-
 export interface Database {
   public: {
-    Tables: Tables & TaskTables;
-    Views: {
-      [_ in never]: never;
-    };
-    Functions: {
-      calculate_commission: {
-        Args: {
-          purchase_amount: number;
-          commission_percentage: number;
-        };
-        Returns: number;
+    Tables: {
+      [key: string]: {
+        Row: Record<string, any>;
+        Insert: Record<string, any>;
+        Update: Record<string, any>;
+        Relationships: Array<{
+          foreignKeyName: string;
+          columns: string[];
+          isOneToOne: boolean;
+          referencedRelation: string;
+          referencedColumns: string[];
+        }>;
       };
     };
     Enums: {
@@ -39,9 +37,6 @@ export interface Database {
         | "admin"
         | "sales_team_leader"
         | "sales_director";
-    };
-    CompositeTypes: {
-      [_ in never]: never;
     };
   };
 }

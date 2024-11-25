@@ -57,5 +57,6 @@ export interface ProfileTables {
       simulated_employee_id?: string | null;
       simulated_role?: string | null;
     };
+    Relationships: [];
   };
 }

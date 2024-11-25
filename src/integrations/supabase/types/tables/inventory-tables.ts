@@ -46,31 +46,4 @@ export interface InventoryTables {
       }
     ];
   };
-  warehouses: {
-    Row: {
-      created_at: string | null;
-      id: string;
-      location: string;
-      name: string;
-      type: string;
-      updated_at: string | null;
-    };
-    Insert: {
-      created_at?: string | null;
-      id?: string;
-      location: string;
-      name: string;
-      type: string;
-      updated_at?: string | null;
-    };
-    Update: {
-      created_at?: string | null;
-      id?: string;
-      location?: string;
-      name?: string;
-      type?: string;
-      updated_at?: string | null;
-    };
-    Relationships: [];
-  };
 }

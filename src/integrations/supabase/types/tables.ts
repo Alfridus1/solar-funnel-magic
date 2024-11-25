@@ -1,4 +1,5 @@
 import type { Json } from './base';
+import type { Database } from './base';
 import type { BaseTables } from './tables/base-tables';
 import type { ProductTables } from './tables/product-tables';
 import type { ProfileTables } from './tables/profile-tables';
@@ -205,7 +206,15 @@ export interface Tables extends
       serial_number?: string | null;
       updated_at?: string | null;
     };
-    Relationships: [];
+    Relationships: [
+      {
+        foreignKeyName: "employee_devices_employee_id_fkey";
+        columns: ["employee_id"];
+        isOneToOne: false;
+        referencedRelation: "employees";
+        referencedColumns: ["id"];
+      }
+    ];
   };
   employee_permissions: {
     Row: {
@@ -259,6 +268,9 @@ export interface Tables extends
       team_id: string | null;
       updated_at: string | null;
       vacation_days: number | null;
+      ms_calendar_connected: boolean | null;
+      ms_refresh_token: string | null;
+      ms_calendar_id: string | null;
     };
     Insert: {
       address?: string | null;
@@ -279,6 +291,9 @@ export interface Tables extends
       team_id?: string | null;
       updated_at?: string | null;
       vacation_days?: number | null;
+      ms_calendar_connected?: boolean | null;
+      ms_refresh_token?: string | null;
+      ms_calendar_id?: string | null;
     };
     Update: {
       address?: string | null;
@@ -299,6 +314,9 @@ export interface Tables extends
       team_id?: string | null;
       updated_at?: string | null;
       vacation_days?: number | null;
+      ms_calendar_connected?: boolean | null;
+      ms_refresh_token?: string | null;
+      ms_calendar_id?: string | null;
     };
     Relationships: [
       {
@@ -346,31 +364,31 @@ export interface Tables extends
   };
   inventory: {
     Row: {
-      created_at: string | null;
       id: string;
-      minimum_quantity: number;
+      warehouse_id: string | null;
       product_id: string | null;
       quantity: number;
+      minimum_quantity: number;
+      created_at: string | null;
       updated_at: string | null;
-      warehouse_id: string | null;
     };
     Insert: {
-      created_at?: string | null;
       id?: string;
-      minimum_quantity?: number;
+      warehouse_id?: string | null;
       product_id?: string | null;
       quantity: number;
+      minimum_quantity: number;
+      created_at?: string | null;
       updated_at?: string | null;
-      warehouse_id?: string | null;
     };
     Update: {
-      created_at?: string | null;
       id?: string;
-      minimum_quantity?: number;
+      warehouse_id?: string | null;
       product_id?: string | null;
       quantity?: number;
+      minimum_quantity?: number;
+      created_at?: string | null;
       updated_at?: string | null;
-      warehouse_id?: string | null;
     };
     Relationships: [
       {
@@ -438,9 +456,9 @@ export interface Tables extends
       email: string;
       id?: string;
       metrics?: Json | null;
-      name?: string;
+      name: string;
       notes?: string | null;
-      phone?: string;
+      phone: string;
       source?: string | null;
       status?: string | null;
       type?: string;
@@ -549,7 +567,7 @@ export interface Tables extends
       modified_date?: string;
       opensolar_id?: string;
       project_sold?: boolean | null;
-      stage?: number;
+      stage: number;
       system_details?: Json | null;
       system_id?: string | null;
       title?: string;
@@ -639,7 +657,7 @@ export interface Tables extends
     Update: {
       created_at?: string | null;
       id?: string;
-      name?: string;
+      name: string;
       updated_at?: string | null;
     };
     Relationships: [];
@@ -701,6 +719,9 @@ export interface Tables extends
       role: Database["public"]["Enums"]["user_role"] | null;
       street: string | null;
       updated_at: string | null;
+      permissions: Json | null;
+      simulated_employee_id: string | null;
+      simulated_role: string | null;
     };
     Insert: {
       annual_consumption?: number | null;
@@ -713,9 +734,12 @@ export interface Tables extends
       last_name: string;
       phone: string;
       postal_code?: string | null;
-      role: Database["public"]["Enums"]["user_role"] | null;
+      role?: Database["public"]["Enums"]["user_role"] | null;
       street?: string | null;
       updated_at?: string | null;
+      permissions?: Json | null;
+      simulated_employee_id?: string | null;
+      simulated_role?: string | null;
     };
     Update: {
       annual_consumption?: number | null;
@@ -731,6 +755,9 @@ export interface Tables extends
       role?: Database["public"]["Enums"]["user_role"] | null;
       street?: string | null;
       updated_at?: string | null;
+      permissions?: Json | null;
+      simulated_employee_id?: string | null;
+      simulated_role?: string | null;
     };
     Relationships: [];
   };
@@ -785,7 +812,7 @@ export interface Tables extends
       content: string;
       created_at?: string | null;
       created_by: string;
-      id?: string;
+      id: string;
       project_id: string;
       updated_at?: string | null;
     };
@@ -1209,7 +1236,7 @@ export interface Tables extends
     Update: {
       created_at?: string | null;
       id?: string;
-      name?: string;
+      name: string;
       updated_at?: string | null;
     };
     Relationships: [];
@@ -1345,9 +1372,9 @@ export interface Tables extends
     Update: {
       created_at?: string | null;
       id?: string;
-      location?: string;
-      name?: string;
-      type?: string;
+      location: string;
+      name: string;
+      type: string;
       updated_at?: string | null;
     };
     Relationships: [];
