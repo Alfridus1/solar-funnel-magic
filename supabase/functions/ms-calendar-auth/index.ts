@@ -7,11 +7,21 @@ const redirectUri = Deno.env.get('MICROSOFT_REDIRECT_URI')
 const supabaseUrl = Deno.env.get('SUPABASE_URL')
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
 serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
   if (!clientId || !clientSecret || !redirectUri) {
     return new Response(
       JSON.stringify({ error: 'Microsoft OAuth credentials not configured' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
 
@@ -19,6 +29,7 @@ serve(async (req) => {
   
   try {
     const { code, state } = await req.json()
+    console.log('Received auth code for employee:', state);
     
     // Exchange code for tokens
     const tokenResponse = await fetch('https://login.microsoftonline.com/common/oauth2/v2.0/token', {
@@ -36,6 +47,7 @@ serve(async (req) => {
     })
 
     const tokens = await tokenResponse.json()
+    console.log('Token exchange completed');
 
     if (!tokens.refresh_token) {
       throw new Error('No refresh token received')
@@ -49,6 +61,7 @@ serve(async (req) => {
     })
 
     const calendar = await calendarResponse.json()
+    console.log('Retrieved calendar ID:', calendar.id);
 
     // Update employee record
     const { error: updateError } = await supabase
@@ -60,16 +73,20 @@ serve(async (req) => {
       })
       .eq('id', state)
 
-    if (updateError) throw updateError
+    if (updateError) {
+      console.error('Error updating employee record:', updateError);
+      throw updateError;
+    }
 
     return new Response(
       JSON.stringify({ success: true }),
-      { headers: { 'Content-Type': 'application/json' } }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error) {
+    console.error('Calendar auth error:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
 })
