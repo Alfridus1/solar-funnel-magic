@@ -32,19 +32,17 @@ export function Login() {
           });
 
           // Weiterleitung basierend auf der Benutzerrolle
-          if (profile?.role === 'customer') {
+          if (profile?.role === 'admin') {
+            navigate("/admin");
+          } else if (profile?.role && Object.keys(roleTranslations).includes(profile.role)) {
+            navigate("/employee/dashboard");
+          } else {
+            // Wenn keine Mitarbeiterrolle vorhanden ist, zum Kundendashboard weiterleiten
             if (returnTo && metrics) {
               navigate(returnTo, { state: { metrics, address } });
             } else {
               navigate("/dashboard");
             }
-          } else if (profile?.role === 'admin') {
-            navigate("/admin");
-          } else if (profile?.role && profile.role !== 'customer') {
-            navigate("/employee/dashboard");
-          } else {
-            // Standardmäßig zum Kundendashboard weiterleiten
-            navigate("/dashboard");
           }
         } catch (error: any) {
           console.error('Profile check error:', error);
