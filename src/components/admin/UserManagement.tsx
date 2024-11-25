@@ -6,7 +6,7 @@ import { Profile, AffiliateInfo } from "./types/userManagement";
 import { Employee } from "./types/employee";
 import { UserDetailsDialog } from "./UserDetailsDialog";
 import { EmployeeDialog } from "./components/employee-dialog/EmployeeDialog";
-import { UserTable } from "./components/UserTableRow";
+import { UserTable } from "./components/user-management/UserTable";
 import { UserFilters } from "./components/user-management/UserFilters";
 import { UserActions } from "./components/user-management/UserActions";
 import { useEmployees } from "./hooks/useEmployees";
