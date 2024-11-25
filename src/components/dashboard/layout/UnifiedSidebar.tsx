@@ -38,11 +38,11 @@ export const UnifiedSidebar = () => {
           return;
         }
 
-        // If profile doesn't exist, create it
+        // If profile doesn't exist, create it with upsert to handle potential race conditions
         if (!existingProfile) {
-          const { error: insertError } = await supabase
+          const { error: upsertError } = await supabase
             .from('profiles')
-            .insert([
+            .upsert([
               {
                 id: user.id,
                 email: user.email,
@@ -51,10 +51,12 @@ export const UnifiedSidebar = () => {
                 phone: '',
                 permissions: ['customer_access']
               }
-            ]);
+            ], {
+              onConflict: 'id'
+            });
 
-          if (insertError) {
-            console.error('Profile creation error:', insertError);
+          if (upsertError) {
+            console.error('Profile creation error:', upsertError);
             return;
           }
         }
@@ -87,7 +89,7 @@ export const UnifiedSidebar = () => {
         
         // If user is an employee, add employee permissions
         if (employee) {
-          permissions = [...permissions, 'employee_access'];
+          permissions = [...new Set([...permissions, 'employee_access'])];
         }
 
         setUserPermissions(permissions);
