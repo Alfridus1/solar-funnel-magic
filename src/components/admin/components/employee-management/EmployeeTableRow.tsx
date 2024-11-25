@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { FileEdit, KeyRound, Trash2 } from "lucide-react";
+import { FileEdit, KeyRound, Trash2, LogIn } from "lucide-react";
 import { Employee } from "../../types/employee";
 import { roleTranslations } from "@/utils/roleTranslations";
 
@@ -9,6 +9,7 @@ interface EmployeeTableRowProps {
   onEdit: (employee: Employee) => void;
   onDelete: (id: string) => void;
   onResetPassword: (email: string) => void;
+  onLoginAs: (email: string) => void;
   isResetting: boolean;
 }
 
@@ -17,6 +18,7 @@ export const EmployeeTableRow = ({
   onEdit,
   onDelete,
   onResetPassword,
+  onLoginAs,
   isResetting,
 }: EmployeeTableRowProps) => {
   return (
@@ -43,6 +45,14 @@ export const EmployeeTableRow = ({
             disabled={isResetting || !employee.profiles?.email}
           >
             <KeyRound className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onLoginAs(employee.profiles?.email || '')}
+            disabled={!employee.profiles?.email}
+          >
+            <LogIn className="h-4 w-4" />
           </Button>
           <Button
             variant="destructive"

@@ -114,6 +114,52 @@ export const EmployeeManagement = () => {
     }
   };
 
+  const handleLoginAs = async (email: string) => {
+    if (!email) return;
+
+    try {
+      // First, invoke the reset-employee-password function to set a temporary password
+      const { error: resetError } = await supabase.functions.invoke('reset-employee-password', {
+        body: { email }
+      });
+
+      if (resetError) throw resetError;
+
+      // Add a small delay to ensure the password reset is processed
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Then attempt to sign in with the temporary password
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: 'Coppen2023!' // This matches the password set in the reset-employee-password function
+      });
+
+      if (signInError) {
+        console.error('Sign in error:', signInError);
+        throw signInError;
+      }
+
+      if (!data?.user) {
+        throw new Error('No user data returned after login');
+      }
+
+      toast({
+        title: "Erfolgreich eingeloggt",
+        description: `Sie sind jetzt als ${email} eingeloggt.`,
+      });
+
+      // Redirect to the employee dashboard
+      window.location.href = '/employee';
+    } catch (error: any) {
+      console.error('Login error:', error);
+      toast({
+        title: "Login fehlgeschlagen",
+        description: error.message || "Ein unerwarteter Fehler ist aufgetreten",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -129,6 +175,7 @@ export const EmployeeManagement = () => {
         onEdit={handleEditEmployee}
         onDelete={handleDeleteEmployee}
         onResetPassword={handleResetPassword}
+        onLoginAs={handleLoginAs}
         isResetting={isResetting}
       />
 

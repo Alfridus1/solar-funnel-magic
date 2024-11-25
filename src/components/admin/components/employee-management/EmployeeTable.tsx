@@ -7,6 +7,7 @@ interface EmployeeTableProps {
   onEdit: (employee: Employee) => void;
   onDelete: (id: string) => void;
   onResetPassword: (email: string) => void;
+  onLoginAs: (email: string) => void;
   isResetting: boolean;
 }
 
@@ -15,6 +16,7 @@ export const EmployeeTable = ({
   onEdit,
   onDelete,
   onResetPassword,
+  onLoginAs,
   isResetting,
 }: EmployeeTableProps) => {
   return (
@@ -36,6 +38,7 @@ export const EmployeeTable = ({
             onEdit={onEdit}
             onDelete={onDelete}
             onResetPassword={onResetPassword}
+            onLoginAs={onLoginAs}
             isResetting={isResetting}
           />
         ))}
