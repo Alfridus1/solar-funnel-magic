@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertCircle, ArrowLeftCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { Employee } from "./types/employee";
+import type { Employee, EmployeeRole } from "./types/employee";
 
 export const EmployeeSimulator = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -50,8 +50,13 @@ export const EmployeeSimulator = () => {
         return;
       }
 
-      setEmployees(data || []);
-      setFilteredEmployees(data || []);
+      const typedEmployees = (data as any[]).map(employee => ({
+        ...employee,
+        role: employee.role as EmployeeRole
+      }));
+
+      setEmployees(typedEmployees);
+      setFilteredEmployees(typedEmployees);
     };
 
     loadSimulatedEmployee();

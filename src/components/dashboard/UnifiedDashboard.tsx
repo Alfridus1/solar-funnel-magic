@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { UnifiedSidebar } from "./layout/UnifiedSidebar";
@@ -23,7 +24,6 @@ import { Tasks } from "@/components/employee/Tasks";
 import { Team } from "@/components/employee/Team";
 import { Calendar } from "@/components/employee/Calendar";
 import { TimeTracking } from "@/components/employee/TimeTracking";
-import { useLocation } from "react-router-dom";
 
 export const UnifiedDashboard = () => {
   const location = useLocation();
@@ -37,7 +37,7 @@ export const UnifiedDashboard = () => {
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('role, simulated_role')
+        .select('role, simulated_employee_id')
         .eq('id', user.id)
         .single();
 
@@ -47,12 +47,11 @@ export const UnifiedDashboard = () => {
         .eq('profile_id', user.id);
 
       const employee = employees?.[0];
-      const effectiveRole = profile?.simulated_role || profile?.role;
 
       return {
         isAdmin: profile?.role === 'admin',
         isEmployee: !!employee || profile?.role === 'admin',
-        simulatedRole: profile?.simulated_role,
+        simulatedEmployeeId: profile?.simulated_employee_id,
         actualRole: profile?.role,
         employeeRole: employee?.role
       };
@@ -107,7 +106,7 @@ export const UnifiedDashboard = () => {
         return userRoles?.isAdmin ? <TaskTypeManagement /> : null;
       case "premium":
         return userRoles?.isAdmin ? <PremiumProductsManagement /> : null;
-      case "system-settings":
+      case "settings":
         return userRoles?.isAdmin ? <SystemSettings /> : null;
       case "admins":
         return userRoles?.isAdmin ? <AdminManagement /> : null;
