@@ -6,9 +6,10 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Calendar as CalendarIcon } from "lucide-react";
 
+// These should be environment variables in your .env file
 const MICROSOFT_CLIENT_ID = import.meta.env.VITE_MICROSOFT_CLIENT_ID;
 const MICROSOFT_TENANT_ID = import.meta.env.VITE_MICROSOFT_TENANT_ID;
-const REDIRECT_URI = `${window.location.origin}/employee#calendar`;
+const REDIRECT_URI = `${window.location.origin}/dashboard/employee#calendar`;
 
 export const Calendar = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -24,22 +25,27 @@ export const Calendar = () => {
   const checkCalendarConnection = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        toast({
+          title: "Nicht authentifiziert",
+          description: "Bitte melden Sie sich an.",
+          variant: "destructive",
+        });
+        return;
+      }
 
       const { data: employees, error } = await supabase
         .from('employees')
         .select('ms_calendar_connected')
-        .eq('profile_id', user.id);
+        .eq('profile_id', user.id)
+        .single();
 
       if (error) {
         console.error('Error checking calendar connection:', error);
         return;
       }
 
-      // Check if we have any employee records and if they're connected
-      if (employees && employees.length > 0) {
-        setIsConnected(employees[0].ms_calendar_connected || false);
-      }
+      setIsConnected(employees?.ms_calendar_connected || false);
     } catch (error) {
       console.error('Error checking calendar connection:', error);
     }
@@ -54,23 +60,19 @@ export const Calendar = () => {
     setIsConnecting(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      if (!user) throw new Error('Nicht authentifiziert');
 
       const { data: employees, error: employeeError } = await supabase
         .from('employees')
         .select('id')
-        .eq('profile_id', user.id);
+        .eq('profile_id', user.id)
+        .single();
 
       if (employeeError) throw employeeError;
-
-      if (!employees || employees.length === 0) {
-        throw new Error('Employee record not found');
-      }
-
-      const employeeId = employees[0].id;
+      if (!employees) throw new Error('Mitarbeiter nicht gefunden');
 
       const { error } = await supabase.functions.invoke('ms-calendar-auth', {
-        body: { code, state: employeeId }
+        body: { code, employeeId: employees.id }
       });
 
       if (error) throw error;
@@ -82,7 +84,7 @@ export const Calendar = () => {
       });
 
       // Clean up URL
-      window.history.replaceState({}, document.title, '/employee#calendar');
+      window.history.replaceState({}, document.title, '/dashboard/employee#calendar');
     } catch (error: any) {
       console.error('Error connecting calendar:', error);
       toast({
@@ -96,8 +98,23 @@ export const Calendar = () => {
   };
 
   const connectCalendar = () => {
-    const scope = 'Calendars.ReadWrite offline_access';
-    const authUrl = `https://login.microsoftonline.com/${MICROSOFT_TENANT_ID}/oauth2/v2.0/authorize?client_id=${MICROSOFT_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(scope)}`;
+    if (!MICROSOFT_CLIENT_ID || !MICROSOFT_TENANT_ID) {
+      toast({
+        title: "Konfigurationsfehler",
+        description: "Die Microsoft-Integration ist nicht korrekt konfiguriert.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const scope = encodeURIComponent('Calendars.ReadWrite offline_access');
+    const authUrl = `https://login.microsoftonline.com/${MICROSOFT_TENANT_ID}/oauth2/v2.0/authorize` +
+      `?client_id=${MICROSOFT_CLIENT_ID}` +
+      `&response_type=code` +
+      `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
+      `&scope=${scope}` +
+      `&response_mode=fragment`;
+
     window.location.href = authUrl;
   };
 

@@ -19,6 +19,7 @@ serve(async (req) => {
   }
 
   if (!clientId || !clientSecret || !redirectUri) {
+    console.error('Missing Microsoft OAuth credentials');
     return new Response(
       JSON.stringify({ error: 'Microsoft OAuth credentials not configured' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -28,8 +29,8 @@ serve(async (req) => {
   const supabase = createClient(supabaseUrl!, supabaseServiceKey!)
   
   try {
-    const { code, state } = await req.json()
-    console.log('Received auth code for employee:', state);
+    const { code, employeeId } = await req.json()
+    console.log('Received auth code for employee:', employeeId);
     
     // Exchange code for tokens
     const tokenResponse = await fetch('https://login.microsoftonline.com/common/oauth2/v2.0/token', {
@@ -71,7 +72,7 @@ serve(async (req) => {
         ms_refresh_token: tokens.refresh_token,
         ms_calendar_id: calendar.id
       })
-      .eq('id', state)
+      .eq('id', employeeId)
 
     if (updateError) {
       console.error('Error updating employee record:', updateError);
