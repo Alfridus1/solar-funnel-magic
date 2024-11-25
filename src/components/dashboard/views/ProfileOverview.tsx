@@ -40,65 +40,83 @@ export const ProfileOverview = () => {
   }, []);
 
   const fetchProfile = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single();
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
 
-    if (error) {
+      if (error) {
+        toast({
+          title: "Fehler beim Laden des Profils",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (data) {
+        setProfile(data as Profile);
+        setFormData({
+          first_name: data.first_name || "",
+          last_name: data.last_name || "",
+          email: data.email || "",
+          phone: data.phone || "",
+          street: data.street || "",
+          house_number: data.house_number || "",
+          postal_code: data.postal_code || "",
+          city: data.city || "",
+          annual_consumption: data.annual_consumption?.toString() || "",
+        });
+      }
+    } catch (error: any) {
       toast({
         title: "Fehler beim Laden des Profils",
         description: error.message,
         variant: "destructive",
       });
-      return;
     }
-
-    setProfile(data);
-    setFormData({
-      first_name: data.first_name || "",
-      last_name: data.last_name || "",
-      email: data.email || "",
-      phone: data.phone || "",
-      street: data.street || "",
-      house_number: data.house_number || "",
-      postal_code: data.postal_code || "",
-      city: data.city || "",
-      annual_consumption: data.annual_consumption?.toString() || "",
-    });
   };
 
   const handleSave = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
-    const { error } = await supabase
-      .from('profiles')
-      .update({
-        ...formData,
-        annual_consumption: formData.annual_consumption ? parseInt(formData.annual_consumption) : null,
-      })
-      .eq('id', user.id);
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          ...formData,
+          annual_consumption: formData.annual_consumption ? parseInt(formData.annual_consumption) : null,
+        })
+        .eq('id', user.id);
 
-    if (error) {
+      if (error) {
+        toast({
+          title: "Fehler beim Speichern",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Erfolgreich gespeichert",
+        description: "Ihre Profildaten wurden aktualisiert.",
+      });
+      setIsEditing(false);
+      fetchProfile();
+    } catch (error: any) {
       toast({
         title: "Fehler beim Speichern",
         description: error.message,
         variant: "destructive",
       });
-      return;
     }
-
-    toast({
-      title: "Erfolgreich gespeichert",
-      description: "Ihre Profildaten wurden aktualisiert.",
-    });
-    setIsEditing(false);
-    fetchProfile();
   };
 
   return (
