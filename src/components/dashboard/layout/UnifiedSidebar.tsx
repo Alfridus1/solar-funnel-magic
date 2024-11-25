@@ -13,40 +13,61 @@ export const UnifiedSidebar = () => {
   const location = useLocation();
   const currentTab = location.hash.replace("#", "") || "dashboard";
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [userPermissions, setUserPermissions] = useState<string[]>([]);
+  const [userPermissions, setUserPermissions] = useState<string[]>(['customer_access']);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
     const loadUserPermissions = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        // Get both profile permissions and employee permissions
-        const { data: profile } = await supabase
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          navigate("/");
+          return;
+        }
+
+        // Get profile permissions
+        const { data: profiles, error: profileError } = await supabase
           .from('profiles')
           .select('permissions')
-          .eq('id', user.id)
-          .single();
-        
-        const { data: employee } = await supabase
+          .eq('id', user.id);
+
+        if (profileError) {
+          console.error('Profile fetch error:', profileError);
+          return;
+        }
+
+        // Get employee status
+        const { data: employees, error: employeeError } = await supabase
           .from('employees')
           .select('*')
-          .eq('profile_id', user.id)
-          .single();
+          .eq('profile_id', user.id);
 
-        let permissions = profile?.permissions || [];
+        if (employeeError) {
+          console.error('Employee fetch error:', employeeError);
+          return;
+        }
+
+        let permissions = profiles?.[0]?.permissions || ['customer_access'];
         
         // If user is an employee, add employee permissions
-        if (employee) {
+        if (employees && employees.length > 0) {
           permissions.push('employee_access');
         }
 
         setUserPermissions(permissions);
+      } catch (error) {
+        console.error('Error loading permissions:', error);
+        toast({
+          title: "Fehler beim Laden der Berechtigungen",
+          description: "Bitte versuchen Sie es später erneut",
+          variant: "destructive",
+        });
       }
     };
 
     loadUserPermissions();
-  }, []);
+  }, [navigate, toast]);
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
