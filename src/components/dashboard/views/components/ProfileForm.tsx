@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Save } from "lucide-react";
 import { ProfileFormData } from "../types/Profile";
 import { Form } from "@/components/ui/form";
+import { useState } from "react";
 
 interface ProfileFormProps {
   formData: ProfileFormData;
@@ -12,11 +13,18 @@ interface ProfileFormProps {
 }
 
 export const ProfileForm = ({ formData, setFormData, onSave, isEditing }: ProfileFormProps) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   if (!isEditing) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave();
+    setIsSubmitting(true);
+    try {
+      await onSave();
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -89,9 +97,13 @@ export const ProfileForm = ({ formData, setFormData, onSave, isEditing }: Profil
         </div>
 
         <div className="flex justify-end">
-          <Button type="submit" className="gap-2">
+          <Button 
+            type="submit" 
+            className="gap-2"
+            disabled={isSubmitting}
+          >
             <Save className="h-4 w-4" />
-            Speichern
+            {isSubmitting ? "Wird gespeichert..." : "Speichern"}
           </Button>
         </div>
       </form>

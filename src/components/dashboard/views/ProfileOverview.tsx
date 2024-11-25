@@ -22,6 +22,7 @@ const PageHeader = ({ heading, text }: PageHeaderProps) => (
 export const ProfileOverview = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState<ProfileFormData>({
     first_name: "",
     last_name: "",
@@ -40,73 +41,95 @@ export const ProfileOverview = () => {
   }, []);
 
   const fetchProfile = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    try {
+      setIsLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Fehler",
+          description: "Benutzer nicht eingeloggt",
+          variant: "destructive",
+        });
+        return;
+      }
 
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single();
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
 
-    if (error) {
+      if (error) throw error;
+
+      setProfile(data);
+      if (data) {
+        setFormData({
+          first_name: data.first_name || "",
+          last_name: data.last_name || "",
+          email: data.email || "",
+          phone: data.phone || "",
+          street: data.street || "",
+          house_number: data.house_number || "",
+          postal_code: data.postal_code || "",
+          city: data.city || "",
+          annual_consumption: data.annual_consumption?.toString() || "",
+        });
+      }
+    } catch (error: any) {
       toast({
         title: "Fehler beim Laden des Profils",
         description: error.message,
         variant: "destructive",
       });
-      return;
+    } finally {
+      setIsLoading(false);
     }
-
-    setProfile(data);
-    setFormData({
-      first_name: data.first_name || "",
-      last_name: data.last_name || "",
-      email: data.email || "",
-      phone: data.phone || "",
-      street: data.street || "",
-      house_number: data.house_number || "",
-      postal_code: data.postal_code || "",
-      city: data.city || "",
-      annual_consumption: data.annual_consumption?.toString() || "",
-    });
   };
 
   const handleSave = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Fehler",
+          description: "Benutzer nicht eingeloggt",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          ...formData,
+          annual_consumption: formData.annual_consumption ? parseInt(formData.annual_consumption) : null,
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
       toast({
-        title: "Fehler",
-        description: "Benutzer nicht eingeloggt",
-        variant: "destructive",
+        title: "Erfolgreich gespeichert",
+        description: "Ihre Profildaten wurden aktualisiert.",
       });
-      return;
-    }
-
-    const { error } = await supabase
-      .from('profiles')
-      .update({
-        ...formData,
-        annual_consumption: formData.annual_consumption ? parseInt(formData.annual_consumption) : null,
-      })
-      .eq('id', user.id);
-
-    if (error) {
+      setIsEditing(false);
+      await fetchProfile();
+    } catch (error: any) {
       toast({
         title: "Fehler beim Speichern",
         description: error.message,
         variant: "destructive",
       });
-      return;
     }
-
-    toast({
-      title: "Erfolgreich gespeichert",
-      description: "Ihre Profildaten wurden aktualisiert.",
-    });
-    setIsEditing(false);
-    fetchProfile();
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
