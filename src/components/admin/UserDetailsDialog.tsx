@@ -74,13 +74,13 @@ export const UserDetailsDialog = ({ user, affiliateInfo, onOpenChange }: UserDet
                 <SelectValue placeholder="Rolle auswählen" />
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(roleTranslations).map(([value, label]) => (
+                {Object.entries(roleTranslations).map(([value, label]) => 
                   value && (
                     <SelectItem key={value} value={value}>
                       {label}
                     </SelectItem>
                   )
-                ))}
+                )}
               </SelectContent>
             </Select>
           </div>
