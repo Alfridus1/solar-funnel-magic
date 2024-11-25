@@ -263,6 +263,38 @@ export type Database = {
           },
         ]
       }
+      employee_permissions: {
+        Row: {
+          id: string;
+          employee_id: string | null;
+          permissions: Record<string, boolean>;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          employee_id?: string | null;
+          permissions: Record<string, boolean>;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          employee_id?: string | null;
+          permissions?: Record<string, boolean>;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "employee_permissions_employee_id_fkey";
+            columns: ["employee_id"];
+            isOneToOne: true;
+            referencedRelation: "employees";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       employees: {
         Row: {
           address: string | null
@@ -383,7 +415,7 @@ export type Database = {
           id?: string
           minimum_quantity?: number
           product_id?: string | null
-          quantity?: number
+          quantity: number
           updated_at?: string | null
           warehouse_id?: string | null
         }
@@ -783,7 +815,7 @@ export type Database = {
           id?: string
           notes?: string | null
           project_id?: string | null
-          type?: string
+          type: string
           updated_at?: string | null
         }
         Relationships: [
@@ -818,7 +850,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string
           id?: string
-          project_id?: string
+          project_id: string
           updated_at?: string | null
         }
         Relationships: [
@@ -1108,7 +1140,7 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           id?: string
-          role?: Database["public"]["Enums"]["user_role"]
+          role: Database["public"]["Enums"]["user_role"]
           updated_at?: string | null
         }
         Relationships: []
@@ -1201,9 +1233,9 @@ export type Database = {
           category_id?: string | null
           created_at?: string | null
           id?: string
-          name?: string
+          name: string
           options?: Json | null
-          type?: string
+          type: string
           unit?: string | null
           updated_at?: string | null
         }
@@ -1332,7 +1364,7 @@ export type Database = {
         Insert: {
           conversion_label?: string | null
           created_at?: string | null
-          id?: string
+          id: string
           is_active?: boolean | null
           pixel_id: string
           platform: string
@@ -1343,7 +1375,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           is_active?: boolean | null
-          pixel_id?: string
+          pixel_id: string
           platform?: string
           updated_at?: string | null
         }
@@ -1420,7 +1452,7 @@ export type Tables<
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
         Database[PublicTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
       Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
@@ -1432,10 +1464,10 @@ export type Tables<
         PublicSchema["Views"])
     ? (PublicSchema["Tables"] &
         PublicSchema["Views"])[PublicTableNameOrOptions] extends {
-        Row: infer R
-      }
-      ? R
-      : never
+      Row: infer R
+    }
+    ? R
+    : never
     : never
 
 export type TablesInsert<

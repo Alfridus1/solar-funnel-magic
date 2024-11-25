@@ -65,15 +65,29 @@ export const AccessControlTab = ({ employeeId }: AccessControlTabProps) => {
     try {
       const { data, error } = await supabase
         .from('employee_permissions')
-        .select('permissions')
+        .select('*')
         .eq('employee_id', employeeId)
         .single();
 
       if (error) throw error;
-      setPermissions(data?.permissions || {});
+      
+      if (data) {
+        setPermissions(data.permissions as Record<string, boolean>);
+      } else {
+        // Initialize with default permissions (all false)
+        const defaultPermissions = ACCESS_PERMISSIONS.reduce((acc, { feature }) => ({
+          ...acc,
+          [feature]: false
+        }), {});
+        setPermissions(defaultPermissions);
+      }
     } catch (error) {
       console.error('Error loading permissions:', error);
-      setPermissions({});
+      toast({
+        title: "Fehler beim Laden",
+        description: "Die Berechtigungen konnten nicht geladen werden.",
+        variant: "destructive",
+      });
     }
   };
 
