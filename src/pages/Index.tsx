@@ -11,7 +11,7 @@ import { useGeolocation } from "@/components/RoofCheck/hooks/useGeolocation";
 import { RoofCheck } from "@/components/RoofCheck";
 import { Testimonials } from "@/components/Testimonials";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sun, Shield, Sparkles, Euro } from "lucide-react";
+import { ArrowRight, Sun, Shield, Sparkles, Euro, MapPin } from "lucide-react";
 
 export function Index() {
   const [address, setAddress] = useState("");
@@ -146,16 +146,26 @@ export function Index() {
 
           <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-6 mb-12">
             <div className="flex flex-col md:flex-row gap-4">
-              <input
-                type="text"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="Ihre Adresse eingeben"
-                className="flex-1 px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-solar-orange"
-              />
+              <div className="flex-1 flex gap-2">
+                <input
+                  type="text"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="Ihre Adresse eingeben"
+                  className="flex-1 px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-solar-orange"
+                />
+                <Button
+                  onClick={handleGeolocation}
+                  variant="outline"
+                  className="shrink-0 border-gray-200 hover:bg-gray-50"
+                  title="Standort erkennen"
+                >
+                  <MapPin className="h-5 w-5 text-solar-orange" />
+                </Button>
+              </div>
               <Button 
                 onClick={() => setShowRoofCheck(true)}
-                className="bg-solar-orange hover:bg-solar-orange-dark text-white px-8 py-3 rounded-lg font-semibold"
+                className="bg-solar-orange hover:bg-solar-orange-dark text-white px-8 py-3 rounded-lg font-semibold whitespace-nowrap"
               >
                 Jetzt berechnen
                 <ArrowRight className="ml-2 h-5 w-5" />
