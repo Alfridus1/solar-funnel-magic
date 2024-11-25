@@ -10,7 +10,8 @@ import {
   ChevronLeft,
   ChevronRight,
   UserPlus,
-  UserCog
+  UserCog,
+  ListTodo
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -51,6 +52,12 @@ const menuItems = [
     icon: Package, 
     value: "products",
     path: "/admin#products"
+  },
+  { 
+    label: "Aufgabentypen", 
+    icon: ListTodo, 
+    value: "task-types",
+    path: "/admin#task-types"
   },
   { 
     label: "Premium", 

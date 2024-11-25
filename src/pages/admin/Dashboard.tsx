@@ -1,25 +1,18 @@
-import { useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { AdminLayout } from "@/components/admin/layout/AdminLayout";
 import { Overview } from "@/components/admin/Overview";
 import { LeadManagement } from "@/components/admin/LeadManagement";
 import { UserManagement } from "@/components/admin/UserManagement";
+import { AffiliateManagement } from "@/components/admin/AffiliateManagement";
+import { EmployeeManagement } from "@/components/admin/EmployeeManagement";
 import { ProductManagement } from "@/components/admin/ProductManagement";
 import { PremiumProductsManagement } from "@/components/admin/PremiumProductsManagement";
 import { SystemSettings } from "@/components/admin/SystemSettings";
-import { AffiliateManagement } from "@/components/admin/AffiliateManagement";
-import { EmployeeManagement } from "@/components/admin/EmployeeManagement";
+import { TaskTypeManagement } from "@/components/admin/TaskTypeManagement";
 
-export const AdminDashboard = () => {
+export const Dashboard = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const currentTab = location.hash.replace("#", "") || "overview";
-
-  useEffect(() => {
-    if (!location.hash) {
-      navigate("#overview", { replace: true });
-    }
-  }, [location, navigate]);
 
   const renderContent = () => {
     switch (currentTab) {
@@ -35,6 +28,8 @@ export const AdminDashboard = () => {
         return <EmployeeManagement />;
       case "products":
         return <ProductManagement />;
+      case "task-types":
+        return <TaskTypeManagement />;
       case "premium":
         return <PremiumProductsManagement />;
       case "settings":
