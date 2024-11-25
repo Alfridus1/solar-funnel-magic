@@ -1,6 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Login } from "@/pages/Login";
-import { EmployeeLogin } from "@/pages/EmployeeLogin";
 import { AdminDashboard } from "@/pages/admin/Dashboard";
 import { EmployeeDashboard } from "@/pages/employee/Dashboard";
 import { CustomerDashboard } from "@/components/dashboard/CustomerDashboard";
@@ -44,7 +43,6 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/employee-login" element={<EmployeeLogin />} />
         <Route path="/admin/*" element={<AdminDashboard />} />
         <Route path="/employee/*" element={
           <ProtectedRoute>

@@ -5,7 +5,6 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import { Button } from "@/components/ui/button";
 
 export function Login() {
   const navigate = useNavigate();
@@ -14,18 +13,46 @@ export function Login() {
   const { returnTo, metrics, address } = location.state || {};
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        toast({
-          title: "Erfolgreich angemeldet",
-          description: "Willkommen zurück!",
-        });
-        
-        // Wenn returnTo und metrics vorhanden sind, zur Auswertung navigieren
-        if (returnTo && metrics) {
-          navigate(returnTo, { state: { metrics, address } });
-        } else {
-          navigate("/");
+        try {
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .maybeSingle();
+
+          if (error) {
+            throw error;
+          }
+
+          toast({
+            title: "Erfolgreich angemeldet",
+            description: "Willkommen zurück!",
+          });
+
+          // Weiterleitung basierend auf der Benutzerrolle
+          if (profile?.role === 'customer') {
+            if (returnTo && metrics) {
+              navigate(returnTo, { state: { metrics, address } });
+            } else {
+              navigate("/dashboard");
+            }
+          } else if (profile?.role === 'admin') {
+            navigate("/admin");
+          } else if (profile?.role && profile.role !== 'customer') {
+            navigate("/employee/dashboard");
+          } else {
+            // Standardmäßig zum Kundendashboard weiterleiten
+            navigate("/dashboard");
+          }
+        } catch (error: any) {
+          console.error('Profile check error:', error);
+          toast({
+            title: "Fehler beim Anmelden",
+            description: "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
+            variant: "destructive",
+          });
         }
       }
     });
@@ -38,10 +65,10 @@ export function Login() {
       <Card className="w-full max-w-md p-6 bg-white/95 backdrop-blur shadow-xl">
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Willkommen zurück
+            Willkommen bei Coppen
           </h1>
           <p className="text-gray-600">
-            Melden Sie sich an, um Ihre Solaranlage zu verwalten
+            Melden Sie sich an, um fortzufahren
           </p>
         </div>
         
@@ -98,15 +125,6 @@ export function Login() {
           theme="light"
           view="sign_in"
         />
-
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">Sind Sie Mitarbeiter?</p>
-          <Link to="/employee-login">
-            <Button variant="link" className="mt-2">
-              Zum Mitarbeiter-Login
-            </Button>
-          </Link>
-        </div>
       </Card>
     </div>
   );
