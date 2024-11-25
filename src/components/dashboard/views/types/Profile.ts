@@ -1,3 +1,5 @@
+import type { UserPermission } from '@/types/permissions';
+
 export interface Profile {
   id: string;
   first_name: string;
@@ -13,6 +15,7 @@ export interface Profile {
   simulated_role?: string | null;
   created_at?: string;
   updated_at?: string;
+  permissions?: UserPermission[] | null;
 }
 
 export interface ProfileFormData {
