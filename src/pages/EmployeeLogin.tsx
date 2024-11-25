@@ -47,6 +47,11 @@ export function EmployeeLogin() {
             variant: "destructive",
           });
         }
+      } else if (event === 'SIGNED_OUT') {
+        toast({
+          title: "Abgemeldet",
+          description: "Sie wurden erfolgreich abgemeldet.",
+        });
       }
     });
 
