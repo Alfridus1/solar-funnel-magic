@@ -38,7 +38,6 @@ export const EmployeeDialog = ({
       last_name: "",
       email: "",
       role: "sales_employee",
-      phone: "",
     },
   });
 
@@ -49,7 +48,6 @@ export const EmployeeDialog = ({
         last_name: employee.profiles.last_name,
         email: employee.profiles.email,
         role: employee.role as EmployeeFormData["role"],
-        phone: employee.profiles.phone || "",
       });
     } else {
       form.reset({
@@ -57,7 +55,6 @@ export const EmployeeDialog = ({
         last_name: "",
         email: "",
         role: "sales_employee",
-        phone: "",
       });
     }
   }, [employee, form]);
@@ -94,7 +91,6 @@ export const EmployeeDialog = ({
         first_name: data.first_name,
         last_name: data.last_name,
         email: data.email,
-        phone: data.phone,
         role: data.role,
       })
       .eq('id', employee!.profile_id);
@@ -129,7 +125,6 @@ export const EmployeeDialog = ({
         first_name: data.first_name,
         last_name: data.last_name,
         email: data.email,
-        phone: data.phone,
         role: data.role,
       })
       .select()
