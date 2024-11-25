@@ -82,7 +82,7 @@ export const LoginDialog = ({ open, onOpenChange, metrics, address }: LoginDialo
           console.error('Error during sign in:', error);
           toast({
             title: "Fehler bei der Anmeldung",
-            description: "Bitte versuchen Sie es später erneut.",
+            description: error.message,
             variant: "destructive",
           });
         }
@@ -91,11 +91,33 @@ export const LoginDialog = ({ open, onOpenChange, metrics, address }: LoginDialo
           title: "Erfolgreich abgemeldet",
           description: "Auf Wiedersehen!",
         });
+      } else if (event === 'USER_UPDATED') {
+        // Handle email confirmation
+        toast({
+          title: "E-Mail bestätigt",
+          description: "Ihre E-Mail wurde erfolgreich bestätigt.",
+        });
       }
     });
 
     return () => subscription.unsubscribe();
   }, [navigate, onOpenChange, toast, metrics, address]);
+
+  const handleError = (error: any) => {
+    let errorMessage = "Ein unerwarteter Fehler ist aufgetreten.";
+    
+    if (error.message.includes("Invalid login credentials")) {
+      errorMessage = "Ungültige Anmeldedaten. Bitte überprüfen Sie Ihre E-Mail und Ihr Passwort.";
+    } else if (error.message.includes("Email not confirmed")) {
+      errorMessage = "Bitte bestätigen Sie zuerst Ihre E-Mail-Adresse.";
+    }
+
+    toast({
+      title: "Fehler bei der Anmeldung",
+      description: errorMessage,
+      variant: "destructive",
+    });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -153,6 +175,7 @@ export const LoginDialog = ({ open, onOpenChange, metrics, address }: LoginDialo
           }}
           providers={[]}
           redirectTo={`${window.location.origin}/auth/callback`}
+          onError={handleError}
         />
       </DialogContent>
     </Dialog>
