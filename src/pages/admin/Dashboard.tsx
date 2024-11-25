@@ -9,6 +9,7 @@ import { ProductManagement } from "@/components/admin/ProductManagement";
 import { PremiumProductsManagement } from "@/components/admin/PremiumProductsManagement";
 import { SystemSettings } from "@/components/admin/SystemSettings";
 import { TaskTypeManagement } from "@/components/admin/TaskTypeManagement";
+import { AdminManagement } from "@/components/admin/AdminManagement";
 
 export const AdminDashboard = () => {
   const location = useLocation();
@@ -34,6 +35,8 @@ export const AdminDashboard = () => {
         return <PremiumProductsManagement />;
       case "settings":
         return <SystemSettings />;
+      case "admins":
+        return <AdminManagement />;
       default:
         return <Overview />;
     }
