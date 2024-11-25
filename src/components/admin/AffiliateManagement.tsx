@@ -39,7 +39,7 @@ export const AffiliateManagement = () => {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         toast({
           title: "Fehler beim Laden der Affiliates",
           description: error.message,

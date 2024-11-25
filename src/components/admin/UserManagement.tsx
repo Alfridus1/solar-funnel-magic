@@ -38,15 +38,12 @@ export const UserManagement = () => {
   const handleUserSelect = async (user: Profile) => {
     setSelectedUser(user);
     try {
-      // Fetch affiliate info when user is selected
       const { data: affiliateData, error } = await supabase
         .from('affiliates')
         .select('*')
-        .eq('email', user.email)
-        .single();
+        .eq('email', user.email);
 
       if (error && error.code !== 'PGRST116') {
-        // Only show error if it's not a "no rows returned" error
         toast({
           title: "Fehler beim Laden der Affiliate-Informationen",
           description: error.message,
@@ -54,7 +51,8 @@ export const UserManagement = () => {
         });
       }
 
-      setAffiliateInfo(affiliateData || null);
+      // If we have affiliate data, use the first record, otherwise set to null
+      setAffiliateInfo(affiliateData && affiliateData.length > 0 ? affiliateData[0] : null);
     } catch (error: any) {
       console.error('Error fetching affiliate info:', error);
       setAffiliateInfo(null);
