@@ -1,166 +1,13 @@
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
-import { 
-  LayoutDashboard, 
-  Inbox,
-  LayoutGrid,
-  Award,
-  FileText,
-  Settings,
-  LogOut,
-  ChevronLeft,
-  ChevronRight,
-  User,
-  Users,
-  Package,
-  CheckSquare,
-  Crown,
-  ShieldCheck,
-  Cog,
-  Clock,
-  Calendar
-} from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
-
-interface MenuItem {
-  label: string;
-  icon: any;
-  value: string;
-  requiredPermission: string;
-}
-
-const menuItems: MenuItem[] = [
-  // Customer menu items
-  { 
-    label: "Dashboard", 
-    icon: LayoutDashboard, 
-    value: "dashboard",
-    requiredPermission: "customer_access"
-  },
-  { 
-    label: "Meine Anfragen", 
-    icon: Inbox, 
-    value: "requests",
-    requiredPermission: "customer_access"
-  },
-  { 
-    label: "Meine Projekte", 
-    icon: LayoutGrid, 
-    value: "projects",
-    requiredPermission: "customer_access"
-  },
-  { 
-    label: "Empfehlungsprogramm", 
-    icon: Award, 
-    value: "referral",
-    requiredPermission: "customer_access"
-  },
-  { 
-    label: "Dokumente", 
-    icon: FileText, 
-    value: "documents",
-    requiredPermission: "customer_access"
-  },
-  {
-    label: "Mein Profil",
-    icon: User,
-    value: "profile",
-    requiredPermission: "customer_access"
-  },
-  // Employee menu items
-  { 
-    label: "Aufgaben", 
-    icon: CheckSquare, 
-    value: "tasks",
-    requiredPermission: "employee_access"
-  },
-  { 
-    label: "Kalender", 
-    icon: Calendar, 
-    value: "calendar",
-    requiredPermission: "employee_access"
-  },
-  { 
-    label: "Zeiterfassung", 
-    icon: Clock, 
-    value: "time",
-    requiredPermission: "employee_access"
-  },
-  { 
-    label: "Team", 
-    icon: Users, 
-    value: "team",
-    requiredPermission: "employee_access"
-  },
-  // Admin menu items
-  { 
-    label: "Leads", 
-    icon: FileText, 
-    value: "leads",
-    requiredPermission: "leads_management"
-  },
-  { 
-    label: "Benutzer", 
-    icon: Users, 
-    value: "users",
-    requiredPermission: "customer_management"
-  },
-  { 
-    label: "Partner", 
-    icon: Award, 
-    value: "affiliates",
-    requiredPermission: "admin_access"
-  },
-  { 
-    label: "Mitarbeiter", 
-    icon: Users, 
-    value: "employees",
-    requiredPermission: "employee_management"
-  },
-  { 
-    label: "Produkte", 
-    icon: Package, 
-    value: "products",
-    requiredPermission: "inventory_management"
-  },
-  { 
-    label: "Aufgabentypen", 
-    icon: CheckSquare, 
-    value: "task-types",
-    requiredPermission: "admin_access"
-  },
-  { 
-    label: "Premium Produkte", 
-    icon: Crown, 
-    value: "premium",
-    requiredPermission: "admin_access"
-  },
-  { 
-    label: "Administratoren", 
-    icon: ShieldCheck, 
-    value: "admins",
-    requiredPermission: "admin_access"
-  },
-  { 
-    label: "Einstellungen", 
-    icon: Settings, 
-    value: "settings",
-    requiredPermission: "customer_access"
-  },
-  { 
-    label: "System Einstellungen", 
-    icon: Cog, 
-    value: "system-settings",
-    requiredPermission: "admin_access"
-  },
-];
-
-// Since this file is too long, let's extract the menu rendering logic
-import { renderMenu } from "./components/MenuRenderer";
+import { menuItems } from "./config/menuItems";
+import { SidebarNav } from "./components/SidebarNav";
 
 export const UnifiedSidebar = () => {
   const location = useLocation();
@@ -241,13 +88,13 @@ export const UnifiedSidebar = () => {
         </h2>
       </div>
 
-      {renderMenu({
-        menuItems,
-        userPermissions,
-        currentTab,
-        isCollapsed,
-        handleLogout
-      })}
+      <SidebarNav
+        menuItems={menuItems}
+        userPermissions={userPermissions}
+        currentTab={currentTab}
+        isCollapsed={isCollapsed}
+        handleLogout={handleLogout}
+      />
     </div>
   );
 };
