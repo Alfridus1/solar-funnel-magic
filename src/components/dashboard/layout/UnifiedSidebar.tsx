@@ -1,120 +1,56 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Users, Building2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
-import { menuItems } from "./config/menuItems";
-import { SidebarNav } from "./components/SidebarNav";
-import { UserPermission } from "@/types/permissions";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 export const UnifiedSidebar = () => {
   const location = useLocation();
-  const currentTab = location.hash.replace("#", "") || "dashboard";
+  const currentPath = location.pathname + location.hash;
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [userPermissions, setUserPermissions] = useState<UserPermission[]>(['customer_access']);
+  const [userRoles, setUserRoles] = useState({
+    isAdmin: false,
+    isEmployee: false
+  });
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const loadUserPermissions = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          navigate("/");
-          return;
-        }
-
-        // Get profile permissions and role
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        if (profileError && profileError.code !== 'PGRST116') {
-          console.error('Profile fetch error:', profileError);
-          toast({
-            title: "Fehler beim Laden des Profils",
-            description: "Bitte versuchen Sie es später erneut",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        // If no profile exists, create one
-        if (!profile) {
-          const { error: insertError } = await supabase
-            .from('profiles')
-            .insert({
-              id: user.id,
-              email: user.email,
-              first_name: '',
-              last_name: '',
-              phone: '',
-              permissions: ['customer_access'] as UserPermission[],
-              role: 'customer'
-            });
-
-          if (insertError) {
-            console.error('Profile creation error:', insertError);
-            toast({
-              title: "Fehler beim Erstellen des Profils",
-              description: "Bitte versuchen Sie es später erneut",
-              variant: "destructive",
-            });
-            return;
-          }
-
-          setUserPermissions(['customer_access']);
-          return;
-        }
-
-        // Get employee status if exists
-        const { data: employee } = await supabase
-          .from('employees')
-          .select('role')
-          .eq('profile_id', user.id)
-          .maybeSingle();
-
-        // Set permissions based on role and employee status
-        let permissions = profile?.permissions || ['customer_access'];
-        
-        // If user is an admin, add all admin permissions
-        if (profile?.role === 'admin') {
-          permissions = [
-            'customer_access',
-            'employee_access',
-            'admin_access',
-            'leads_management',
-            'customer_management',
-            'project_management',
-            'inventory_management',
-            'financial_access',
-            'employee_management',
-            'reporting'
-          ] as UserPermission[];
-        }
-        // If user is an employee, add employee permissions
-        else if (employee) {
-          permissions = [...new Set([...permissions, 'employee_access'])] as UserPermission[];
-        }
-
-        setUserPermissions(permissions);
-      } catch (error) {
-        console.error('Error loading permissions:', error);
-        toast({
-          title: "Fehler beim Laden der Berechtigungen",
-          description: "Bitte versuchen Sie es später erneut",
-          variant: "destructive",
-        });
+    const loadUserRoles = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate("/");
+        return;
       }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+      const { data: employee } = await supabase
+        .from('employees')
+        .select('role')
+        .eq('profile_id', user.id)
+        .single();
+
+      setUserRoles({
+        isAdmin: profile?.role === 'admin',
+        isEmployee: !!employee || profile?.role === 'admin' // Admin is also an employee
+      });
     };
 
-    loadUserPermissions();
-  }, [navigate, toast]);
+    loadUserRoles();
+  }, [navigate]);
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -131,7 +67,7 @@ export const UnifiedSidebar = () => {
 
   return (
     <div className={cn(
-      "relative bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300",
+      "relative bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 h-screen",
       isCollapsed ? "w-20" : "w-64"
     )}>
       <Button
@@ -156,13 +92,74 @@ export const UnifiedSidebar = () => {
         </h2>
       </div>
 
-      <SidebarNav
-        menuItems={menuItems}
-        userPermissions={userPermissions}
-        currentTab={currentTab}
-        isCollapsed={isCollapsed}
-        handleLogout={handleLogout}
-      />
+      <div className="space-y-2 px-3">
+        {/* Kundenbereich */}
+        <Collapsible>
+          <CollapsibleTrigger className="flex items-center w-full px-3 py-2 text-left">
+            <Building2 className="h-5 w-5 mr-3" />
+            {!isCollapsed && <span>Kundenbereich</span>}
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="ml-8 space-y-1">
+              <Button variant="ghost" className="w-full justify-start">
+                Übersicht
+              </Button>
+              <Button variant="ghost" className="w-full justify-start">
+                Meine Projekte
+              </Button>
+              <Button variant="ghost" className="w-full justify-start">
+                Dokumente
+              </Button>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+
+        {/* Mitarbeiterbereich */}
+        {userRoles.isEmployee && (
+          <Collapsible>
+            <CollapsibleTrigger className="flex items-center w-full px-3 py-2 text-left">
+              <Users className="h-5 w-5 mr-3" />
+              {!isCollapsed && <span>Mitarbeiterbereich</span>}
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="ml-8 space-y-1">
+                <Button variant="ghost" className="w-full justify-start">
+                  Aufgaben
+                </Button>
+                <Button variant="ghost" className="w-full justify-start">
+                  Kalender
+                </Button>
+                <Button variant="ghost" className="w-full justify-start">
+                  Team
+                </Button>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        )}
+
+        {/* Administrationsbereich */}
+        {userRoles.isAdmin && (
+          <Collapsible>
+            <CollapsibleTrigger className="flex items-center w-full px-3 py-2 text-left">
+              <ShieldCheck className="h-5 w-5 mr-3" />
+              {!isCollapsed && <span>Administration</span>}
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="ml-8 space-y-1">
+                <Button variant="ghost" className="w-full justify-start">
+                  Benutzer
+                </Button>
+                <Button variant="ghost" className="w-full justify-start">
+                  Einstellungen
+                </Button>
+                <Button variant="ghost" className="w-full justify-start">
+                  Statistiken
+                </Button>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        )}
+      </div>
     </div>
   );
 };
