@@ -32,8 +32,7 @@ export const EmployeeManagement = () => {
             role,
             phone
           )
-        `)
-        .eq('profiles.role', 'employee');
+        `);
 
       if (error) {
         toast({
