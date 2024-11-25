@@ -19,16 +19,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Database } from "@/integrations/supabase/types";
 
-interface Task {
-  id: string;
-  title: string;
-  description: string | null;
-  document_url: string | null;
-  document_name: string | null;
-  status: string;
-  created_at: string;
-}
+type Task = Database["public"]["Tables"]["tasks"]["Row"];
 
 export const Tasks = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -112,7 +105,7 @@ export const Tasks = () => {
                 )}
               </TableCell>
               <TableCell>
-                {new Date(task.created_at).toLocaleDateString()}
+                {new Date(task.created_at || "").toLocaleDateString()}
               </TableCell>
             </TableRow>
           ))}
