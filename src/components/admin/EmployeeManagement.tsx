@@ -24,7 +24,7 @@ export const EmployeeManagement = () => {
         .from('employees')
         .select(`
           *,
-          profiles (
+          profiles:profile_id (
             first_name,
             last_name,
             email,
