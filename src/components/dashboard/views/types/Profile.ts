@@ -10,6 +10,7 @@ export interface Profile {
   city?: string | null;
   annual_consumption?: number | null;
   role?: string;
+  simulated_role?: string | null;
   created_at?: string;
   updated_at?: string;
 }

@@ -816,6 +816,7 @@ export type Database = {
           postal_code: string | null
           role: Database["public"]["Enums"]["user_role"] | null
           simulated_employee_id: string | null
+          simulated_role: string | null
           street: string | null
           updated_at: string | null
         }
@@ -833,6 +834,7 @@ export type Database = {
           postal_code?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
           simulated_employee_id?: string | null
+          simulated_role?: string | null
           street?: string | null
           updated_at?: string | null
         }
@@ -850,6 +852,7 @@ export type Database = {
           postal_code?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
           simulated_employee_id?: string | null
+          simulated_role?: string | null
           street?: string | null
           updated_at?: string | null
         }

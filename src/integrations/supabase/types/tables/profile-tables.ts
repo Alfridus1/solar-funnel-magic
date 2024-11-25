@@ -16,6 +16,7 @@ export interface ProfileTables {
       postal_code: string | null;
       city: string | null;
       annual_consumption: number | null;
+      simulated_role: string | null;
     };
     Insert: {
       id?: string;
@@ -31,6 +32,7 @@ export interface ProfileTables {
       postal_code?: string | null;
       city?: string | null;
       annual_consumption?: number | null;
+      simulated_role?: string | null;
     };
     Update: {
       id?: string;
@@ -46,6 +48,7 @@ export interface ProfileTables {
       postal_code?: string | null;
       city?: string | null;
       annual_consumption?: number | null;
+      simulated_role?: string | null;
     };
   };
 }
