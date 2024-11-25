@@ -17,11 +17,13 @@ export const UnifiedDashboard = () => {
         .eq('id', user.id)
         .single();
 
-      const { data: employee } = await supabase
+      // Changed to handle no employee record case
+      const { data: employees } = await supabase
         .from('employees')
         .select('role')
-        .eq('profile_id', user.id)
-        .single();
+        .eq('profile_id', user.id);
+
+      const employee = employees?.[0]; // Get first employee if exists
 
       return {
         isAdmin: profile?.role === 'admin',
