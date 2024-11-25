@@ -4,6 +4,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { motion } from "framer-motion";
 
 interface AccessPermission {
   feature: string;
@@ -74,7 +75,6 @@ export const AccessControlTab = ({ employeeId }: AccessControlTabProps) => {
       if (data) {
         setPermissions(data.permissions as Record<string, boolean>);
       } else {
-        // Initialize with default permissions (all false)
         const defaultPermissions = ACCESS_PERMISSIONS.reduce((acc, { feature }) => ({
           ...acc,
           [feature]: false
@@ -128,33 +128,47 @@ export const AccessControlTab = ({ employeeId }: AccessControlTabProps) => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Zugriffsberechtigungen</h3>
-        <Button 
-          onClick={savePermissions} 
-          disabled={isSaving}
-        >
-          {isSaving ? "Wird gespeichert..." : "Änderungen speichern"}
-        </Button>
-      </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Card className="p-6 bg-white/50 backdrop-blur-sm">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-lg font-semibold text-gray-900">Zugriffsberechtigungen</h3>
+          <Button 
+            onClick={savePermissions} 
+            disabled={isSaving}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            {isSaving ? "Wird gespeichert..." : "Änderungen speichern"}
+          </Button>
+        </div>
 
-      <div className="grid gap-4">
-        {ACCESS_PERMISSIONS.map((permission) => (
-          <Card key={permission.feature} className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <h4 className="font-medium">{permission.label}</h4>
-                <p className="text-sm text-gray-500">{permission.description}</p>
-              </div>
-              <Switch
-                checked={permissions[permission.feature] || false}
-                onCheckedChange={(checked) => handlePermissionChange(permission.feature, checked)}
-              />
-            </div>
-          </Card>
-        ))}
-      </div>
-    </div>
+        <div className="grid gap-4">
+          {ACCESS_PERMISSIONS.map((permission) => (
+            <motion.div
+              key={permission.feature}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Card className="p-4 bg-white">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <h4 className="font-medium text-gray-900">{permission.label}</h4>
+                    <p className="text-sm text-gray-500">{permission.description}</p>
+                  </div>
+                  <Switch
+                    checked={permissions[permission.feature] || false}
+                    onCheckedChange={(checked) => handlePermissionChange(permission.feature, checked)}
+                  />
+                </div>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+      </Card>
+    </motion.div>
   );
 };

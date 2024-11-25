@@ -152,17 +152,36 @@ export const EmployeeDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[800px]">
+      <DialogContent className="sm:max-w-[800px] bg-white/95 backdrop-blur-lg border border-gray-200/50 shadow-xl">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-gray-900">
             {employee ? "Mitarbeiter bearbeiten" : "Neuer Mitarbeiter"}
           </DialogTitle>
         </DialogHeader>
         <Tabs defaultValue="basic" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="basic">Basisdaten</TabsTrigger>
-            {employee && <TabsTrigger value="contract">Vertrag</TabsTrigger>}
-            {employee && <TabsTrigger value="access">Berechtigungen</TabsTrigger>}
+          <TabsList className="grid w-full grid-cols-3 bg-gray-100/50 p-1 rounded-lg">
+            <TabsTrigger 
+              value="basic"
+              className="data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            >
+              Basisdaten
+            </TabsTrigger>
+            {employee && (
+              <TabsTrigger 
+                value="contract"
+                className="data-[state=active]:bg-white data-[state=active]:shadow-sm"
+              >
+                Vertrag
+              </TabsTrigger>
+            )}
+            {employee && (
+              <TabsTrigger 
+                value="access"
+                className="data-[state=active]:bg-white data-[state=active]:shadow-sm"
+              >
+                Berechtigungen
+              </TabsTrigger>
+            )}
           </TabsList>
           
           <TabsContent value="basic">
