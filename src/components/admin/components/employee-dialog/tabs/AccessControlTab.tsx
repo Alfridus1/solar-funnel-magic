@@ -66,16 +66,16 @@ export const AccessControlTab = ({ employeeId }: AccessControlTabProps) => {
     try {
       const { data, error } = await supabase
         .from('employee_permissions')
-        .select('*')
+        .select('permissions')
         .eq('employee_id', employeeId)
         .maybeSingle();
 
       if (error && error.code !== 'PGRST116') {
         throw error;
       }
-      
+
       if (data) {
-        setPermissions(data.permissions as Record<string, boolean>);
+        setPermissions(data.permissions);
       } else {
         // Set default permissions if none exist
         const defaultPermissions = ACCESS_PERMISSIONS.reduce((acc, { feature }) => ({
@@ -84,7 +84,7 @@ export const AccessControlTab = ({ employeeId }: AccessControlTabProps) => {
         }), {});
         setPermissions(defaultPermissions);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading permissions:', error);
       toast({
         title: "Fehler beim Laden",
@@ -118,7 +118,7 @@ export const AccessControlTab = ({ employeeId }: AccessControlTabProps) => {
         title: "Berechtigungen gespeichert",
         description: "Die Zugriffsberechtigungen wurden erfolgreich aktualisiert.",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving permissions:', error);
       toast({
         title: "Fehler beim Speichern",
