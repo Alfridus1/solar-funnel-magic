@@ -34,8 +34,14 @@ export const UnifiedSidebar = () => {
           .eq('id', user.id)
           .maybeSingle();
 
+        // Only handle non-PGRST116 errors (PGRST116 means no rows found which we handle below)
         if (profileError && profileError.code !== 'PGRST116') {
           console.error('Profile fetch error:', profileError);
+          toast({
+            title: "Fehler beim Laden des Profils",
+            description: "Bitte versuchen Sie es später erneut",
+            variant: "destructive",
+          });
           return;
         }
 
@@ -48,6 +54,11 @@ export const UnifiedSidebar = () => {
 
         if (employeeError && employeeError.code !== 'PGRST116') {
           console.error('Employee fetch error:', employeeError);
+          toast({
+            title: "Fehler beim Laden der Mitarbeiterdaten",
+            description: "Bitte versuchen Sie es später erneut",
+            variant: "destructive",
+          });
           return;
         }
 
@@ -74,8 +85,13 @@ export const UnifiedSidebar = () => {
             });
             return;
           }
+
+          // Set default permissions for new profile
+          setUserPermissions(['customer_access']);
+          return;
         }
 
+        // Set permissions based on role and employee status
         let permissions = profile?.permissions || ['customer_access'];
         
         // If user is an admin, add all admin permissions
