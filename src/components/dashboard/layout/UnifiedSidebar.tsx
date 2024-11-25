@@ -39,27 +39,45 @@ export const UnifiedSidebar = () => {
           return;
         }
 
-        // If profile doesn't exist, create it with upsert
+        // If profile doesn't exist, try to find if email is already used
         if (!existingProfile) {
-          const { error: upsertError } = await supabase
+          const { data: emailCheck } = await supabase
             .from('profiles')
-            .upsert([
-              {
-                id: user.id,
-                email: user.email,
-                first_name: '',
-                last_name: '',
-                phone: '',
-                permissions: ['customer_access'] as UserPermission[],
-                role: 'customer'
-              }
-            ], {
-              onConflict: 'id'
-            });
+            .select('id')
+            .eq('email', user.email)
+            .maybeSingle();
 
-          if (upsertError) {
-            console.error('Profile creation error:', upsertError);
-            return;
+          if (emailCheck) {
+            // If email exists, update the existing profile with the new user id
+            const { error: updateError } = await supabase
+              .from('profiles')
+              .update({ id: user.id })
+              .eq('email', user.email);
+
+            if (updateError) {
+              console.error('Profile update error:', updateError);
+              return;
+            }
+          } else {
+            // If email doesn't exist, create new profile
+            const { error: insertError } = await supabase
+              .from('profiles')
+              .insert([
+                {
+                  id: user.id,
+                  email: user.email,
+                  first_name: '',
+                  last_name: '',
+                  phone: '',
+                  permissions: ['customer_access'] as UserPermission[],
+                  role: 'customer'
+                }
+              ]);
+
+            if (insertError) {
+              console.error('Profile creation error:', insertError);
+              return;
+            }
           }
         }
 
