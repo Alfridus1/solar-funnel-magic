@@ -1,4 +1,7 @@
-export type Tables = {
+import type { Json } from './base';
+import type { Database } from './base';
+
+export interface Tables {
   tasks: {
     Row: {
       id: string;
@@ -1457,3 +1460,4 @@ export type Tables = {
         Relationships: []
       }
 };
+}
