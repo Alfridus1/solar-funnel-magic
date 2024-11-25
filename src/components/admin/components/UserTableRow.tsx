@@ -1,7 +1,7 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Profile } from "../types/userManagement";
-import { Trash2, FileSearch, LogIn } from "lucide-react";
+import { Trash2, FileSearch } from "lucide-react";
 
 interface UserTableRowProps {
   user: Profile;
