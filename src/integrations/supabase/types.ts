@@ -1276,6 +1276,53 @@ export type Database = {
         }
         Relationships: []
       }
+      tasks: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          document_name: string | null
+          document_url: string | null
+          due_date: string | null
+          id: string
+          status: string | null
+          title: string
+          type_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          document_name?: string | null
+          document_url?: string | null
+          due_date?: string | null
+          id?: string
+          status?: string | null
+          title: string
+          type_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          document_name?: string | null
+          document_url?: string | null
+          due_date?: string | null
+          id?: string
+          status?: string | null
+          title?: string
+          type_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_type_id_fkey"
+            columns: ["type_id"]
+            isOneToOne: false
+            referencedRelation: "task_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       teams: {
         Row: {
           created_at: string | null
