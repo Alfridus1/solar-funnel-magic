@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { Badge } from "@/components/ui/badge";
+import { roleTranslations } from "@/utils/roleTranslations";
 
 export function Debug() {
   const [session, setSession] = useState<any>(null);
@@ -35,7 +37,7 @@ export function Debug() {
 
   const fetchUserData = async (userId: string) => {
     try {
-      // Fetch profile data
+      // Fetch profile data with permissions
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
@@ -48,7 +50,12 @@ export function Debug() {
       // Fetch employee data if it exists
       const { data: employeeData, error: employeeError } = await supabase
         .from('employees')
-        .select('*')
+        .select(`
+          *,
+          employee_permissions (
+            permissions
+          )
+        `)
         .eq('profile_id', userId)
         .single();
 
@@ -68,6 +75,14 @@ export function Debug() {
     await supabase.auth.signOut();
   };
 
+  const renderPermissionsBadges = (permissions: string[]) => {
+    return permissions?.map((permission: string) => (
+      <Badge key={permission} variant="secondary" className="mr-2 mb-2">
+        {permission}
+      </Badge>
+    ));
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-4xl mx-auto space-y-8">
@@ -79,6 +94,7 @@ export function Debug() {
             <p><strong>Angemeldet:</strong> {session ? "Ja" : "Nein"}</p>
             <p><strong>User ID:</strong> {session?.user?.id || "Nicht angemeldet"}</p>
             <p><strong>Email:</strong> {session?.user?.email || "Nicht angemeldet"}</p>
+            <p><strong>Auth Provider:</strong> {session?.user?.app_metadata?.provider || "Nicht verfügbar"}</p>
             {session && (
               <Button variant="destructive" onClick={handleSignOut}>
                 Abmelden
@@ -90,13 +106,40 @@ export function Debug() {
         {profile && (
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">Profil Informationen</h2>
-            <div className="space-y-2">
-              <p><strong>Rolle:</strong> {profile.role || "Keine Rolle"}</p>
-              <p><strong>Name:</strong> {profile.first_name} {profile.last_name}</p>
-              <p><strong>Berechtigungen:</strong> {profile.permissions?.join(", ") || "Keine Berechtigungen"}</p>
-              <pre className="bg-gray-100 p-4 rounded-md mt-4 overflow-auto">
-                {JSON.stringify(profile, null, 2)}
-              </pre>
+            <div className="space-y-4">
+              <div>
+                <p className="font-medium text-gray-700">Rolle</p>
+                <Badge variant="outline" className="mt-1">
+                  {roleTranslations[profile.role] || profile.role || "Keine Rolle"}
+                </Badge>
+              </div>
+              
+              <div>
+                <p className="font-medium text-gray-700">Berechtigungen</p>
+                <div className="mt-1">
+                  {renderPermissionsBadges(profile.permissions)}
+                </div>
+              </div>
+
+              <div>
+                <p className="font-medium text-gray-700">Persönliche Daten</p>
+                <div className="grid grid-cols-2 gap-2 mt-1">
+                  <p><strong>Name:</strong> {profile.first_name} {profile.last_name}</p>
+                  <p><strong>Email:</strong> {profile.email}</p>
+                  <p><strong>Telefon:</strong> {profile.phone || "Nicht angegeben"}</p>
+                  <p><strong>Jahresverbrauch:</strong> {profile.annual_consumption || "Nicht angegeben"} kWh</p>
+                </div>
+              </div>
+
+              <div>
+                <p className="font-medium text-gray-700">Adresse</p>
+                <div className="grid grid-cols-2 gap-2 mt-1">
+                  <p><strong>Straße:</strong> {profile.street || "Nicht angegeben"}</p>
+                  <p><strong>Hausnummer:</strong> {profile.house_number || "Nicht angegeben"}</p>
+                  <p><strong>PLZ:</strong> {profile.postal_code || "Nicht angegeben"}</p>
+                  <p><strong>Stadt:</strong> {profile.city || "Nicht angegeben"}</p>
+                </div>
+              </div>
             </div>
           </Card>
         )}
@@ -104,12 +147,34 @@ export function Debug() {
         {employee && (
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">Mitarbeiter Informationen</h2>
-            <div className="space-y-2">
-              <p><strong>Rolle:</strong> {employee.role}</p>
-              <p><strong>Team ID:</strong> {employee.team_id || "Kein Team"}</p>
-              <pre className="bg-gray-100 p-4 rounded-md mt-4 overflow-auto">
-                {JSON.stringify(employee, null, 2)}
-              </pre>
+            <div className="space-y-4">
+              <div>
+                <p className="font-medium text-gray-700">Position</p>
+                <Badge variant="outline" className="mt-1">
+                  {roleTranslations[employee.role] || employee.role}
+                </Badge>
+              </div>
+
+              <div>
+                <p className="font-medium text-gray-700">Zusätzliche Berechtigungen</p>
+                <div className="mt-1">
+                  {employee.employee_permissions?.[0]?.permissions && 
+                    renderPermissionsBadges(Object.keys(employee.employee_permissions[0].permissions))}
+                </div>
+              </div>
+
+              <div>
+                <p className="font-medium text-gray-700">Mitarbeiter Details</p>
+                <div className="grid grid-cols-2 gap-2 mt-1">
+                  <p><strong>Mitarbeiter ID:</strong> {employee.id}</p>
+                  <p><strong>Team ID:</strong> {employee.team_id || "Kein Team"}</p>
+                  <p><strong>Standort:</strong> {employee.location || "Nicht angegeben"}</p>
+                  <p><strong>Provision aktiviert:</strong> {employee.commission_enabled ? "Ja" : "Nein"}</p>
+                  <p><strong>Urlaubstage:</strong> {employee.vacation_days || 0}</p>
+                  <p><strong>Arbeitsstunden/Monat:</strong> {employee.hours_per_month || 0}</p>
+                  <p><strong>Firmenwagen:</strong> {employee.has_company_car ? "Ja" : "Nein"}</p>
+                </div>
+              </div>
             </div>
           </Card>
         )}
