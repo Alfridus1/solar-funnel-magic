@@ -7,7 +7,6 @@ import { AffiliateLanding } from "@/pages/AffiliateLanding";
 import { ProductShowcase } from "@/components/solar-showcase/ProductShowcase";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { UserManagement } from "@/components/admin/UserManagement";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
