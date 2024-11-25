@@ -218,6 +218,33 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_roles: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          permissions: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          permissions?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          permissions?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       customers: {
         Row: {
           city: string
@@ -573,6 +600,47 @@ export type Database = {
           {
             foreignKeyName: "leads_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      news: {
+        Row: {
+          author_id: string | null
+          content: string
+          created_at: string | null
+          id: string
+          published_at: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          author_id?: string | null
+          content: string
+          created_at?: string | null
+          id?: string
+          published_at?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          author_id?: string | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          published_at?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "news_author_id_fkey"
+            columns: ["author_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
