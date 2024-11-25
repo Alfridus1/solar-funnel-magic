@@ -815,6 +815,7 @@ export type Database = {
           phone: string
           postal_code: string | null
           role: Database["public"]["Enums"]["user_role"] | null
+          simulated_role: string | null
           street: string | null
           updated_at: string | null
         }
@@ -831,6 +832,7 @@ export type Database = {
           phone: string
           postal_code?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
+          simulated_role?: string | null
           street?: string | null
           updated_at?: string | null
         }
@@ -847,6 +849,7 @@ export type Database = {
           phone?: string
           postal_code?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
+          simulated_role?: string | null
           street?: string | null
           updated_at?: string | null
         }
@@ -1555,6 +1558,13 @@ export type Database = {
           commission_percentage: number
         }
         Returns: number
+      }
+      set_simulated_role: {
+        Args: {
+          user_id: string
+          new_role: string
+        }
+        Returns: undefined
       }
     }
     Enums: {
