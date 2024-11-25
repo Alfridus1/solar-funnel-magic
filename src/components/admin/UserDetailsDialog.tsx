@@ -20,43 +20,22 @@ export const UserDetailsDialog = ({ user, affiliateInfo, onOpenChange }: UserDet
 
   const handleLogin = async () => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      // Generate a magic link for the user
+      const { error } = await supabase.auth.signInWithOtp({
         email: user?.email || '',
-        password: 'password123', // Temporary password for testing
       });
 
       if (error) {
         throw error;
       }
 
-      if (!data.user) {
-        throw new Error('No user data returned after login');
-      }
-
-      // Get the user's profile to determine their role
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', data.user.id)
-        .maybeSingle();
-
-      if (profileError && profileError.code !== 'PGRST116') {
-        throw profileError;
-      }
-
       setImpersonatedUser(user?.email || null);
 
       toast({
-        title: "Erfolgreich eingeloggt",
-        description: `Sie sind jetzt als ${user?.email} eingeloggt.`,
+        title: "Magic Link gesendet",
+        description: `Ein Login-Link wurde an ${user?.email} gesendet.`,
       });
 
-      // Redirect based on user role
-      if (profileData?.role === 'customer') {
-        window.location.href = '/dashboard';
-      } else {
-        window.location.href = '/employee/dashboard';
-      }
     } catch (error: any) {
       console.error('Login error:', error);
       toast({
