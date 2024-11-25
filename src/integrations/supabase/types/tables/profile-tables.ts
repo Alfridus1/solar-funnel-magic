@@ -16,6 +16,8 @@ export interface ProfileTables {
       postal_code: string | null;
       city: string | null;
       annual_consumption: number | null;
+      permissions: Database["public"]["Enums"]["user_permission"][] | null;
+      simulated_employee_id: string | null;
       simulated_role: string | null;
     };
     Insert: {
@@ -32,6 +34,8 @@ export interface ProfileTables {
       postal_code?: string | null;
       city?: string | null;
       annual_consumption?: number | null;
+      permissions?: Database["public"]["Enums"]["user_permission"][] | null;
+      simulated_employee_id?: string | null;
       simulated_role?: string | null;
     };
     Update: {
@@ -48,6 +52,8 @@ export interface ProfileTables {
       postal_code?: string | null;
       city?: string | null;
       annual_consumption?: number | null;
+      permissions?: Database["public"]["Enums"]["user_permission"][] | null;
+      simulated_employee_id?: string | null;
       simulated_role?: string | null;
     };
   };
