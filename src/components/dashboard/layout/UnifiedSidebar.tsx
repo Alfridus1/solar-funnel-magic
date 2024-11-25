@@ -27,60 +27,6 @@ export const UnifiedSidebar = () => {
           return;
         }
 
-        // First check if profile exists
-        const { data: existingProfile, error: checkError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        if (checkError) {
-          console.error('Profile check error:', checkError);
-          return;
-        }
-
-        // If profile doesn't exist, try to find if email is already used
-        if (!existingProfile) {
-          const { data: emailCheck } = await supabase
-            .from('profiles')
-            .select('id')
-            .eq('email', user.email)
-            .maybeSingle();
-
-          if (emailCheck) {
-            // If email exists, update the existing profile with the new user id
-            const { error: updateError } = await supabase
-              .from('profiles')
-              .update({ id: user.id })
-              .eq('email', user.email);
-
-            if (updateError) {
-              console.error('Profile update error:', updateError);
-              return;
-            }
-          } else {
-            // If email doesn't exist, create new profile
-            const { error: insertError } = await supabase
-              .from('profiles')
-              .insert([
-                {
-                  id: user.id,
-                  email: user.email,
-                  first_name: '',
-                  last_name: '',
-                  phone: '',
-                  permissions: ['customer_access'] as UserPermission[],
-                  role: 'customer'
-                }
-              ]);
-
-            if (insertError) {
-              console.error('Profile creation error:', insertError);
-              return;
-            }
-          }
-        }
-
         // Get profile permissions and role
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
@@ -88,7 +34,7 @@ export const UnifiedSidebar = () => {
           .eq('id', user.id)
           .maybeSingle();
 
-        if (profileError) {
+        if (profileError && profileError.code !== 'PGRST116') {
           console.error('Profile fetch error:', profileError);
           return;
         }
@@ -103,6 +49,31 @@ export const UnifiedSidebar = () => {
         if (employeeError && employeeError.code !== 'PGRST116') {
           console.error('Employee fetch error:', employeeError);
           return;
+        }
+
+        // If no profile exists, create one
+        if (!profile) {
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert({
+              id: user.id,
+              email: user.email,
+              first_name: '',
+              last_name: '',
+              phone: '',
+              permissions: ['customer_access'] as UserPermission[],
+              role: 'customer'
+            });
+
+          if (insertError) {
+            console.error('Profile creation error:', insertError);
+            toast({
+              title: "Fehler beim Erstellen des Profils",
+              description: "Bitte versuchen Sie es später erneut",
+              variant: "destructive",
+            });
+            return;
+          }
         }
 
         let permissions = profile?.permissions || ['customer_access'];
