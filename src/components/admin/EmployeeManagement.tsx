@@ -37,9 +37,7 @@ export const EmployeeManagement = () => {
         throw error;
       }
 
-      if (data) {
-        setEmployees(data);
-      }
+      setEmployees(data || []);
     } catch (error: any) {
       toast({
         title: "Fehler beim Laden der Mitarbeiter",
@@ -113,20 +111,17 @@ export const EmployeeManagement = () => {
     if (!email) return;
 
     try {
-      // First, invoke the reset-employee-password function to set a temporary password
       const { error: resetError } = await supabase.functions.invoke('reset-employee-password', {
         body: { email }
       });
 
       if (resetError) throw resetError;
 
-      // Add a small delay to ensure the password reset is processed
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Then attempt to sign in with the temporary password
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email: email,
-        password: 'Coppen2023!' // This matches the password set in the reset-employee-password function
+        password: 'Coppen2023!'
       });
 
       if (signInError) {
@@ -143,7 +138,6 @@ export const EmployeeManagement = () => {
         description: `Sie sind jetzt als ${email} eingeloggt.`,
       });
 
-      // Redirect to the employee dashboard
       window.location.href = '/employee';
     } catch (error: any) {
       console.error('Login error:', error);
