@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { User, Phone, Mail, Home, Zap } from "lucide-react";
+import { User, Phone, Mail, Home, Zap, Pencil } from "lucide-react";
 import { Profile, ProfileFormData } from "./types/Profile";
 import { ProfileForm } from "./components/ProfileForm";
 
@@ -14,8 +14,8 @@ interface PageHeaderProps {
 
 const PageHeader = ({ heading, text }: PageHeaderProps) => (
   <div className="flex flex-col gap-2">
-    <h1 className="text-3xl font-bold">{heading}</h1>
-    {text && <p className="text-gray-600">{text}</p>}
+    <h1 className="text-3xl font-bold tracking-tight">{heading}</h1>
+    {text && <p className="text-muted-foreground">{text}</p>}
   </div>
 );
 
@@ -109,36 +109,64 @@ export const ProfileOverview = () => {
       />
 
       <Card className="p-6">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-8">
           <h3 className="text-lg font-semibold">Persönliche Informationen</h3>
           <Button
             variant={isEditing ? "outline" : "default"}
             onClick={() => setIsEditing(!isEditing)}
+            className="gap-2"
           >
+            <Pencil className="h-4 w-4" />
             {isEditing ? "Abbrechen" : "Bearbeiten"}
           </Button>
         </div>
 
-        <div className="grid gap-6">
-          <div className="flex items-center gap-2 text-gray-600">
-            <User className="h-4 w-4" />
-            <span>Name</span>
+        <div className="grid gap-8">
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <User className="h-4 w-4" />
+                <span className="text-sm font-medium">Name</span>
+              </div>
+              <p className="text-lg">
+                {formData.first_name} {formData.last_name}
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Mail className="h-4 w-4" />
+                <span className="text-sm font-medium">E-Mail</span>
+              </div>
+              <p className="text-lg">{formData.email}</p>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Phone className="h-4 w-4" />
+                <span className="text-sm font-medium">Telefon</span>
+              </div>
+              <p className="text-lg">{formData.phone || "-"}</p>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Zap className="h-4 w-4" />
+                <span className="text-sm font-medium">Jährlicher Stromverbrauch</span>
+              </div>
+              <p className="text-lg">{formData.annual_consumption ? `${formData.annual_consumption} kWh` : "-"}</p>
+            </div>
           </div>
-          <div className="flex items-center gap-2 text-gray-600">
-            <Mail className="h-4 w-4" />
-            <span>E-Mail</span>
-          </div>
-          <div className="flex items-center gap-2 text-gray-600">
-            <Phone className="h-4 w-4" />
-            <span>Telefon</span>
-          </div>
-          <div className="flex items-center gap-2 text-gray-600">
-            <Zap className="h-4 w-4" />
-            <span>Jährlicher Stromverbrauch (kWh)</span>
-          </div>
-          <div className="flex items-center gap-2 text-gray-600">
-            <Home className="h-4 w-4" />
-            <span>Adresse</span>
+
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Home className="h-4 w-4" />
+              <span className="text-sm font-medium">Adresse</span>
+            </div>
+            <p className="text-lg">
+              {formData.street} {formData.house_number}<br />
+              {formData.postal_code} {formData.city}
+            </p>
           </div>
         </div>
 
