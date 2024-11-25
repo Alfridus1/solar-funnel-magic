@@ -67,7 +67,7 @@ export const UserDetailsDialog = ({ user, affiliateInfo, onOpenChange }: UserDet
           <div className="grid gap-2">
             <Label>Rolle</Label>
             <Select
-              value={user.role || undefined}
+              value={user.role || "customer"}
               onValueChange={handleRoleChange}
             >
               <SelectTrigger>
@@ -75,9 +75,11 @@ export const UserDetailsDialog = ({ user, affiliateInfo, onOpenChange }: UserDet
               </SelectTrigger>
               <SelectContent>
                 {Object.entries(roleTranslations).map(([value, label]) => (
-                  <SelectItem key={value} value={value as UserRole}>
-                    {label}
-                  </SelectItem>
+                  value && (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  )
                 ))}
               </SelectContent>
             </Select>
