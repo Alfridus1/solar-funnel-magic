@@ -14,14 +14,15 @@ export function EmployeeLogin() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
         try {
-          // Überprüfen, ob der Benutzer ein Mitarbeiter ist
           const { data: profile, error } = await supabase
             .from('profiles')
             .select('role')
             .eq('id', session.user.id)
             .maybeSingle();
 
-          if (error) throw error;
+          if (error) {
+            throw error;
+          }
 
           if (profile?.role && profile.role !== 'customer') {
             toast({
@@ -30,7 +31,6 @@ export function EmployeeLogin() {
             });
             navigate("/admin");
           } else {
-            // Wenn kein Mitarbeiter oder kein Profil gefunden, ausloggen und Fehlermeldung anzeigen
             await supabase.auth.signOut();
             toast({
               title: "Zugriff verweigert",
@@ -51,6 +51,12 @@ export function EmployeeLogin() {
         toast({
           title: "Abgemeldet",
           description: "Sie wurden erfolgreich abgemeldet.",
+        });
+      } else if (event === 'USER_DELETED') {
+        toast({
+          title: "Fehler",
+          description: "Benutzer nicht gefunden.",
+          variant: "destructive",
         });
       }
     });
