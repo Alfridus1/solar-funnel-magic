@@ -18,19 +18,79 @@ export const LoginDialog = ({ open, onOpenChange, metrics, address }: LoginDialo
   const navigate = useNavigate();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        toast({
-          title: "Erfolgreich angemeldet",
-          description: "Willkommen zurück!",
-        });
-        onOpenChange(false);
-        
-        if (metrics) {
-          navigate("/solar-showcase", { state: { metrics, address } });
-        } else {
-          navigate("/");
+        try {
+          // First check if profile exists
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+
+          if (profileError && profileError.code !== 'PGRST116') {
+            throw profileError;
+          }
+
+          if (!profile) {
+            // Check if email is already used
+            const { data: emailProfile } = await supabase
+              .from('profiles')
+              .select('id')
+              .eq('email', session.user.email)
+              .maybeSingle();
+
+            if (emailProfile) {
+              // Update existing profile with new user id
+              const { error: updateError } = await supabase
+                .from('profiles')
+                .update({ id: session.user.id })
+                .eq('id', emailProfile.id);
+
+              if (updateError) throw updateError;
+            } else {
+              // Create new profile
+              const { error: insertError } = await supabase
+                .from('profiles')
+                .insert({
+                  id: session.user.id,
+                  email: session.user.email,
+                  first_name: '',
+                  last_name: '',
+                  phone: '',
+                  permissions: ['customer_access'],
+                  role: 'customer'
+                });
+
+              if (insertError) throw insertError;
+            }
+          }
+
+          toast({
+            title: "Erfolgreich angemeldet",
+            description: "Willkommen zurück!",
+          });
+          
+          onOpenChange(false);
+          
+          if (metrics) {
+            navigate("/solar-showcase", { state: { metrics, address } });
+          } else {
+            navigate("/");
+          }
+        } catch (error: any) {
+          console.error('Error during sign in:', error);
+          toast({
+            title: "Fehler bei der Anmeldung",
+            description: "Bitte versuchen Sie es später erneut.",
+            variant: "destructive",
+          });
         }
+      } else if (event === 'SIGNED_OUT') {
+        toast({
+          title: "Erfolgreich abgemeldet",
+          description: "Auf Wiedersehen!",
+        });
       }
     });
 
