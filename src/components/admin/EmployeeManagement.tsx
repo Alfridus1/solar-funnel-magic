@@ -23,13 +23,26 @@ export const EmployeeManagement = () => {
       const { data, error } = await supabase
         .from('employees')
         .select(`
-          *,
+          id,
+          first_name,
+          last_name,
+          email,
+          role,
+          team_id,
+          profile_id,
+          address,
+          location,
+          iban,
+          base_salary,
+          commission_enabled,
+          vacation_days,
+          hours_per_month,
+          has_company_car,
           profiles:profile_id (
             first_name,
             last_name,
             email,
-            role,
-            phone
+            role
           )
         `);
 
