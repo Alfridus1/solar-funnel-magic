@@ -30,7 +30,8 @@ export const UnifiedSidebar = () => {
         const { data: profiles, error: profileError } = await supabase
           .from('profiles')
           .select('permissions')
-          .eq('id', user.id);
+          .eq('id', user.id)
+          .maybeSingle();
 
         if (profileError) {
           console.error('Profile fetch error:', profileError);
@@ -41,18 +42,19 @@ export const UnifiedSidebar = () => {
         const { data: employees, error: employeeError } = await supabase
           .from('employees')
           .select('*')
-          .eq('profile_id', user.id);
+          .eq('profile_id', user.id)
+          .maybeSingle();
 
         if (employeeError) {
           console.error('Employee fetch error:', employeeError);
           return;
         }
 
-        let permissions = profiles?.[0]?.permissions || ['customer_access'];
+        let permissions = profiles?.permissions || ['customer_access'];
         
         // If user is an employee, add employee permissions
-        if (employees && employees.length > 0) {
-          permissions.push('employee_access');
+        if (employees) {
+          permissions = [...permissions, 'employee_access'];
         }
 
         setUserPermissions(permissions);
