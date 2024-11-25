@@ -26,14 +26,19 @@ export const Calendar = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data: employee } = await supabase
+      const { data: employees, error } = await supabase
         .from('employees')
         .select('ms_calendar_connected')
-        .eq('profile_id', user.id)
-        .single();
+        .eq('profile_id', user.id);
 
-      if (employee) {
-        setIsConnected(employee.ms_calendar_connected);
+      if (error) {
+        console.error('Error checking calendar connection:', error);
+        return;
+      }
+
+      // Check if we have any employee records and if they're connected
+      if (employees && employees.length > 0) {
+        setIsConnected(employees[0].ms_calendar_connected || false);
       }
     } catch (error) {
       console.error('Error checking calendar connection:', error);
@@ -51,16 +56,21 @@ export const Calendar = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { data: employee } = await supabase
+      const { data: employees, error: employeeError } = await supabase
         .from('employees')
         .select('id')
-        .eq('profile_id', user.id)
-        .single();
+        .eq('profile_id', user.id);
 
-      if (!employee) throw new Error('Employee not found');
+      if (employeeError) throw employeeError;
+
+      if (!employees || employees.length === 0) {
+        throw new Error('Employee record not found');
+      }
+
+      const employeeId = employees[0].id;
 
       const { error } = await supabase.functions.invoke('ms-calendar-auth', {
-        body: { code, state: employee.id }
+        body: { code, state: employeeId }
       });
 
       if (error) throw error;
