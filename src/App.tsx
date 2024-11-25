@@ -1,107 +1,60 @@
-import { useEffect, useState } from 'react';
-import { Routes, Route, Navigate, Outlet, useNavigate } from 'react-router-dom';
-import { Toaster } from "@/components/ui/toaster";
-import { supabase } from "@/integrations/supabase/client";
-import { Login } from "@/pages/Login";
-import { EmployeeLogin } from "@/pages/EmployeeLogin";
-import { Index } from "@/pages/Index";
-import { AdminLayout } from "@/components/admin/layout/AdminLayout";
-import { EmployeeLayout } from "@/components/employee/layout/EmployeeLayout";
-import { UnifiedLayout } from "@/components/dashboard/layout/UnifiedLayout";
-import { Debug } from "@/pages/Debug";
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { AdminLayout } from "./components/admin/layout/AdminLayout";
+import { Overview } from "./components/admin/Overview";
+import { UserManagement } from "./components/admin/UserManagement";
+import { LeadManagement } from "./components/admin/LeadManagement";
+import { RoleManagement } from "./components/admin/RoleManagement";
+import { APIDebugger } from "./components/admin/APIDebugger";
+import { AffiliateManagement } from "./components/admin/AffiliateManagement";
+import { EmployeeManagement } from "./components/admin/EmployeeManagement";
+import { ProductManagement } from "./components/admin/ProductManagement";
+import { SystemSettings } from "./components/admin/SystemSettings";
+import { NewsManagement } from "./components/admin/marketing/NewsManagement";
+import { EmployeeLayout } from "./components/employee/layout/EmployeeLayout";
+import { Overview as EmployeeOverview } from "./components/employee/Overview";
+import { Tasks } from "./components/employee/Tasks";
+import { Team } from "./components/employee/Team";
+import { Calendar } from "./components/employee/Calendar";
+import { TimeTracking } from "./components/employee/TimeTracking";
+import { Settings } from "./components/employee/Settings";
+import { Toaster } from "./components/ui/toaster";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 function App() {
-  useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT') {
-        // Handle sign out
-        console.log('User signed out');
-      } else if (event === 'SIGNED_IN') {
-        // Handle sign in
-        console.log('User signed in:', session?.user?.id);
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
   return (
-    <>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/employee-login" element={<EmployeeLogin />} />
-        <Route path="/debug" element={<Debug />} />
-        
-        <Route path="/admin/*" element={
-          <ProtectedRoute>
-            <AdminLayout>
-              <Outlet />
-            </AdminLayout>
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/employee/*" element={
-          <ProtectedRoute>
-            <EmployeeLayout>
-              <Outlet />
-            </EmployeeLayout>
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/dashboard/*" element={
-          <ProtectedRoute>
-            <UnifiedLayout>
-              <Outlet />
-            </UnifiedLayout>
-          </ProtectedRoute>
-        } />
-      </Routes>
-      <Toaster />
-    </>
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+
+          <Route path="/admin" element={<AdminLayout><Outlet /></AdminLayout>}>
+            <Route path="dashboard" element={<Overview />} />
+            <Route path="users" element={<UserManagement />} />
+            <Route path="leads" element={<LeadManagement />} />
+            <Route path="roles" element={<RoleManagement />} />
+            <Route path="api-debug" element={<APIDebugger />} />
+            <Route path="affiliates" element={<AffiliateManagement />} />
+            <Route path="employees" element={<EmployeeManagement />} />
+            <Route path="marketing" element={<NewsManagement />} />
+            <Route path="products" element={<ProductManagement />} />
+            <Route path="settings" element={<SystemSettings />} />
+          </Route>
+
+          <Route path="/employee" element={<EmployeeLayout><Outlet /></EmployeeLayout>}>
+            <Route index element={<EmployeeOverview />} />
+            <Route path="tasks" element={<Tasks />} />
+            <Route path="team" element={<Team />} />
+            <Route path="calendar" element={<Calendar />} />
+            <Route path="time" element={<TimeTracking />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
+        </Routes>
+        <Toaster />
+      </Router>
+    </QueryClientProvider>
   );
-}
-
-// Protected Route component
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        setIsAuthenticated(!!session);
-      } catch (error) {
-        console.error('Error checking auth status:', error);
-        setIsAuthenticated(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkAuth();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return <>{children}</>;
 }
 
 export default App;
