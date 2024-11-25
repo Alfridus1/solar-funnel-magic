@@ -1,12 +1,10 @@
 import { useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import { CustomerDashboard } from "./CustomerDashboard";
 import { EmployeeDashboard } from "./EmployeeDashboard";
 import { AdminDashboard } from "./AdminDashboard";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
-import { UserPermission } from "@/types/permissions";
 
 export const UnifiedDashboard = () => {
   const { data: userRoles, isLoading } = useQuery({
@@ -38,7 +36,7 @@ export const UnifiedDashboard = () => {
         return {
           isAdmin: false,
           isEmployee: false,
-          permissions: ['customer_access'] as UserPermission[]
+          permissions: ['customer_access']
         };
       }
     }
