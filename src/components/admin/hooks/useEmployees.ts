@@ -13,31 +13,28 @@ export const useEmployees = () => {
         .from('employees')
         .select(`
           *,
-          profiles:profile_id (
+          profiles (
             first_name,
             last_name,
             email,
-            role,
-            phone
+            phone,
+            role
           )
         `);
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       if (!data) {
         setEmployees([]);
         return;
       }
 
-      // Transform and validate the data to match the Employee type
       const transformedData: Employee[] = data.map(employee => ({
         id: employee.id,
-        first_name: employee.first_name,
-        last_name: employee.last_name,
-        email: employee.email,
-        role: employee.role as Employee['role'],
+        first_name: employee.profiles?.first_name || '',
+        last_name: employee.profiles?.last_name || '',
+        email: employee.profiles?.email || '',
+        role: employee.role,
         team_id: employee.team_id,
         profile_id: employee.profile_id,
         address: employee.address,
@@ -51,11 +48,11 @@ export const useEmployees = () => {
         created_at: employee.created_at,
         updated_at: employee.updated_at,
         profiles: employee.profiles ? {
-          first_name: employee.profiles.first_name || '',
-          last_name: employee.profiles.last_name || '',
-          email: employee.profiles.email || '',
-          role: employee.profiles.role || '',
-          phone: employee.profiles.phone || ''
+          first_name: employee.profiles.first_name,
+          last_name: employee.profiles.last_name,
+          email: employee.profiles.email,
+          role: employee.profiles.role,
+          phone: employee.profiles.phone
         } : undefined
       }));
 
