@@ -1,79 +1,56 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { UnifiedLayout } from "./layout/UnifiedLayout";
-import { DashboardOverview } from "./views/DashboardOverview";
-import { RequestsOverview } from "./views/RequestsOverview";
-import { ProjectsOverview } from "./views/ProjectsOverview";
-import { ReferralOverview } from "./views/ReferralOverview";
-import { DocumentsOverview } from "./views/DocumentsOverview";
-import { SettingsOverview } from "./views/SettingsOverview";
-import { ProfileOverview } from "./views/ProfileOverview";
-import { LeadManagement } from "@/components/admin/LeadManagement";
-import { UserManagement } from "@/components/admin/UserManagement";
-import { AffiliateManagement } from "@/components/admin/AffiliateManagement";
-import { EmployeeManagement } from "@/components/admin/EmployeeManagement";
-import { ProductManagement } from "@/components/admin/ProductManagement";
-import { PremiumProductsManagement } from "@/components/admin/PremiumProductsManagement";
-import { SystemSettings } from "@/components/admin/SystemSettings";
-import { TaskTypeManagement } from "@/components/admin/TaskTypeManagement";
-import { AdminManagement } from "@/components/admin/AdminManagement";
+import { CustomerDashboard } from "./CustomerDashboard";
+import { EmployeeDashboard } from "./EmployeeDashboard";
+import { AdminDashboard } from "./AdminDashboard";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from "lucide-react";
 
 export const UnifiedDashboard = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const currentTab = location.hash.replace("#", "") || "dashboard";
+  const { data: userRole, isLoading } = useQuery({
+    queryKey: ['user-role'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
 
-  useEffect(() => {
-    if (!location.hash) {
-      navigate("#dashboard", { replace: true });
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        const { data: employee } = await supabase
+          .from('employees')
+          .select('role')
+          .eq('profile_id', user.id)
+          .maybeSingle();
+
+        if (profile?.role === 'admin') return 'admin';
+        if (employee?.role) return 'employee';
+        return 'customer';
+      } catch (error) {
+        console.error('Error fetching user role:', error);
+        return 'customer';
+      }
     }
-  }, [location, navigate]);
+  });
 
-  const renderContent = () => {
-    switch (currentTab) {
-      // Customer views
-      case "dashboard":
-        return <DashboardOverview />;
-      case "requests":
-        return <RequestsOverview />;
-      case "projects":
-        return <ProjectsOverview />;
-      case "referral":
-        return <ReferralOverview />;
-      case "documents":
-        return <DocumentsOverview />;
-      case "profile":
-        return <ProfileOverview />;
-      case "settings":
-        return <SettingsOverview />;
-      
-      // Admin/Employee views
-      case "leads":
-        return <LeadManagement />;
-      case "users":
-        return <UserManagement />;
-      case "affiliates":
-        return <AffiliateManagement />;
-      case "employees":
-        return <EmployeeManagement />;
-      case "products":
-        return <ProductManagement />;
-      case "task-types":
-        return <TaskTypeManagement />;
-      case "premium":
-        return <PremiumProductsManagement />;
-      case "system-settings":
-        return <SystemSettings />;
-      case "admins":
-        return <AdminManagement />;
-      default:
-        return <DashboardOverview />;
-    }
-  };
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
-  return (
-    <UnifiedLayout>
-      {renderContent()}
-    </UnifiedLayout>
-  );
+  switch (userRole) {
+    case 'admin':
+      return <AdminDashboard />;
+    case 'employee':
+      return <EmployeeDashboard />;
+    default:
+      return <CustomerDashboard />;
+  }
 };
