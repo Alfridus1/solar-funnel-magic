@@ -5,6 +5,9 @@ import { Profile, AffiliateInfo } from "./types/userManagement";
 import { roleTranslations } from "@/utils/roleTranslations";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { Database } from "@/integrations/supabase/types";
+
+type UserRole = Database["public"]["Enums"]["user_role"];
 
 interface UserDetailsDialogProps {
   user: Profile | null;
@@ -15,7 +18,7 @@ interface UserDetailsDialogProps {
 export const UserDetailsDialog = ({ user, affiliateInfo, onOpenChange }: UserDetailsDialogProps) => {
   const { toast } = useToast();
 
-  const handleRoleChange = async (newRole: string) => {
+  const handleRoleChange = async (newRole: UserRole) => {
     if (!user) return;
 
     const { error } = await supabase
