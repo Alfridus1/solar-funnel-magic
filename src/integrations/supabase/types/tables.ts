@@ -1,6 +1,11 @@
-import { TaskTables } from "./tables/task-tables";
+import type { Json } from './base';
+import type { Database } from './base';
+import type { BaseTables } from './tables/base-tables';
+import type { ProductTables } from './tables/product-tables';
+import type { ProfileTables } from './tables/profile-tables';
+import type { TaskTables } from './tables/task-tables';
 
-export interface Tables extends TaskTables {
+export interface Tables extends BaseTables, ProductTables, ProfileTables, TaskTables {
   affiliates: {
     Row: {
       created_at: string | null
@@ -434,7 +439,7 @@ export interface Tables extends TaskTables {
       metrics?: Json | null
       name?: string
       notes?: string | null
-      phone?: string
+      phone: string
       source?: string | null
       status?: string | null
       type?: string
@@ -1340,7 +1345,7 @@ export interface Tables extends TaskTables {
       created_at?: string | null
       id?: string
       location?: string
-      name?: string
+      name: string
       type: string
       updated_at?: string | null
     }

@@ -33,45 +33,4 @@ export interface ProductTables {
       datasheet_url?: string | null;
     };
   };
-  premium_products: {
-    Row: {
-      id: string;
-      name: string;
-      description: string;
-      image_url: string;
-      features: string[];
-      climate_impact: string;
-      order_number: number;
-      created_at: string | null;
-      updated_at: string | null;
-      purchase_options: Json | null;
-      inclusion_type: string;
-    };
-    Insert: {
-      id?: string;
-      name: string;
-      description: string;
-      image_url: string;
-      features?: string[];
-      climate_impact: string;
-      order_number: number;
-      created_at?: string | null;
-      updated_at?: string | null;
-      purchase_options?: Json | null;
-      inclusion_type?: string;
-    };
-    Update: {
-      id?: string;
-      name?: string;
-      description?: string;
-      image_url?: string;
-      features?: string[];
-      climate_impact?: string;
-      order_number?: number;
-      created_at?: string | null;
-      updated_at?: string | null;
-      purchase_options?: Json | null;
-      inclusion_type?: string;
-    };
-  };
 }

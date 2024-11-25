@@ -2,42 +2,36 @@ import type { Json } from '../base';
 import type { Database } from '../base';
 
 export interface BaseTables {
-  tasks: {
+  employee_permissions: {
     Row: {
       id: string;
-      title: string;
-      description: string | null;
-      type_id: string | null;
-      document_url: string | null;
-      document_name: string | null;
-      status: string | null;
-      due_date: string | null;
+      employee_id: string | null;
+      permissions: Json;
       created_at: string | null;
       updated_at: string | null;
     };
     Insert: {
       id?: string;
-      title: string;
-      description?: string | null;
-      type_id?: string | null;
-      document_url?: string | null;
-      document_name?: string | null;
-      status?: string | null;
-      due_date?: string | null;
+      employee_id?: string | null;
+      permissions?: Json;
       created_at?: string | null;
       updated_at?: string | null;
     };
     Update: {
       id?: string;
-      title?: string;
-      description?: string | null;
-      type_id?: string | null;
-      document_url?: string | null;
-      document_name?: string | null;
-      status?: string | null;
-      due_date?: string | null;
+      employee_id?: string | null;
+      permissions?: Json;
       created_at?: string | null;
       updated_at?: string | null;
     };
+    Relationships: [
+      {
+        foreignKeyName: "employee_permissions_employee_id_fkey";
+        columns: ["employee_id"];
+        isOneToOne: true;
+        referencedRelation: "employees";
+        referencedColumns: ["id"];
+      }
+    ];
   };
 }
