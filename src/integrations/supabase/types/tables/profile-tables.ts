@@ -1,4 +1,5 @@
 import type { Database } from '../base';
+import type { UserPermission } from '@/types/permissions';
 
 export interface ProfileTables {
   profiles: {
@@ -16,7 +17,7 @@ export interface ProfileTables {
       postal_code: string | null;
       city: string | null;
       annual_consumption: number | null;
-      permissions: Database["public"]["Enums"]["user_permission"][] | null;
+      permissions: UserPermission[] | null;
       simulated_employee_id: string | null;
       simulated_role: string | null;
     };
@@ -34,7 +35,7 @@ export interface ProfileTables {
       postal_code?: string | null;
       city?: string | null;
       annual_consumption?: number | null;
-      permissions?: Database["public"]["Enums"]["user_permission"][] | null;
+      permissions?: UserPermission[] | null;
       simulated_employee_id?: string | null;
       simulated_role?: string | null;
     };
@@ -52,7 +53,7 @@ export interface ProfileTables {
       postal_code?: string | null;
       city?: string | null;
       annual_consumption?: number | null;
-      permissions?: Database["public"]["Enums"]["user_permission"][] | null;
+      permissions?: UserPermission[] | null;
       simulated_employee_id?: string | null;
       simulated_role?: string | null;
     };

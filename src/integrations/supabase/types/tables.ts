@@ -1,5 +1,4 @@
 import type { Json } from './base';
-import type { Database } from './base';
 import type { BaseTables } from './tables/base-tables';
 import type { ProductTables } from './tables/product-tables';
 import type { ProfileTables } from './tables/profile-tables';
@@ -104,7 +103,7 @@ export interface Tables extends BaseTables, ProductTables, ProfileTables, TaskTa
       company_name?: string
       created_at?: string | null
       default_commission_percentage?: number | null
-      id?: string
+      id: string
       letterhead_url?: string | null
       tax_number?: string | null
       updated_at?: string | null
@@ -306,7 +305,7 @@ export interface Tables extends BaseTables, ProductTables, ProfileTables, TaskTa
         isOneToOne: false
         referencedRelation: "profiles"
         referencedColumns: ["id"]
-      },
+      }
       {
         foreignKeyName: "employees_team_id_fkey"
         columns: ["team_id"]
@@ -378,7 +377,7 @@ export interface Tables extends BaseTables, ProductTables, ProfileTables, TaskTa
         isOneToOne: false
         referencedRelation: "solar_products"
         referencedColumns: ["id"]
-      },
+      }
       {
         foreignKeyName: "inventory_warehouse_id_fkey"
         columns: ["warehouse_id"]
@@ -453,7 +452,7 @@ export interface Tables extends BaseTables, ProductTables, ProfileTables, TaskTa
         isOneToOne: false
         referencedRelation: "affiliates"
         referencedColumns: ["id"]
-      },
+      }
       {
         foreignKeyName: "leads_user_id_fkey"
         columns: ["user_id"]
@@ -675,7 +674,7 @@ export interface Tables extends BaseTables, ProductTables, ProfileTables, TaskTa
         isOneToOne: false
         referencedRelation: "solar_products"
         referencedColumns: ["id"]
-      },
+      }
       {
         foreignKeyName: "product_specifications_template_id_fkey"
         columns: ["template_id"]
@@ -793,7 +792,7 @@ export interface Tables extends BaseTables, ProductTables, ProfileTables, TaskTa
       created_at?: string | null
       created_by?: string
       id?: string
-      project_id?: string
+      project_id: string
       updated_at?: string | null
     }
     Relationships: [
@@ -877,7 +876,7 @@ export interface Tables extends BaseTables, ProductTables, ProfileTables, TaskTa
         isOneToOne: false
         referencedRelation: "customers"
         referencedColumns: ["id"]
-      },
+      }
       {
         foreignKeyName: "projects_team_id_fkey"
         columns: ["team_id"]
@@ -922,7 +921,7 @@ export interface Tables extends BaseTables, ProductTables, ProfileTables, TaskTa
         isOneToOne: false
         referencedRelation: "solar_products"
         referencedColumns: ["id"]
-      },
+      }
       {
         foreignKeyName: "purchase_order_items_purchase_order_id_fkey"
         columns: ["purchase_order_id"]
@@ -1003,7 +1002,7 @@ export interface Tables extends BaseTables, ProductTables, ProfileTables, TaskTa
         isOneToOne: false
         referencedRelation: "solar_products"
         referencedColumns: ["id"]
-      },
+      }
       {
         foreignKeyName: "quote_items_quote_id_fkey"
         columns: ["quote_id"]
@@ -1054,7 +1053,7 @@ export interface Tables extends BaseTables, ProductTables, ProfileTables, TaskTa
         isOneToOne: false
         referencedRelation: "customers"
         referencedColumns: ["id"]
-      },
+      }
       {
         foreignKeyName: "quotes_project_id_fkey"
         columns: ["project_id"]
@@ -1208,7 +1207,7 @@ export interface Tables extends BaseTables, ProductTables, ProfileTables, TaskTa
     Update: {
       created_at?: string | null
       id?: string
-      name?: string
+      name: string
       updated_at?: string | null
     }
     Relationships: []
@@ -1284,7 +1283,7 @@ export interface Tables extends BaseTables, ProductTables, ProfileTables, TaskTa
         isOneToOne: false
         referencedRelation: "projects"
         referencedColumns: ["id"]
-      },
+      }
       {
         foreignKeyName: "time_tracking_team_id_fkey"
         columns: ["team_id"]
@@ -1345,8 +1344,8 @@ export interface Tables extends BaseTables, ProductTables, ProfileTables, TaskTa
       created_at?: string | null
       id?: string
       location?: string
-      name: string
-      type: string
+      name?: string
+      type?: string
       updated_at?: string | null
     }
     Relationships: []
