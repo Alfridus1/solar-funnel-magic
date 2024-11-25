@@ -88,7 +88,7 @@ export const BasicInfoTab = ({ form }: BasicInfoTabProps) => {
         render={({ field }) => (
           <FormItem>
             <FormLabel>Rolle</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <Select onValueChange={field.onChange} defaultValue={field.value || "customer"}>
               <FormControl>
                 <SelectTrigger className="h-12">
                   <SelectValue placeholder="Wähle eine Rolle" />
@@ -96,9 +96,11 @@ export const BasicInfoTab = ({ form }: BasicInfoTabProps) => {
               </FormControl>
               <SelectContent>
                 {Object.entries(roleTranslations).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
-                  </SelectItem>
+                  value ? (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ) : null
                 ))}
               </SelectContent>
             </Select>
