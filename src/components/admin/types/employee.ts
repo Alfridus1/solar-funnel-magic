@@ -1,6 +1,6 @@
 export type EmployeeRole = 
-  | "sales_employee" 
-  | "customer" 
+  | "sales_employee"
+  | "customer"
   | "external_sales"
   | "customer_service"
   | "planning"
@@ -29,6 +29,8 @@ export interface Employee {
   vacation_days?: number;
   hours_per_month?: number;
   has_company_car?: boolean;
+  created_at?: string;
+  updated_at?: string;
   profiles?: {
     first_name: string;
     last_name: string;

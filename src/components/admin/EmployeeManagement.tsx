@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { UserPlus } from "lucide-react";
-import { Employee } from "./types/employee";
+import { Employee, EmployeeRole } from "./types/employee";
 import { EmployeeTable } from "./components/employee-management/EmployeeTable";
 import { EmployeeDialog } from "./components/employee-dialog/EmployeeDialog";
 
@@ -37,15 +37,16 @@ export const EmployeeManagement = () => {
         throw error;
       }
 
-      // Transform the data to match the Employee type
+      // Transform and validate the data to match the Employee type
       const transformedData: Employee[] = data.map(employee => ({
         ...employee,
+        role: employee.role as EmployeeRole, // Cast the role to EmployeeRole type
         profiles: employee.profiles ? {
           first_name: employee.profiles.first_name,
           last_name: employee.profiles.last_name,
           email: employee.profiles.email,
           role: employee.profiles.role,
-          phone: employee.profiles.phone
+          phone: employee.profiles.phone || ''
         } : undefined
       }));
 
