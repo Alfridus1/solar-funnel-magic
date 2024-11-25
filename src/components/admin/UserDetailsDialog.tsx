@@ -62,13 +62,28 @@ export const UserDetailsDialog = ({ user, affiliateInfo, onOpenChange }: UserDet
         throw new Error('No user data returned after login');
       }
 
+      // Get the user's profile to determine their role
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .maybeSingle();
+
+      if (profileError && profileError.code !== 'PGRST116') {
+        throw profileError;
+      }
+
       toast({
         title: "Erfolgreich eingeloggt",
         description: `Sie sind jetzt als ${user.email} eingeloggt.`,
       });
 
-      // Redirect to the main page
-      window.location.href = '/';
+      // Redirect based on user role
+      if (profileData?.role === 'customer') {
+        window.location.href = '/dashboard';
+      } else {
+        window.location.href = '/employee/dashboard';
+      }
     } catch (error: any) {
       console.error('Login error:', error);
       toast({

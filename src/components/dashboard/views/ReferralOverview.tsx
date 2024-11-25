@@ -17,18 +17,26 @@ export const ReferralOverview = () => {
       if (!user) throw new Error('Not authenticated');
 
       // Get or create affiliate record
-      let { data: affiliate } = await supabase
+      let { data: affiliate, error: affiliateError } = await supabase
         .from('affiliates')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();  // Changed from single() to maybeSingle()
+
+      if (affiliateError && affiliateError.code !== 'PGRST116') {
+        throw affiliateError;
+      }
 
       if (!affiliate) {
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('first_name, last_name, email')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();  // Changed from single() to maybeSingle()
+
+        if (profileError && profileError.code !== 'PGRST116') {
+          throw profileError;
+        }
 
         if (!profile) throw new Error('Profile not found');
 

@@ -33,21 +33,29 @@ export const AffiliateManagement = () => {
   }, []);
 
   const loadAffiliates = async () => {
-    const { data, error } = await supabase
-      .from('affiliates')
-      .select('*')
-      .order('created_at', { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from('affiliates')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    if (error) {
+      if (error && error.code !== 'PGRST116') {
+        toast({
+          title: "Fehler beim Laden der Affiliates",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setAffiliates(data || []);
+    } catch (error: any) {
       toast({
         title: "Fehler beim Laden der Affiliates",
         description: error.message,
         variant: "destructive",
       });
-      return;
     }
-
-    setAffiliates(data || []);
   };
 
   const copyToClipboard = (referralCode: string) => {
