@@ -38,14 +38,12 @@ export const RoofCheckContent = ({
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold mb-2">Zeichnen Sie Ihr Dach ein</h1>
-              {paths.length > 0 && (
-                <Button 
-                  onClick={handleFinish}
-                  className="bg-solar-orange hover:bg-solar-orange/90"
-                >
-                  Weiter zur Analyse
-                </Button>
-              )}
+              <Button 
+                onClick={handleFinish}
+                className="bg-solar-orange hover:bg-solar-orange/90"
+              >
+                Weiter zur Analyse
+              </Button>
             </div>
             <p className="text-gray-600 mb-4">
               Klicken Sie auf die Ecken Ihres Daches, um die Fläche einzuzeichnen. Sie können mehrere Dachflächen hinzufügen.
