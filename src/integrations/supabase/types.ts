@@ -531,6 +531,33 @@ export type Database = {
           },
         ]
       }
+      landing_page_content: {
+        Row: {
+          created_at: string | null
+          description: string
+          id: string
+          section: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          id?: string
+          section: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          id?: string
+          section?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           address: string | null
