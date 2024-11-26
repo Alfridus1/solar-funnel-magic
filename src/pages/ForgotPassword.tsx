@@ -18,7 +18,7 @@ export function ForgotPassword() {
         
         <Auth
           supabaseClient={supabase}
-          view="forgot_password"
+          view="forgotten_password"
           appearance={{
             theme: ThemeSupa,
             variables: {

@@ -10,7 +10,23 @@ export const Index = () => {
   const [address, setAddress] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { getCurrentLocation } = useGeolocation();
+  const { handleGeolocation } = useGeolocation({
+    onSuccess: (formattedAddress: string) => {
+      setAddress(formattedAddress);
+      toast({
+        title: "Standort erkannt",
+        description: "Ihre Adresse wurde automatisch erkannt.",
+      });
+    },
+    onError: (error: string) => {
+      toast({
+        title: "Fehler bei der Standorterkennung",
+        description: error,
+        variant: "destructive",
+      });
+    },
+    toast
+  });
 
   const handleCalculateClick = () => {
     if (!address.trim()) {
@@ -25,23 +41,6 @@ export const Index = () => {
     navigate("/roof-check", {
       state: { address }
     });
-  };
-
-  const handleLocationClick = async () => {
-    try {
-      const address = await getCurrentLocation();
-      setAddress(address);
-      toast({
-        title: "Standort erkannt",
-        description: "Ihre Adresse wurde automatisch erkannt.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Fehler bei der Standorterkennung",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
   };
 
   return (
@@ -65,7 +64,7 @@ export const Index = () => {
             />
             <Button
               variant="outline"
-              onClick={handleLocationClick}
+              onClick={handleGeolocation}
               className="shrink-0"
             >
               <MapPin className="h-4 w-4 mr-2" />
