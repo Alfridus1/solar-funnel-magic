@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { LoginDialog } from "@/components/auth/LoginDialog";
@@ -125,21 +125,14 @@ export function Index() {
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex-grow">
-        <div className="container mx-auto px-4">
-          <Header 
-            isLoggedIn={isLoggedIn}
-            userRole={userRole}
-            onShowLogin={() => setShowLoginDialog(true)}
-            onShowRegister={() => setShowRegistrationOverlay(true)}
-            handleDashboardNavigation={() => navigate('/dashboard')}
-          />
-        </div>
-
         <HeroSection
           address={address}
           setAddress={setAddress}
           handleGeolocation={handleGeolocation}
           setShowRoofCheck={setShowRoofCheck}
+          onShowLogin={() => setShowLoginDialog(true)}
+          onShowRegister={() => setShowRegistrationOverlay(true)}
+          isLoggedIn={isLoggedIn}
         />
 
         <div className="container mx-auto px-4">

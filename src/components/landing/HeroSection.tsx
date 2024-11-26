@@ -7,6 +7,9 @@ interface HeroSectionProps {
   setAddress: (address: string) => void;
   handleGeolocation: () => void;
   setShowRoofCheck: (show: boolean) => void;
+  onShowLogin: () => void;
+  onShowRegister: () => void;
+  isLoggedIn: boolean;
 }
 
 export const HeroSection = ({
@@ -14,18 +17,40 @@ export const HeroSection = ({
   setAddress,
   handleGeolocation,
   setShowRoofCheck,
+  onShowLogin,
+  onShowRegister,
+  isLoggedIn,
 }: HeroSectionProps) => {
   return (
     <div className="relative">
       {/* Hero Image with Overlay */}
       <div className="absolute inset-0 z-0">
         <img
-          src="https://images.unsplash.com/photo-1508514177221-188b1cf16e9d"
+          src="/lovable-uploads/03677377-bf21-4a7d-b8a4-c5f6e9b87885.png"
           alt="Solar panels on modern house roof"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-transparent" />
       </div>
+
+      {/* Auth Buttons */}
+      {!isLoggedIn && (
+        <div className="absolute top-4 right-4 z-20 flex gap-4">
+          <Button
+            onClick={onShowLogin}
+            variant="outline"
+            className="bg-white/90 hover:bg-white"
+          >
+            Login
+          </Button>
+          <Button
+            onClick={onShowRegister}
+            className="bg-solar-orange hover:bg-solar-orange/90"
+          >
+            Registrieren
+          </Button>
+        </div>
+      )}
 
       {/* Content */}
       <motion.div 
