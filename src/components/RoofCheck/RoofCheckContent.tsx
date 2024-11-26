@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { RoofDesigner } from "@/components/roof/RoofDesigner";
 import { RoofMetrics } from "@/components/roof/RoofMetrics";
 
-export interface RoofCheckContentProps {
+interface RoofCheckContentProps {
   address: string;
   handleRoofOutlineComplete: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number; kWp: number }[]) => void;
   handleFinish: () => void;
