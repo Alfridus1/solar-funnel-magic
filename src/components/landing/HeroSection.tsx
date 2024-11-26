@@ -33,13 +33,13 @@ export const HeroSection = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="relative z-10 flex flex-col items-center justify-center min-h-[800px] sm:min-h-[900px] px-4 sm:px-6 pt-20"
+        className="relative z-10 flex flex-col items-center justify-center min-h-[600px] sm:min-h-[700px] px-4 sm:px-6 pt-20"
       >
         {/* Logo */}
         <motion.img
           src="/lovable-uploads/337fef83-79fd-4479-9b06-c12a527eed84.png"
           alt="COPPEN Logo"
-          className="w-48 sm:w-56 mb-8 sm:mb-12"
+          className="w-64 sm:w-72 mb-8 sm:mb-12"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
