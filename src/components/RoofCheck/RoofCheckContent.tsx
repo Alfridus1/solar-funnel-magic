@@ -1,73 +1,50 @@
-import { FC, useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { FC } from "react";
 import { RoofDesigner } from "@/components/roof/RoofDesigner";
 import { RoofMetrics } from "@/components/roof/RoofMetrics";
-import { calculateRoofArea, calculateSolarMetrics } from "@/utils/roofCalculations";
-import { saveConfigToCookie } from "@/utils/configCookieManager";
 
 interface RoofCheckContentProps {
   address?: string;
+  onRoofOutlineComplete: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number; kWp: number }[]) => void;
+  onFinish: () => void;
+  paths: google.maps.LatLng[][];
+  metrics: {
+    monthlyProduction: number;
+    annualSavings: number;
+    roofArea: number;
+    possiblePanels: number;
+    kWp: number;
+    roofDetails: any[];
+  };
   onLog?: (message: string) => void;
 }
 
-export const RoofCheckContent: FC<RoofCheckContentProps> = ({ address, onLog }) => {
-  const [paths, setPaths] = useState<google.maps.LatLng[][]>([]);
-  const [metrics, setMetrics] = useState({
-    monthlyProduction: 0,
-    annualSavings: 0,
-    roofArea: 0,
-    possiblePanels: 0,
-    kWp: 0,
-    roofDetails: []
-  });
-  const navigate = useNavigate();
-
-  const handleRoofOutlineComplete = useCallback(
-    (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number; kWp: number }[]) => {
-      setPaths(paths);
-      const totalArea = calculateRoofArea(paths);
-      const calculatedMetrics = calculateSolarMetrics(totalArea);
-      const updatedMetrics = {
-        ...calculatedMetrics,
-        roofArea: Math.round(totalArea * 100) / 100,
-        roofDetails
-      };
-      setMetrics(updatedMetrics);
-      onLog?.("Roof outline completed");
-    },
-    [onLog]
-  );
-
-  const handleFinish = useCallback(() => {
-    saveConfigToCookie({
-      metrics,
-      address,
-    });
-
-    onLog?.("Configuration saved");
-    navigate("/solar-showcase", {
-      state: {
-        metrics,
-        address,
-      },
-    });
-  }, [metrics, address, navigate, onLog]);
-
+export const RoofCheckContent: FC<RoofCheckContentProps> = ({
+  address,
+  onRoofOutlineComplete,
+  onFinish,
+  paths,
+  metrics,
+  onLog
+}) => {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4 p-4">
         <div className="lg:col-span-2">
           <RoofDesigner
             address={address}
-            onRoofOutlineComplete={handleRoofOutlineComplete}
+            onRoofOutlineComplete={onRoofOutlineComplete}
             onLog={onLog}
           />
         </div>
         <div>
           <RoofMetrics
-            metrics={metrics}
-            onFinish={handleFinish}
-            paths={paths}
+            monthlyProduction={metrics.monthlyProduction}
+            annualSavings={metrics.annualSavings}
+            roofArea={metrics.roofArea}
+            possiblePanels={metrics.possiblePanels}
+            kWp={metrics.kWp}
+            roofDetails={metrics.roofDetails}
+            onContinue={onFinish}
           />
         </div>
       </div>

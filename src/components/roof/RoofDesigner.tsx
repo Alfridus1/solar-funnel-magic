@@ -7,8 +7,9 @@ import { RoofAreaCalculator } from './components/RoofAreaCalculator';
 import { useGoogleMaps } from '@/hooks/useGoogleMaps';
 
 interface RoofDesignerProps {
-  onComplete?: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number }[]) => void;
-  address: string;
+  address?: string;
+  onRoofOutlineComplete: (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number; kWp: number }[]) => void;
+  onLog?: (message: string) => void;
 }
 
 const mapContainerStyle = {
@@ -17,7 +18,7 @@ const mapContainerStyle = {
   position: "relative" as const,
 };
 
-export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
+export const RoofDesigner = ({ onRoofOutlineComplete, address, onLog }: RoofDesignerProps) => {
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [polygons, setPolygons] = useState<google.maps.Polygon[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -63,7 +64,7 @@ export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
         moduleCount: 0
       }));
       
-      onComplete?.(allPaths, roofDetails);
+      onRoofOutlineComplete?.(allPaths, roofDetails);
     });
 
     toast({
@@ -71,7 +72,7 @@ export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
       description: "Die Dachfläche wurde erfolgreich eingezeichnet. Sie können weitere Dachflächen hinzufügen.",
       duration: 3000,
     });
-  }, [polygons, onComplete, toast]);
+  }, [polygons, onRoofOutlineComplete, toast]);
 
   const startDrawing = () => {
     setIsDrawing(true);
@@ -94,7 +95,7 @@ export const RoofDesigner = ({ onComplete, address }: RoofDesignerProps) => {
         moduleCount: 0
       }));
       
-      onComplete?.(remainingPaths, roofDetails);
+      onRoofOutlineComplete?.(remainingPaths, roofDetails);
       
       toast({
         title: "Dachfläche entfernt",

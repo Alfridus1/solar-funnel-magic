@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { Index } from "@/pages/Index";
 import { RoofCheck } from "@/components/RoofCheck";
@@ -16,7 +16,7 @@ import { Debug } from "@/pages/Debug";
 
 function App() {
   return (
-    <Router>
+    <>
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/roof-check" element={<RoofCheck />} />
@@ -33,7 +33,7 @@ function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster />
-    </Router>
+    </>
   );
 }
 
