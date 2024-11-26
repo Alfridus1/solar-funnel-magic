@@ -27,16 +27,16 @@ export const Header = ({
   const { toast } = useToast();
 
   return (
-    <div className="flex justify-end gap-4 py-4">
+    <div className="fixed top-0 right-0 p-4 z-50 w-full flex justify-end">
       {isLoggedIn ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="flex items-center gap-2">
+            <Button variant="outline" className="flex items-center gap-2 bg-white/90 backdrop-blur hover:bg-white">
               <User className="h-4 w-4" />
               Profil
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuItem onClick={handleDashboardNavigation}>
               Dashboard
             </DropdownMenuItem>
@@ -56,7 +56,7 @@ export const Header = ({
           <Button 
             variant="outline"
             onClick={onShowLogin}
-            className="bg-white hover:bg-solar-orange hover:text-white transition-colors"
+            className="bg-white/90 backdrop-blur hover:bg-white"
           >
             Login
           </Button>
