@@ -125,16 +125,15 @@ export function Index() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Header 
+        isLoggedIn={isLoggedIn} 
+        onShowLogin={() => setShowLoginDialog(true)}
+        onShowRegister={() => setShowRegistrationOverlay(true)}
+        userRole={userRole}
+      />
+      
       <div className="flex-grow">
-        <HeroSection
-          address={address}
-          setAddress={setAddress}
-          handleGeolocation={handleGeolocation}
-          setShowRoofCheck={setShowRoofCheck}
-          onShowLogin={() => setShowLoginDialog(true)}
-          onShowRegister={() => setShowRegistrationOverlay(true)}
-          isLoggedIn={isLoggedIn}
-        />
+        <HeroSection />
 
         <div className="container mx-auto px-4">
           <Features />
