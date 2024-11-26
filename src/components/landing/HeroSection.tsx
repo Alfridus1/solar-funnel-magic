@@ -2,19 +2,33 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, MapPin } from "lucide-react";
 import { RoofCheck } from "../RoofCheck";
+import { useToast } from "@/components/ui/use-toast";
+import { useGeolocation } from "@/components/RoofCheck/hooks/useGeolocation";
 
 export const HeroSection = () => {
   const [address, setAddress] = useState("");
   const [showRoofCheck, setShowRoofCheck] = useState(false);
+  const { toast } = useToast();
 
-  const handleAddressSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (address.trim()) {
-      setShowRoofCheck(true);
-    }
-  };
+  const { handleGeolocation } = useGeolocation({
+    onSuccess: (formattedAddress: string) => {
+      setAddress(formattedAddress);
+      toast({
+        title: "Erfolg",
+        description: "Ihr Standort wurde erfolgreich erkannt.",
+      });
+    },
+    onError: (errorMessage: string) => {
+      toast({
+        title: "Fehler",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    },
+    toast
+  });
 
   return (
     <section className="relative w-full">
@@ -55,17 +69,26 @@ export const HeroSection = () => {
         <div className="w-full max-w-2xl mx-auto bg-white/95 backdrop-blur rounded-xl shadow-lg p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1 flex gap-2">
-              <input
+              <Input
                 type="text"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="Ihre Adresse eingeben"
-                className="flex-1 h-12 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-solar-orange focus:border-transparent"
+                className="flex-1 h-12"
               />
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-12 w-12 shrink-0"
+                onClick={handleGeolocation}
+              >
+                <MapPin className="h-5 w-5" />
+              </Button>
             </div>
             <Button 
               onClick={() => setShowRoofCheck(true)}
               className="h-12 bg-solar-orange hover:bg-solar-orange-dark text-white px-6 rounded-lg font-semibold whitespace-nowrap w-full sm:w-auto transition-colors duration-200"
+              disabled={!address.trim()}
             >
               Jetzt berechnen
               <ArrowRight className="ml-2 h-5 w-5" />
