@@ -6,6 +6,7 @@ import { RoofCheckContent } from "./RoofCheck/RoofCheckContent";
 import { RoofCheckLoading } from "./RoofCheck/RoofCheckLoading";
 import { saveConfigToCookie } from "@/utils/configCookieManager";
 import { useGoogleMaps } from "@/hooks/useGoogleMaps";
+import { ProcessSteps } from "./RoofCheck/ProcessSteps";
 
 interface RoofCheckProps {
   address: string;
@@ -70,13 +71,18 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
   }
 
   return (
-    <RoofCheckContent
-      address={address}
-      handleRoofOutlineComplete={handleRoofOutlineComplete}
-      handleFinish={handleFinish}
-      paths={paths}
-      metrics={metrics}
-      onLog={onLog}
-    />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-8">
+      <div className="container mx-auto px-4">
+        <ProcessSteps currentStep={2} />
+        <RoofCheckContent
+          address={address}
+          handleRoofOutlineComplete={handleRoofOutlineComplete}
+          handleFinish={handleFinish}
+          paths={paths}
+          metrics={metrics}
+          onLog={onLog}
+        />
+      </div>
+    </div>
   );
 };

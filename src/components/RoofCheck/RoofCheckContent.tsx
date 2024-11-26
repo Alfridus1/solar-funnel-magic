@@ -1,9 +1,7 @@
-import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RoofDesigner } from "@/components/roof/RoofDesigner";
 import { RoofMetrics } from "@/components/roof/RoofMetrics";
-import { ProgressBar } from "@/components/ProgressBar";
 
 interface RoofCheckContentProps {
   address: string;
@@ -22,45 +20,47 @@ export const RoofCheckContent = ({
   metrics,
   onLog
 }: RoofCheckContentProps) => {
-  const steps = [
-    { title: "Adresse", description: "Ihre Adresse" },
-    { title: "Dach vermessen", description: "Zeichnen Sie Ihr Dach" },
-    { title: "Potenzialanalyse", description: "Ihre Solaranlage" },
-    { title: "Unverbindliches Angebot", description: "Mit Vor-Ort Termin" }
-  ];
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-8">
-      <div className="container mx-auto px-4">
-        <ProgressBar currentStep={2} totalSteps={4} steps={steps} />
-        
-        <Card className="max-w-5xl mx-auto p-6">
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
+    <div className="space-y-8">
+      <Card className="p-6">
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
               <h1 className="text-2xl font-bold mb-2">Zeichnen Sie Ihr Dach ein</h1>
-              <Button 
-                onClick={handleFinish}
-                className={paths.length > 0 ? "bg-solar-orange hover:bg-solar-orange/90" : "bg-gray-300 hover:bg-gray-300 cursor-not-allowed"}
-                disabled={paths.length === 0}
-              >
-                Weiter zur Analyse
-              </Button>
+              <p className="text-gray-600">
+                Klicken Sie auf die Ecken Ihres Daches, um die Fläche einzuzeichnen.
+                Sie können mehrere Dachflächen hinzufügen.
+              </p>
             </div>
-            <p className="text-gray-600 mb-4">
-              Klicken Sie auf die Ecken Ihres Daches, um die Fläche einzuzeichnen. Sie können mehrere Dachflächen hinzufügen.
-            </p>
-
-            <RoofDesigner 
-              onComplete={handleRoofOutlineComplete} 
-              address={address}
-            />
-
-            {paths.length > 0 && (
-              <RoofMetrics {...metrics} />
-            )}
+            <Button 
+              onClick={handleFinish}
+              className={paths.length > 0 ? "bg-solar-orange hover:bg-solar-orange/90" : "bg-gray-300 hover:bg-gray-300 cursor-not-allowed"}
+              disabled={paths.length === 0}
+            >
+              Weiter zur Analyse
+            </Button>
           </div>
+
+          <RoofDesigner 
+            onComplete={handleRoofOutlineComplete} 
+            address={address}
+          />
+        </div>
+      </Card>
+
+      {paths.length > 0 && (
+        <Card className="p-6 bg-white/80 backdrop-blur">
+          <RoofMetrics 
+            monthlyProduction={metrics.monthlyProduction}
+            annualSavings={metrics.annualSavings}
+            roofArea={metrics.roofArea}
+            possiblePanels={metrics.possiblePanels}
+            kWp={metrics.kWp}
+            roofDetails={metrics.roofDetails}
+            onContinue={handleFinish}
+          />
         </Card>
-      </div>
+      )}
     </div>
   );
 };
