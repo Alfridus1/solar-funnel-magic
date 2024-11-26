@@ -3,19 +3,19 @@ import { motion } from "framer-motion";
 export const PhotoGallery = () => {
   const photos = [
     {
-      url: "https://images.unsplash.com/photo-1508514177221-188b1cf16e9d",
-      title: "Moderne Solaranlage",
-      description: "Hocheffiziente Solarmodule für maximale Leistung"
+      url: "/lovable-uploads/7522a791-776e-477a-9b45-a30e09c748cf.png",
+      title: "Klassische Solaranlage",
+      description: "Perfekte Integration in bestehende Dachlandschaft"
     },
     {
-      url: "https://images.unsplash.com/photo-1509391366360-2e959784a276",
-      title: "Nachhaltige Energie",
-      description: "Umweltfreundliche Stromerzeugung für Ihr Zuhause"
+      url: "/lovable-uploads/05564d51-6e88-43c0-bd92-d4384f2b7668.png",
+      title: "Moderne Installation",
+      description: "Maximale Effizienz durch optimale Ausrichtung"
     },
     {
-      url: "https://images.unsplash.com/photo-1613665813446-82a78c468a1d",
-      title: "Professionelle Installation",
-      description: "Fachmännische Montage durch unsere Experten"
+      url: "/lovable-uploads/29b544de-613c-42f9-aa34-0574957e516a.png",
+      title: "Premium Design",
+      description: "Ästhetische Integration bei Neubauten"
     }
   ];
 
@@ -32,7 +32,7 @@ export const PhotoGallery = () => {
               transition={{ delay: index * 0.2 }}
               className="group"
             >
-              <div className="relative overflow-hidden rounded-xl shadow-lg aspect-video">
+              <div className="relative overflow-hidden rounded-xl shadow-lg aspect-[4/3]">
                 <img
                   src={photo.url}
                   alt={photo.title}
