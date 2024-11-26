@@ -1,62 +1,61 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import { Login } from "@/pages/Login";
-import { UnifiedDashboard } from "@/components/dashboard/UnifiedDashboard";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { Index } from "@/pages/Index";
-import { AffiliateLanding } from "@/pages/AffiliateLanding";
-import { ProductShowcase } from "@/components/solar-showcase/ProductShowcase";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { RoofCheck } from "@/components/RoofCheck";
+import { SolarShowcase } from "@/pages/SolarShowcase";
+import { Configurator } from "@/pages/Configurator";
+import { Login } from "@/pages/Login";
+import { Register } from "@/pages/Register";
+import { Dashboard } from "@/pages/Dashboard";
+import { AdminDashboard } from "@/pages/AdminDashboard";
+import { PrivateRoute } from "@/components/auth/PrivateRoute";
+import { AdminRoute } from "@/components/auth/AdminRoute";
+import { ForgotPassword } from "@/pages/ForgotPassword";
+import { ResetPassword } from "@/pages/ResetPassword";
+import { Profile } from "@/pages/Profile";
+import { NotFound } from "@/pages/NotFound";
 
-// Protected Route Component
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsAuthenticated(!!session);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
-      setIsAuthenticated(!!session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  if (isAuthenticated === null) {
-    return <div>Loading...</div>;
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return <>{children}</>;
-};
-
-export default function App() {
+function App() {
   return (
-    <>
+    <Router>
       <Routes>
         <Route path="/" element={<Index />} />
+        <Route path="/roof-check" element={<RoofCheck />} />
+        <Route path="/solar-showcase" element={<SolarShowcase />} />
+        <Route path="/configurator" element={<Configurator />} />
         <Route path="/login" element={<Login />} />
-        <Route 
-          path="/dashboard/*" 
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route
+          path="/dashboard/*"
           element={
-            <ProtectedRoute>
-              <UnifiedDashboard />
-            </ProtectedRoute>
-          } 
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
         />
-        <Route path="/solar-showcase" element={<ProductShowcase />} />
-        <Route path="/affiliate" element={<AffiliateLanding />} />
-        <Route 
-          path="/recommended-config" 
-          element={<Navigate to="/solar-showcase" replace />} 
+        <Route
+          path="/admin/*"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
         />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <Profile />
+            </PrivateRoute>
+          }
+        />
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster />
-    </>
+    </Router>
   );
 }
+
+export default App;

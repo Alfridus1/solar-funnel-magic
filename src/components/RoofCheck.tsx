@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { calculateRoofArea, calculateSolarMetrics } from "@/utils/roofCalculations";
 import { RoofCheckContent } from "./RoofCheck/RoofCheckContent";
@@ -8,12 +8,7 @@ import { saveConfigToCookie } from "@/utils/configCookieManager";
 import { useGoogleMaps } from "@/hooks/useGoogleMaps";
 import { ProcessSteps } from "./RoofCheck/ProcessSteps";
 
-interface RoofCheckProps {
-  address: string;
-  onLog?: (message: string) => void;
-}
-
-export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
+export const RoofCheck = () => {
   const [paths, setPaths] = useState<google.maps.LatLng[][]>([]);
   const [metrics, setMetrics] = useState({
     monthlyProduction: 0,
@@ -24,7 +19,15 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
     roofDetails: []
   });
   const navigate = useNavigate();
+  const location = useLocation();
+  const address = location.state?.address;
   const { isLoaded, loadError } = useGoogleMaps();
+
+  useEffect(() => {
+    if (!address) {
+      navigate('/');
+    }
+  }, [address, navigate]);
 
   const handleRoofOutlineComplete = useCallback(
     (paths: google.maps.LatLng[][], roofDetails: { roofId: string; moduleCount: number; kWp: number }[]) => {
@@ -37,9 +40,8 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
         roofDetails
       };
       setMetrics(updatedMetrics);
-      onLog?.("Metrics calculated: " + JSON.stringify(updatedMetrics));
     },
-    [onLog]
+    []
   );
 
   const handleFinish = useCallback(() => {
@@ -80,7 +82,6 @@ export const RoofCheck = ({ address, onLog }: RoofCheckProps) => {
           handleFinish={handleFinish}
           paths={paths}
           metrics={metrics}
-          onLog={onLog}
         />
       </div>
     </div>
