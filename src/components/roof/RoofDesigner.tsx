@@ -61,7 +61,8 @@ export const RoofDesigner = ({ onRoofOutlineComplete, address, onLog }: RoofDesi
       
       const roofDetails = allPaths.map((_, index) => ({
         roofId: `roof-${index + 1}`,
-        moduleCount: 0
+        moduleCount: 0,
+        kWp: 0
       }));
       
       onRoofOutlineComplete?.(allPaths, roofDetails);
@@ -92,7 +93,8 @@ export const RoofDesigner = ({ onRoofOutlineComplete, address, onLog }: RoofDesi
       const remainingPaths = polygons.slice(0, -1).map(p => p.getPath().getArray());
       const roofDetails = remainingPaths.map((_, index) => ({
         roofId: `roof-${index + 1}`,
-        moduleCount: 0
+        moduleCount: 0,
+        kWp: 0
       }));
       
       onRoofOutlineComplete?.(remainingPaths, roofDetails);

@@ -1773,7 +1773,24 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      dashboard_kpis: {
+        Row: {
+          new_leads: number | null
+          total_affiliates: number | null
+          total_customers: number | null
+          total_leads: number | null
+          total_projects: number | null
+        }
+        Relationships: []
+      }
+      lead_sources_stats: {
+        Row: {
+          count: number | null
+          month: string | null
+          source: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       calculate_commission: {

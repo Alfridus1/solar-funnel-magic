@@ -78,8 +78,8 @@ export const RoofCheck = () => {
         <ProcessSteps currentStep={2} />
         <RoofCheckContent
           address={address}
-          handleRoofOutlineComplete={handleRoofOutlineComplete}
-          handleFinish={handleFinish}
+          onRoofOutlineComplete={handleRoofOutlineComplete}
+          onFinish={handleFinish}
           paths={paths}
           metrics={metrics}
         />
