@@ -15,6 +15,7 @@ import { Sun } from "lucide-react";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { Features } from "@/components/landing/Features";
 import { PhotoGallery } from "@/components/landing/PhotoGallery";
+import { ServicesSection } from "@/components/landing/ServicesSection";
 
 export function Index() {
   const [address, setAddress] = useState("");
@@ -137,6 +138,7 @@ export function Index() {
 
         <div className="container mx-auto px-4">
           <Features />
+          <ServicesSection />
           <PhotoGallery />
 
           <div className="py-16 bg-gradient-to-br from-solar-orange/5 to-white rounded-3xl my-12">
