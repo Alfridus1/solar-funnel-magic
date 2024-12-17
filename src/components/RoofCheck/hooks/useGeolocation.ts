@@ -61,6 +61,7 @@ export const useGeolocation = ({ onSuccess, onError, toast }: UseGeolocationProp
       return;
     }
 
+    // First check for permissions
     navigator.permissions.query({ name: 'geolocation' }).then((result) => {
       if (result.state === 'denied') {
         onError("Bitte erlauben Sie den Zugriff auf Ihren Standort in Ihren Browsereinstellungen.");
@@ -80,9 +81,19 @@ export const useGeolocation = ({ onSuccess, onError, toast }: UseGeolocationProp
         (error) => {
           console.error('Geolocation error:', error);
           let errorMessage = "Ihr Standort konnte nicht ermittelt werden.";
-          if (error.code === error.PERMISSION_DENIED) {
-            errorMessage = "Bitte erlauben Sie den Zugriff auf Ihren Standort.";
+          
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = "Bitte erlauben Sie den Zugriff auf Ihren Standort.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = "Ihr Standort ist derzeit nicht verfügbar.";
+              break;
+            case error.TIMEOUT:
+              errorMessage = "Die Anfrage nach Ihrem Standort ist abgelaufen.";
+              break;
           }
+          
           onError(errorMessage);
         },
         {
